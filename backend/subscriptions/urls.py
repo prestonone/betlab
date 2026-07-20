@@ -1,6 +1,6 @@
 from django.urls import path
 
-from .views import CountryListView
+from .views import CountryListView, PlanListView
 
 app_name = "subscriptions"
 
@@ -9,5 +9,10 @@ urlpatterns = [
         "countries/",
         CountryListView.as_view(),
         name="country-list",
+    ),
+    path(
+        "plans/",
+        PlanListView.as_view(),
+        name="plan-list",
     ),
 ]
