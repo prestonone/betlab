@@ -17,6 +17,8 @@ import {
   getPredictions,
   type Prediction as ApiPrediction,
 } from "../services/predictions";
+import { useAuth } from "../contexts/AuthContext";
+import { AuthApiError } from "../services/auth";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -1097,19 +1099,68 @@ function FaqRow({ q, a }: { q: string; a: string }) {
 
 // ─── AUTH ─────────────────────────────────────────────────────────────────────
 
-function AuthPage({ mode, nav, setAuthed }: {
-  mode: "login" | "register"; nav: (p: Page) => void; setAuthed: (v: boolean) => void;
+function AuthPage({ mode, nav }: {
+  mode: "login" | "register";
+  nav: (p: Page) => void;
 }) {
+  const { login, register } = useAuth();
   const [tab, setTab] = useState<"login" | "register">(mode);
   const [step, setStep] = useState(1);
   const [showPass, setShowPass] = useState(false);
   const [form, setForm] = useState({ name: "", email: "", pass: "", plan: "Weekly Lab" });
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const go = (e: React.FormEvent) => {
+  const go = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (tab === "register" && step === 1) { setStep(2); return; }
-    setAuthed(true);
-    nav("dashboard");
+    setError("");
+
+    if (tab === "register" && step === 1) {
+      setStep(2);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      if (tab === "login") {
+        await login({
+          email: form.email.trim(),
+          password: form.pass,
+        });
+      } else {
+        const username =
+          form.name
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_+|_+$/g, "") ||
+          form.email
+            .split("@")[0]
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "_") ||
+          "member";
+
+        await register({
+          username,
+          email: form.email.trim(),
+          password: form.pass,
+          password_confirm: form.pass,
+        });
+      }
+
+      nav("dashboard");
+    } catch (requestError) {
+      if (requestError instanceof AuthApiError) {
+        setError(requestError.message);
+      } else {
+        setError(
+          "Unable to connect to Bet Lab. Please confirm the backend is running.",
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -1130,7 +1181,7 @@ function AuthPage({ mode, nav, setAuthed }: {
         {/* Tab toggle */}
         <div className="flex bg-card border border-[#D4AF37]/12 rounded-lg p-1 mb-6">
           {(["login", "register"] as const).map(t => (
-            <button key={t} onClick={() => { setTab(t); setStep(1); }} className={cn("flex-1 py-2 rounded text-[13px] font-medium transition-all capitalize cursor-pointer", tab === t ? "bg-[#D4AF37] text-[#070E1A]" : "text-white/40 hover:text-white")}>
+            <button key={t} onClick={() => { setTab(t); setStep(1); setError(""); }} className={cn("flex-1 py-2 rounded text-[13px] font-medium transition-all capitalize cursor-pointer", tab === t ? "bg-[#D4AF37] text-[#070E1A]" : "text-white/40 hover:text-white")}>
               {t === "login" ? "Sign In" : "Register"}
             </button>
           ))}
@@ -1202,12 +1253,33 @@ function AuthPage({ mode, nav, setAuthed }: {
               </div>
             )}
 
+            {error && (
+              <div
+                role="alert"
+                className="flex items-start gap-2 rounded-lg border border-red-400/20 bg-red-400/5 px-3.5 py-3"
+              >
+                <AlertCircle
+                  size={14}
+                  className="mt-0.5 shrink-0 text-red-400"
+                />
+                <p className="text-[12px] leading-relaxed text-red-300">
+                  {error}
+                </p>
+              </div>
+            )}
+
             <GoldBtn full size="md">
-              {tab === "login" ? "Sign In" : step === 1 ? "Continue" : "Get Lab Access"}
-              <ArrowRight size={14} />
+              {isSubmitting
+                ? "Please wait..."
+                : tab === "login"
+                  ? "Sign In"
+                  : step === 1
+                    ? "Continue"
+                    : "Create Account"}
+              {!isSubmitting && <ArrowRight size={14} />}
             </GoldBtn>
           </form>
-          <p className="mt-5 text-center font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">Demo: any credentials work</p>
+          <p className="mt-5 text-center font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">Secure authentication powered by Bet Lab</p>
         </div>
       </div>
     </div>
@@ -2201,7 +2273,11 @@ function ContactPage() {
 
 export default function App() {
   const [page, setPage] = useState<Page>("home");
-  const [authed, setAuthed] = useState(false);
+  const { isAuthenticated: authed, isLoading: authLoading, logout } = useAuth();
+
+  const setAuthed = (value: boolean) => {
+    if (!value) logout();
+  };
 
   const nav = (p: Page) => {
     setPage(p);
@@ -2210,6 +2286,21 @@ export default function App() {
 
   const isDash = page === "dashboard";
 
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-10 h-10 rounded-lg bg-[#D4AF37] flex items-center justify-center mx-auto mb-3">
+            <BarChart2 size={18} className="text-[#070E1A]" />
+          </div>
+          <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35">
+            Restoring secure session
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <Navbar page={page} nav={nav} authed={authed} setAuthed={setAuthed} />
@@ -2217,8 +2308,8 @@ export default function App() {
       <div className={cn("animate-fade-in")}>
         {page === "home" && <HomePage nav={nav} />}
         {page === "pricing" && <PricingPage nav={nav} />}
-        {page === "login" && <AuthPage mode="login" nav={nav} setAuthed={setAuthed} />}
-        {page === "register" && <AuthPage mode="register" nav={nav} setAuthed={setAuthed} />}
+        {page === "login" && <AuthPage mode="login" nav={nav} />}
+        {page === "register" && <AuthPage mode="register" nav={nav} />}
         {page === "dashboard" && <DashboardPage nav={nav} />}
         {page === "predictions" && <PredictionsPage nav={nav} authed={authed} />}
         {page === "results" && <MatchCentrePage />}
