@@ -13,6 +13,11 @@ import {
   Home, Trophy,
 } from "lucide-react";
 
+import {
+  getPredictions,
+  type Prediction as ApiPrediction,
+} from "../services/predictions";
+
 // ─── Types ────────────────────────────────────────────────────────────────────
 
 type Page =
@@ -21,7 +26,7 @@ type Page =
   | "about" | "contact";
 
 type DashSection = "overview" | "predictions" | "results" | "performance";
-type PredCategory = "Banker" | "Sure 2" | "Sure 5" | "Rollover";
+type PredCategory = "Banker" | "Sure 2" | "Sure 3" | "Sure 5" | "Rollover";
 type PredStatus = "pending" | "won" | "lost" | "void";
 
 interface Prediction {
@@ -258,8 +263,12 @@ function ConfidenceBar({ value }: { value: number }) {
 }
 
 function CategoryPip({ cat }: { cat: PredCategory }) {
-  const m: Record<PredCategory, "gold" | "emerald" | "rose" | "blue"> = {
-    "Banker": "gold", "Sure 2": "emerald", "Sure 5": "blue", "Rollover": "rose",
+  const m: Record<PredCategory, "gold" | "emerald" | "rose" | "blue" | "violet"> = {
+    "Banker": "gold",
+    "Sure 2": "emerald",
+    "Sure 3": "violet",
+    "Sure 5": "blue",
+    "Rollover": "rose",
   };
   return <Chip label={cat} variant={m[cat]} />;
 }
@@ -289,6 +298,7 @@ function PredCard({ pred, locked = false }: { pred: Prediction; locked?: boolean
   const accentLine: Record<PredCategory, string> = {
     "Banker": "from-[#D4AF37] via-[#D4AF37]/50 to-transparent",
     "Sure 2": "from-emerald-500 via-emerald-500/50 to-transparent",
+    "Sure 3": "from-violet-500 via-violet-500/50 to-transparent",
     "Sure 5": "from-blue-400 via-blue-400/50 to-transparent",
     "Rollover": "from-rose-500 via-rose-500/50 to-transparent",
   };
@@ -390,6 +400,153 @@ function PredCard({ pred, locked = false }: { pred: Prediction; locked?: boolean
           </div>
           <p className="font-['Rajdhani',sans-serif] font-bold text-white text-lg">Lab Access Required</p>
           <p className="text-[11px] text-white/35 mt-1 font-[JetBrains_Mono,monospace]">Choose a plan to unlock</p>
+        </div>
+      )}
+    </article>
+  );
+}
+
+
+function ApiPredictionCard({
+  pred,
+  locked = false,
+}: {
+  pred: ApiPrediction;
+  locked?: boolean;
+}) {
+  const [open, setOpen] = useState(false);
+
+  const category = pred.category.name as PredCategory;
+
+  const accentLine: Record<PredCategory, string> = {
+    "Banker": "from-[#D4AF37] via-[#D4AF37]/50 to-transparent",
+    "Sure 2": "from-emerald-500 via-emerald-500/50 to-transparent",
+    "Sure 3": "from-violet-500 via-violet-500/50 to-transparent",
+    "Sure 5": "from-blue-400 via-blue-400/50 to-transparent",
+    "Rollover": "from-rose-500 via-rose-500/50 to-transparent",
+  };
+
+  const totalOdds = pred.selections.reduce(
+    (total, selection) => total * Number(selection.odds),
+    1,
+  );
+
+  return (
+    <article
+      className={cn(
+        "relative bg-card border border-[#D4AF37]/10 rounded-lg overflow-hidden",
+        "transition-all duration-300 hover:border-[#D4AF37]/22",
+        "hover:shadow-[0_4px_40px_rgba(212,175,55,0.07)]",
+        locked && "pointer-events-none select-none",
+      )}
+    >
+      <div
+        className={cn(
+          "h-[2px] w-full bg-gradient-to-r",
+          accentLine[category] ?? accentLine.Banker,
+        )}
+      />
+
+      <div className={cn("p-5", locked && "blur-sm")}>
+        <div className="flex items-start justify-between gap-3 mb-5">
+          <div>
+            <CategoryPip cat={category} />
+            <h3 className="font-['Rajdhani',sans-serif] font-bold text-[25px] text-white mt-2 leading-tight">
+              {pred.title}
+            </h3>
+          </div>
+
+          <div className="text-right flex-shrink-0">
+            <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 uppercase tracking-widest">
+              Total odds
+            </p>
+            <p className="font-['Rajdhani',sans-serif] font-bold text-[27px] text-[#D4AF37] leading-none mt-1">
+              {totalOdds.toFixed(2)}
+            </p>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          {pred.selections.map((selection, index) => (
+            <div
+              key={selection.id}
+              className="bg-[#0B1220]/70 border border-white/5 rounded-lg p-3.5"
+            >
+              <div className="flex items-center justify-between gap-3 mb-2">
+                <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/35 uppercase tracking-wider">
+                  {index + 1}. {selection.league}
+                </span>
+
+                <span className="flex items-center gap-1 font-[JetBrains_Mono,monospace] text-[9px] text-white/30">
+                  <Clock size={10} />
+                  {formatKickoff(selection.match_time)}
+                </span>
+              </div>
+
+              <p className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white">
+                {selection.home_team}
+                <span className="text-white/25 mx-2">vs</span>
+                {selection.away_team}
+              </p>
+
+              <div className="flex items-end justify-between gap-3 mt-2">
+                <div>
+                  <p className="font-[JetBrains_Mono,monospace] text-[8px] text-white/25 uppercase tracking-widest">
+                    Selection
+                  </p>
+                  <p className="text-[13px] text-white/70 mt-0.5">
+                    {selection.market}
+                  </p>
+                </div>
+
+                <p className="font-['Rajdhani',sans-serif] font-bold text-[21px] text-[#D4AF37]">
+                  {Number(selection.odds).toFixed(2)}
+                </p>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between pt-4 mt-4 border-t border-white/[0.05]">
+          <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 uppercase tracking-widest">
+            {pred.selections.length} selection{pred.selections.length === 1 ? "" : "s"}
+          </span>
+
+          <button
+            onClick={() => setOpen(!open)}
+            className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/60 hover:text-[#D4AF37] transition-colors uppercase tracking-widest flex items-center gap-1 cursor-pointer"
+          >
+            Analysis
+            <ChevronDown
+              size={9}
+              className={cn(
+                "transition-transform duration-200",
+                open && "rotate-180",
+              )}
+            />
+          </button>
+        </div>
+
+        {open && (
+          <div className="mt-3 pt-3 border-t border-white/[0.05]">
+            <p className="text-[12px] text-white/50 leading-relaxed">
+              {pred.analysis || "No analysis has been published yet."}
+            </p>
+          </div>
+        )}
+      </div>
+
+      {locked && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-[#0B1220]/75 backdrop-blur-[3px]">
+          <div className="w-11 h-11 rounded-full bg-[#D4AF37]/15 border border-[#D4AF37]/35 flex items-center justify-center mb-3">
+            <Lock size={18} className="text-[#D4AF37]" />
+          </div>
+          <p className="font-['Rajdhani',sans-serif] font-bold text-white text-lg">
+            Lab Access Required
+          </p>
+          <p className="text-[11px] text-white/35 mt-1 font-[JetBrains_Mono,monospace]">
+            Choose a plan to unlock
+          </p>
         </div>
       )}
     </article>
@@ -1376,8 +1533,30 @@ function DashboardPage({ nav }: { nav: (p: Page) => void }) {
 
 function PredictionsPage({ nav, authed }: { nav: (p: Page) => void; authed: boolean }) {
   const [filter, setFilter] = useState<"all" | PredCategory>("all");
+  const [predictions, setPredictions] = useState<ApiPrediction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-  const cats: ("all" | PredCategory)[] = ["all", "Banker", "Sure 2", "Sure 5", "Rollover"];
+  useEffect(() => {
+    async function loadPredictions() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const data = await getPredictions();
+        setPredictions(data);
+      } catch (err) {
+        console.error(err);
+        setError("Unable to load predictions.");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadPredictions();
+  }, []);
+
+  const cats: ("all" | PredCategory)[] = ["all", "Banker", "Sure 2", "Sure 3", "Sure 5", "Rollover"];
   const filtered = filter === "all" ? PREDICTIONS : PREDICTIONS.filter(p => p.category === filter);
 
   return (

@@ -22,12 +22,6 @@ class Prediction(models.Model):
         FREE = "free", "Free"
         LAB = "lab", "Lab Access"
 
-    class ConfidenceLevel(models.TextChoices):
-        LOW = "low", "Low"
-        MEDIUM = "medium", "Medium"
-        HIGH = "high", "High"
-        VERY_HIGH = "very_high", "Very High"
-
     class ResultStatus(models.TextChoices):
         PENDING = "pending", "Pending"
         WON = "won", "Won"
@@ -40,25 +34,9 @@ class Prediction(models.Model):
         related_name="predictions",
     )
 
-    league = models.CharField(max_length=120)
-    home_team = models.CharField(max_length=120)
-    away_team = models.CharField(max_length=120)
-
-    market = models.CharField(
+    title = models.CharField(
         max_length=150,
-        help_text="Example: Over 2.5 Goals, Home Win, Both Teams To Score",
-    )
-
-    odds = models.DecimalField(max_digits=6, decimal_places=2)
-
-    confidence_score = models.PositiveSmallIntegerField(
-        help_text="Enter a value from 1 to 100",
-    )
-
-    confidence_level = models.CharField(
-        max_length=20,
-        choices=ConfidenceLevel.choices,
-        default=ConfidenceLevel.HIGH,
+        help_text="Example: Monday Sure 3 or Weekend Banker",
     )
 
     access_level = models.CharField(
@@ -67,7 +45,6 @@ class Prediction(models.Model):
         default=AccessLevel.LAB,
     )
 
-    match_time = models.DateTimeField()
     analysis = models.TextField(blank=True)
 
     result_status = models.CharField(
@@ -93,7 +70,36 @@ class Prediction(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ["-match_time", "-created_at"]
+        ordering = ["-created_at"]
 
     def __str__(self) -> str:
-        return f"{self.home_team} vs {self.away_team} — {self.market}"
+        return self.title
+
+
+class PredictionSelection(models.Model):
+    prediction = models.ForeignKey(
+        Prediction,
+        on_delete=models.CASCADE,
+        related_name="selections",
+    )
+
+    league = models.CharField(max_length=120)
+    home_team = models.CharField(max_length=120)
+    away_team = models.CharField(max_length=120)
+
+    market = models.CharField(
+        max_length=150,
+        help_text="Example: Home Win, Over 1.5 Goals, BTTS",
+    )
+
+    odds = models.DecimalField(max_digits=6, decimal_places=2)
+    match_time = models.DateTimeField()
+    selection_order = models.PositiveIntegerField(default=1)
+
+    class Meta:
+        ordering = ["selection_order", "match_time"]
+
+    def __str__(self) -> str:
+        return (
+            f"{self.home_team} vs {self.away_team} — {self.market}"
+        )
