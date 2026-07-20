@@ -1894,44 +1894,96 @@ function MatchCentrePage() {
             <div className="relative overflow-hidden rounded-xl border border-[#D4AF37]/12 bg-card min-h-[520px]">
               <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/[0.025] to-transparent pointer-events-none" />
 
-              <div className="relative flex min-h-[520px] flex-col items-center justify-center px-6 py-12 text-center">
-                <div className="w-14 h-14 rounded-2xl border border-[#D4AF37]/15 bg-[#D4AF37]/[0.05] flex items-center justify-center mb-5">
-                  <Activity size={25} className="text-[#D4AF37]" />
+              <div className="relative flex min-h-[520px] flex-col px-6 py-8 sm:px-8 sm:py-10">
+                <div className="mb-7 text-center">
+                  <div className="w-14 h-14 rounded-2xl border border-[#D4AF37]/15 bg-[#D4AF37]/[0.05] flex items-center justify-center mx-auto mb-5">
+                    <Activity size={25} className="text-[#D4AF37]" />
+                  </div>
+
+                  <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/65 uppercase tracking-[0.2em] mb-3">
+                    Live-score providers
+                  </p>
+
+                  <h3 className="font-['Rajdhani',sans-serif] font-bold text-[28px] text-white mb-3">
+                    Follow today&apos;s matches live
+                  </h3>
+
+                  <p className="text-[12px] text-white/30 leading-relaxed max-w-md mx-auto">
+                    Choose a trusted score provider below. It opens in a new tab,
+                    while Bet Lab remains available for reviewing your picks.
+                  </p>
                 </div>
 
-                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/65 uppercase tracking-[0.2em] mb-3">
-                  Live-score integration
-                </p>
-
-                <h3 className="font-['Rajdhani',sans-serif] font-bold text-[28px] text-white mb-3">
-                  Your live match window is ready
-                </h3>
-
-                <p className="text-[12px] text-white/30 leading-relaxed max-w-md mb-7">
-                  The official score widget will appear in this panel after we
-                  select and insert the supported provider embed.
-                </p>
-
-                <div className="flex flex-col sm:flex-row gap-3">
+                <div className="grid gap-3">
                   <a
                     href="https://www.sofascore.com/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-md bg-[#D4AF37] px-5 py-3 font-[JetBrains_Mono,monospace] text-[9px] font-bold text-[#07111F] uppercase tracking-wider hover:brightness-110 transition"
+                    className="group rounded-xl border border-[#D4AF37]/15 bg-[#D4AF37]/[0.04] p-5 text-left hover:border-[#D4AF37]/35 hover:bg-[#D4AF37]/[0.07] transition"
                   >
-                    <Globe size={13} />
-                    Open Sofascore
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 shrink-0 rounded-lg bg-[#D4AF37] flex items-center justify-center">
+                          <Globe size={18} className="text-[#07111F]" />
+                        </div>
+
+                        <div>
+                          <p className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">
+                            Sofascore
+                          </p>
+                          <p className="text-[11px] text-white/30 leading-relaxed">
+                            Live scores, fixtures, tables and detailed match statistics.
+                          </p>
+                        </div>
+                      </div>
+
+                      <ArrowRight
+                        size={17}
+                        className="mt-1 shrink-0 text-[#D4AF37]/45 group-hover:text-[#D4AF37] group-hover:translate-x-1 transition"
+                      />
+                    </div>
                   </a>
 
                   <a
-                    href="https://www.livescore.com/"
+                    href="https://www.livescore.com/en/"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 rounded-md border border-white/[0.09] bg-white/[0.025] px-5 py-3 font-[JetBrains_Mono,monospace] text-[9px] text-white/55 uppercase tracking-wider hover:text-white hover:border-white/20 transition"
+                    className="group rounded-xl border border-white/[0.07] bg-white/[0.02] p-5 text-left hover:border-white/15 hover:bg-white/[0.04] transition"
                   >
-                    <Activity size={13} />
-                    Open LiveScore
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex items-start gap-4">
+                        <div className="w-10 h-10 shrink-0 rounded-lg border border-white/[0.08] bg-white/[0.035] flex items-center justify-center">
+                          <Activity size={18} className="text-white/55" />
+                        </div>
+
+                        <div>
+                          <p className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">
+                            LiveScore
+                          </p>
+                          <p className="text-[11px] text-white/30 leading-relaxed">
+                            Fast live results, upcoming fixtures and competition schedules.
+                          </p>
+                        </div>
+                      </div>
+
+                      <ArrowRight
+                        size={17}
+                        className="mt-1 shrink-0 text-white/20 group-hover:text-white/60 group-hover:translate-x-1 transition"
+                      />
+                    </div>
                   </a>
+                </div>
+
+                <div className="mt-auto pt-7">
+                  <div className="rounded-lg border border-white/[0.05] bg-white/[0.018] px-4 py-3">
+                    <div className="flex items-start gap-3">
+                      <Info size={14} className="text-[#D4AF37]/55 mt-0.5 shrink-0" />
+                      <p className="text-[10px] text-white/25 leading-relaxed">
+                        Return to this Match Centre at any time to compare the live
+                        action with Bet Lab&apos;s published selections.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
