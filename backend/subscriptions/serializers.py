@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Country, Plan
+from .models import BillingProfile, Country, Plan
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -43,4 +43,32 @@ class PlanSerializer(serializers.ModelSerializer):
             "price",
             "currency",
             "currency_symbol",
+        )
+
+
+class BillingProfileSerializer(serializers.ModelSerializer):
+    country = serializers.CharField(source="country.iso_code", read_only=True)
+    country_name = serializers.CharField(source="country.name", read_only=True)
+    currency = serializers.CharField(
+        source="country.default_currency",
+        read_only=True,
+    )
+    currency_symbol = serializers.CharField(
+        source="country.currency_symbol",
+        read_only=True,
+    )
+    checkout_enabled = serializers.BooleanField(
+        source="country.checkout_enabled",
+        read_only=True,
+    )
+
+    class Meta:
+        model = BillingProfile
+        fields = (
+            "country",
+            "country_name",
+            "currency",
+            "currency_symbol",
+            "checkout_enabled",
+            "country_locked",
         )
