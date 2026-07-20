@@ -564,8 +564,8 @@ function Navbar({ page, nav, authed, setAuthed }: {
   const unread = NOTIFICATIONS.filter(n => n.unread).length;
 
   const links = authed
-    ? [{ label: "Dashboard", p: "dashboard" as Page }, { label: "Predictions", p: "predictions" as Page }, { label: "Results", p: "results" as Page }]
-    : [{ label: "Home", p: "home" as Page }, { label: "Predictions", p: "predictions" as Page }, { label: "Pricing", p: "pricing" as Page }, { label: "Results", p: "results" as Page }, { label: "About", p: "about" as Page }];
+    ? [{ label: "Dashboard", p: "dashboard" as Page }, { label: "Predictions", p: "predictions" as Page }, { label: "Live Scores", p: "results" as Page }]
+    : [{ label: "Home", p: "home" as Page }, { label: "Predictions", p: "predictions" as Page }, { label: "Pricing", p: "pricing" as Page }, { label: "Live Scores", p: "results" as Page }, { label: "About", p: "about" as Page }];
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 h-[60px] border-b border-[#D4AF37]/8 bg-[#0B1220]/92 backdrop-blur-xl">
@@ -684,7 +684,7 @@ function Footer({ nav }: { nav: (p: Page) => void }) {
           <p className="text-[10px] font-[JetBrains_Mono,monospace] text-white/20 leading-relaxed">Bet Lab is a sports analytics subscription service. We are not a bookmaker. Please gamble responsibly. 18+ only.</p>
         </div>
         {[
-          { title: "Platform", links: [["Home", "home"], ["Predictions", "predictions"], ["Results", "results"], ["Pricing", "pricing"]] as [string, Page][] },
+          { title: "Platform", links: [["Home", "home"], ["Predictions", "predictions"], ["Live Scores", "results"], ["Pricing", "pricing"]] as [string, Page][] },
           { title: "Company", links: [["About", "about"], ["Contact", "contact"]] as [string, Page][] },
           { title: "Legal", links: [["Privacy Policy", "about"], ["Terms of Service", "about"], ["Responsible Gambling", "about"]] as [string, Page][] },
         ].map(col => (
@@ -1557,7 +1557,10 @@ function PredictionsPage({ nav, authed }: { nav: (p: Page) => void; authed: bool
   }, []);
 
   const cats: ("all" | PredCategory)[] = ["all", "Banker", "Sure 2", "Sure 3", "Sure 5", "Rollover"];
-  const filtered = filter === "all" ? PREDICTIONS : PREDICTIONS.filter(p => p.category === filter);
+  const filtered =
+    filter === "all"
+      ? predictions
+      : predictions.filter((prediction) => prediction.category.name === filter);
 
   return (
     <div className="pt-[60px]">
@@ -1566,7 +1569,7 @@ function PredictionsPage({ nav, authed }: { nav: (p: Page) => void; authed: bool
           <div>
             <SectionEyebrow>Intelligence Feed</SectionEyebrow>
             <h1 className="font-['Rajdhani',sans-serif] font-bold text-[52px] text-white leading-none">TODAY&apos;S PREDICTIONS</h1>
-            <p className="text-white/35 text-[12px] mt-2 font-[JetBrains_Mono,monospace]">Saturday, 19 July 2026 · {PREDICTIONS.length} predictions published</p>
+            <p className="text-white/35 text-[12px] mt-2 font-[JetBrains_Mono,monospace]">Saturday, 19 July 2026 · {predictions.length} prediction packages published</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 border border-emerald-500/20 bg-emerald-500/8 rounded-full px-3 py-1.5">
@@ -1591,9 +1594,48 @@ function PredictionsPage({ nav, authed }: { nav: (p: Page) => void; authed: bool
           ))}
         </div>
 
-        <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
-          {filtered.map((p, i) => <PredCard key={p.id} pred={p} locked={!authed && i >= 1} />)}
-        </div>
+        {loading && (
+          <div className="py-20 text-center">
+            <div className="w-8 h-8 border-2 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin mx-auto" />
+            <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white/35 uppercase tracking-widest mt-4">
+              Loading prediction packages
+            </p>
+          </div>
+        )}
+
+        {!loading && error && (
+          <div className="bg-rose-500/5 border border-rose-500/20 rounded-xl px-6 py-10 text-center">
+            <p className="font-['Rajdhani',sans-serif] font-bold text-[22px] text-white">
+              Predictions unavailable
+            </p>
+            <p className="text-[12px] text-white/40 mt-2">
+              {error} Please confirm that the Django server is running.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && filtered.length === 0 && (
+          <div className="bg-card border border-[#D4AF37]/10 rounded-xl px-6 py-14 text-center">
+            <p className="font-['Rajdhani',sans-serif] font-bold text-[24px] text-white">
+              No prediction packages found
+            </p>
+            <p className="text-[12px] text-white/35 mt-2">
+              There are currently no published packages in this category.
+            </p>
+          </div>
+        )}
+
+        {!loading && !error && filtered.length > 0 && (
+          <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-5">
+            {filtered.map((prediction, index) => (
+              <ApiPredictionCard
+                key={prediction.id}
+                pred={prediction}
+                locked={!authed && index >= 1}
+              />
+            ))}
+          </div>
+        )}
 
         {!authed && (
           <div className="mt-10 bg-card border border-[#D4AF37]/18 rounded-xl p-10 text-center">
@@ -1610,106 +1652,319 @@ function PredictionsPage({ nav, authed }: { nav: (p: Page) => void; authed: bool
   );
 }
 
-// ─── RESULTS PAGE ─────────────────────────────────────────────────────────────
+// ─── MATCH CENTRE PAGE ────────────────────────────────────────────────────────
 
-function ResultsPage() {
-  const wins = RESULTS.filter(r => r.result === "won").length;
-  const losses = RESULTS.filter(r => r.result === "lost").length;
-  const totalProfit = RESULTS.reduce((a, r) => a + r.profit, 0);
-  const winRate = Math.round((wins / (wins + losses)) * 100);
+function MatchCentrePage() {
+  const [predictions, setPredictions] = useState<ApiPrediction[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadPredictions() {
+      try {
+        setLoading(true);
+        setError("");
+
+        const data = await getPredictions();
+
+        if (active) {
+          setPredictions(data);
+        }
+      } catch (err) {
+        console.error("Failed to load Match Centre predictions:", err);
+
+        if (active) {
+          setError("We could not load the current Bet Lab picks.");
+        }
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    }
+
+    loadPredictions();
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const matchSelections = predictions.flatMap((prediction) =>
+    prediction.selections.map((selection) => ({
+      predictionId: prediction.id,
+      predictionTitle: prediction.title,
+      category: prediction.category.name,
+      accessLevel: prediction.access_level,
+      selection,
+    }))
+  );
 
   return (
     <div className="pt-[60px]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 pb-20">
-        <div className="mb-10">
-          <SectionEyebrow>Track Record</SectionEyebrow>
-          <h1 className="font-['Rajdhani',sans-serif] font-bold text-[52px] text-white mb-2">RESULTS & TRANSPARENCY</h1>
-          <p className="text-white/35 text-[13px] max-w-xl">Every prediction published, win or loss. We believe in complete accountability.</p>
-        </div>
 
-        {/* Summary */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-          {[
-            { label: "Win Rate", value: `${winRate}%`, c: "text-emerald-400", bc: "border-emerald-500/18 bg-emerald-500/5" },
-            { label: "Wins", value: wins, c: "text-emerald-400", bc: "border-emerald-500/18 bg-emerald-500/5" },
-            { label: "Losses", value: losses, c: "text-rose-400", bc: "border-rose-500/18 bg-rose-500/5" },
-            { label: "Net P&L (100u stake)", value: `${totalProfit > 0 ? "+" : ""}${totalProfit}u`, c: totalProfit > 0 ? "text-emerald-400" : "text-rose-400", bc: "border-[#D4AF37]/8 bg-card" },
-          ].map((s, i) => (
-            <div key={i} className={cn("rounded-lg border p-5", s.bc)}>
-              <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest mb-1.5">{s.label}</p>
-              <p className={cn("font-['Rajdhani',sans-serif] font-bold text-[30px] leading-none", s.c)}>{s.value}</p>
-            </div>
-          ))}
-        </div>
+        {/* Hero */}
+        <div className="relative overflow-hidden rounded-2xl border border-[#D4AF37]/15 bg-card px-6 py-10 sm:px-10 sm:py-14 mb-8">
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1A2845]/75 via-transparent to-[#D4AF37]/[0.04] pointer-events-none" />
+          <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent" />
 
-        {/* ROI chart */}
-        <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5 mb-7">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white">Cumulative ROI — July 2026</h3>
-            <Chip label="All markets" variant="ghost" />
-          </div>
-          <ResponsiveContainer width="100%" height={160}>
-            <AreaChart data={PERF_DATA} margin={{ top: 2, right: 2, bottom: 0, left: -22 }}>
-              <defs>
-                <linearGradient id="rROI" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#10B981" stopOpacity={0.2} />
-                  <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <XAxis dataKey="day" tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: "rgba(255,255,255,0.2)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: "#111C2E", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 6, fontSize: 11, fontFamily: "JetBrains Mono,monospace" }} itemStyle={{ color: "#10B981" }} />
-              <Area type="monotone" dataKey="roi" stroke="#10B981" strokeWidth={1.5} fill="url(#rROI)" dot={false} />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+          <div className="relative max-w-3xl">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-40 animate-ping" />
+                <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+              </span>
 
-        {/* League bar chart */}
-        <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5 mb-7">
-          <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-5">Win Rate by League</h3>
-          <ResponsiveContainer width="100%" height={140}>
-            <BarChart data={LEAGUE_PERF} margin={{ top: 0, right: 0, bottom: 0, left: -22 }} barSize={18}>
-              <XAxis dataKey="league" tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fill: "rgba(255,255,255,0.3)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} domain={[60, 100]} />
-              <Tooltip contentStyle={{ background: "#111C2E", border: "1px solid rgba(212,175,55,0.18)", borderRadius: 6, fontSize: 11, fontFamily: "JetBrains Mono,monospace" }} itemStyle={{ color: GOLD }} />
-              <Bar dataKey="winRate" radius={[2, 2, 0, 0]}>
-                {LEAGUE_PERF.map((l, i) => (
-                  <Cell key={i} fill={l.winRate >= 80 ? "#10B981" : l.winRate >= 75 ? GOLD : "rgba(255,255,255,0.2)"} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Full log */}
-        <div className="bg-card border border-[#D4AF37]/8 rounded-lg overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-white/[0.04] flex items-center justify-between">
-            <h3 className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white">Full Results Log</h3>
-            <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25">{RESULTS.length} records</span>
-          </div>
-          <div className="hidden sm:grid grid-cols-[0.5fr_1.6fr_1.4fr_0.5fr_0.7fr_0.6fr] gap-4 px-5 py-2.5 border-b border-white/[0.04]">
-            {["Date", "Match", "Prediction", "Odds", "Result", "P&L"].map(h => (
-              <span key={h} className="font-[JetBrains_Mono,monospace] text-[9px] text-white/22 uppercase tracking-widest">{h}</span>
-            ))}
-          </div>
-          {RESULTS.map((r, i) => (
-            <div key={r.id} className={cn("grid grid-cols-1 sm:grid-cols-[0.5fr_1.6fr_1.4fr_0.5fr_0.7fr_0.6fr] gap-2 sm:gap-4 px-5 py-3.5 items-center hover:bg-white/[0.015] transition-colors", i < RESULTS.length - 1 && "border-b border-white/[0.04]")}>
-              <span className="font-[JetBrains_Mono,monospace] text-[10px] text-white/25">{r.date}</span>
-              <div>
-                <p className="text-[13px] text-white/70">{r.match}</p>
-                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/22 mt-0.5">{r.league}</p>
-              </div>
-              <p className="text-[12px] text-white/45 hidden sm:block">{r.prediction}</p>
-              <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white/45 hidden sm:block">{r.odds}</span>
-              <div className="flex items-center gap-1.5">
-                <div className={cn("w-1.5 h-1.5 rounded-full", r.result === "won" ? "bg-emerald-500" : r.result === "lost" ? "bg-rose-500" : "bg-white/15")} />
-                <span className={cn("font-[JetBrains_Mono,monospace] text-[10px] uppercase", r.result === "won" ? "text-emerald-400" : r.result === "lost" ? "text-rose-400" : "text-white/20")}>{r.result}</span>
-              </div>
-              <span className={cn("font-[JetBrains_Mono,monospace] text-[11px] font-bold hidden sm:block", r.profit > 0 ? "text-emerald-400" : r.profit < 0 ? "text-rose-400" : "text-white/20")}>
-                {r.profit > 0 ? `+${r.profit}u` : r.profit === 0 ? "VOID" : `${r.profit}u`}
+              <span className="font-[JetBrains_Mono,monospace] text-[9px] text-emerald-400 uppercase tracking-[0.22em]">
+                Live football hub
               </span>
             </div>
-          ))}
+
+            <SectionEyebrow>Live Scores</SectionEyebrow>
+
+            <h1 className="font-['Rajdhani',sans-serif] font-bold text-[46px] sm:text-[64px] text-white leading-[0.95] mb-5">
+              BET LAB
+              <br />
+              <span className="text-[#D4AF37]">MATCH CENTRE</span>
+            </h1>
+
+            <p className="text-white/45 text-[14px] sm:text-[15px] leading-relaxed max-w-2xl">
+              Follow the matches connected to Bet Lab predictions and keep up
+              with today&apos;s football action from one convenient place.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 xl:grid-cols-[0.9fr_1.4fr] gap-7">
+
+          {/* Bet Lab picks */}
+          <section>
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/70 uppercase tracking-widest mb-1">
+                  Bet Lab intelligence
+                </p>
+
+                <h2 className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-white">
+                  Current Picks
+                </h2>
+              </div>
+
+              {!loading && !error && (
+                <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25">
+                  {matchSelections.length} matches
+                </span>
+              )}
+            </div>
+
+            {loading && (
+              <div className="rounded-xl border border-[#D4AF37]/10 bg-card p-10 text-center">
+                <div className="w-7 h-7 border-2 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin mx-auto mb-4" />
+                <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white/30 uppercase tracking-widest">
+                  Loading picks
+                </p>
+              </div>
+            )}
+
+            {!loading && error && (
+              <div className="rounded-xl border border-rose-500/15 bg-rose-500/[0.04] p-6">
+                <div className="flex items-start gap-3">
+                  <AlertCircle size={18} className="text-rose-400 mt-0.5 shrink-0" />
+                  <div>
+                    <p className="text-[13px] text-rose-300 mb-1">
+                      Match Centre unavailable
+                    </p>
+                    <p className="text-[11px] text-white/30 leading-relaxed">
+                      {error} You can still use the live-score links beside this panel.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!loading && !error && matchSelections.length === 0 && (
+              <div className="rounded-xl border border-[#D4AF37]/10 bg-card p-8 text-center">
+                <Trophy size={24} className="text-[#D4AF37]/50 mx-auto mb-3" />
+                <p className="text-[13px] text-white/55 mb-1">
+                  No current picks yet
+                </p>
+                <p className="text-[11px] text-white/25">
+                  Published Bet Lab matches will appear here automatically.
+                </p>
+              </div>
+            )}
+
+            {!loading && !error && matchSelections.length > 0 && (
+              <div className="space-y-3">
+                {matchSelections.slice(0, 8).map((item) => {
+                  const kickoff = new Date(item.selection.match_time);
+                  const hasValidKickoff = !Number.isNaN(kickoff.getTime());
+
+                  return (
+                    <article
+                      key={`${item.predictionId}-${item.selection.id}`}
+                      className="group rounded-xl border border-white/[0.06] bg-card p-5 hover:border-[#D4AF37]/20 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-4 mb-4">
+                        <div>
+                          <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/65 uppercase tracking-wider mb-1">
+                            {item.selection.league}
+                          </p>
+
+                          <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white leading-tight">
+                            {item.selection.home_team}
+                            <span className="text-white/25 mx-2">vs</span>
+                            {item.selection.away_team}
+                          </h3>
+                        </div>
+
+                        <span className="shrink-0 rounded-full border border-[#D4AF37]/15 bg-[#D4AF37]/[0.05] px-2.5 py-1 font-[JetBrains_Mono,monospace] text-[8px] text-[#D4AF37] uppercase tracking-wider">
+                          {item.category}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3 mb-4">
+                        <div className="rounded-lg bg-white/[0.025] px-3 py-2.5">
+                          <p className="font-[JetBrains_Mono,monospace] text-[8px] text-white/20 uppercase tracking-wider mb-1">
+                            Selection
+                          </p>
+                          <p className="text-[12px] text-white/65">
+                            {item.selection.market}
+                          </p>
+                        </div>
+
+                        <div className="rounded-lg bg-white/[0.025] px-3 py-2.5">
+                          <p className="font-[JetBrains_Mono,monospace] text-[8px] text-white/20 uppercase tracking-wider mb-1">
+                            Kickoff
+                          </p>
+                          <p className="text-[12px] text-white/65">
+                            {hasValidKickoff
+                              ? kickoff.toLocaleString([], {
+                                  day: "2-digit",
+                                  month: "short",
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                })
+                              : "To be confirmed"}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between border-t border-white/[0.04] pt-3">
+                        <span className="text-[10px] text-white/25 truncate pr-4">
+                          {item.predictionTitle}
+                        </span>
+
+                        <span className="flex items-center gap-1.5 font-[JetBrains_Mono,monospace] text-[8px] text-white/30 uppercase tracking-wider">
+                          <Clock size={11} />
+                          Awaiting kickoff
+                        </span>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            )}
+          </section>
+
+          {/* Live-score area */}
+          <section>
+            <div className="flex items-end justify-between mb-4">
+              <div>
+                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/70 uppercase tracking-widest mb-1">
+                  Live football
+                </p>
+
+                <h2 className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-white">
+                  Scores & Fixtures
+                </h2>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                <span className="font-[JetBrains_Mono,monospace] text-[8px] text-emerald-400/70 uppercase tracking-wider">
+                  Live access
+                </span>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-xl border border-[#D4AF37]/12 bg-card min-h-[520px]">
+              <div className="absolute inset-0 bg-gradient-to-b from-[#D4AF37]/[0.025] to-transparent pointer-events-none" />
+
+              <div className="relative flex min-h-[520px] flex-col items-center justify-center px-6 py-12 text-center">
+                <div className="w-14 h-14 rounded-2xl border border-[#D4AF37]/15 bg-[#D4AF37]/[0.05] flex items-center justify-center mb-5">
+                  <Activity size={25} className="text-[#D4AF37]" />
+                </div>
+
+                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/65 uppercase tracking-[0.2em] mb-3">
+                  Live-score integration
+                </p>
+
+                <h3 className="font-['Rajdhani',sans-serif] font-bold text-[28px] text-white mb-3">
+                  Your live match window is ready
+                </h3>
+
+                <p className="text-[12px] text-white/30 leading-relaxed max-w-md mb-7">
+                  The official score widget will appear in this panel after we
+                  select and insert the supported provider embed.
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <a
+                    href="https://www.sofascore.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-md bg-[#D4AF37] px-5 py-3 font-[JetBrains_Mono,monospace] text-[9px] font-bold text-[#07111F] uppercase tracking-wider hover:brightness-110 transition"
+                  >
+                    <Globe size={13} />
+                    Open Sofascore
+                  </a>
+
+                  <a
+                    href="https://www.livescore.com/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 rounded-md border border-white/[0.09] bg-white/[0.025] px-5 py-3 font-[JetBrains_Mono,monospace] text-[9px] text-white/55 uppercase tracking-wider hover:text-white hover:border-white/20 transition"
+                  >
+                    <Activity size={13} />
+                    Open LiveScore
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mt-3">
+              {[
+                "Premier League",
+                "Champions League",
+                "La Liga",
+                "Serie A",
+              ].map((competition) => (
+                <div
+                  key={competition}
+                  className="rounded-lg border border-white/[0.05] bg-card px-3 py-3 text-center"
+                >
+                  <p className="font-[JetBrains_Mono,monospace] text-[8px] text-white/30 uppercase tracking-wider">
+                    {competition}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+
+        <div className="mt-8 rounded-xl border border-[#D4AF37]/10 bg-[#D4AF37]/[0.025] px-5 py-4">
+          <div className="flex items-start gap-3">
+            <Info size={16} className="text-[#D4AF37]/70 mt-0.5 shrink-0" />
+            <p className="text-[11px] text-white/30 leading-relaxed">
+              Live scores are supplied by independent football-score services.
+              Bet Lab predictions remain informational and do not guarantee any
+              betting outcome.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -1914,7 +2169,7 @@ export default function App() {
         {page === "register" && <AuthPage mode="register" nav={nav} setAuthed={setAuthed} />}
         {page === "dashboard" && <DashboardPage nav={nav} />}
         {page === "predictions" && <PredictionsPage nav={nav} authed={authed} />}
-        {page === "results" && <ResultsPage />}
+        {page === "results" && <MatchCentrePage />}
         {page === "about" && <AboutPage nav={nav} />}
         {page === "contact" && <ContactPage />}
       </div>
