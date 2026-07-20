@@ -1,4 +1,15 @@
-"""Serializers for subscription API resources."""
+from rest_framework import serializers
 
-# Country, plan, billing-profile and subscription serializers
-# will be introduced during Sprint 2.
+from .models import Country
+
+
+class CountrySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Country
+        fields = (
+            "name",
+            "iso_code",
+            "default_currency",
+            "currency_symbol",
+            "checkout_enabled",
+        )
