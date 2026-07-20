@@ -28,3 +28,50 @@ yarn-debug.log*
 
 # Python cache
 .pytest_cache/
+
+# -------------------------------------------------
+# Local and generated files
+# -------------------------------------------------
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+
+# Local databases
+db.sqlite3
+*.sqlite3
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Local backup files
+*.bak
+*.bak_*
+*.bak-*
+*.before-*
+*~
+
+# macOS
+.DS_Store
+
+# Editors
+.idea/
+.vscode/
+
+# Test and tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Frontend dependencies and builds
+node_modules/
+dist/
