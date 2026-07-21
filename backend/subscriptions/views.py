@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db.models import F
 from rest_framework import status
 from rest_framework.generics import ListAPIView
@@ -10,7 +11,12 @@ from .models import BillingProfile, Country, Plan
 from .serializers import (
     BillingProfileSerializer,
     CountrySerializer,
+    CurrentSubscriptionSerializer,
     PlanSerializer,
+)
+from .services import (
+    activate_or_extend_subscription,
+    get_current_subscription,
 )
 
 
@@ -197,4 +203,140 @@ class BillingProfileView(APIView):
                 if created
                 else "Billing profile updated successfully."
             ),
+        )
+
+
+class CurrentSubscriptionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        subscription = get_current_subscription(request.user)
+
+        if subscription is None:
+            return success_response(
+                data={
+                    "has_subscription": False,
+                    "subscription": None,
+                },
+                message="No active subscription found.",
+            )
+
+        serializer = CurrentSubscriptionSerializer(subscription)
+
+        return success_response(
+            data={
+                "has_subscription": True,
+                "subscription": serializer.data,
+            },
+            message="Current subscription retrieved successfully.",
+        )
+
+
+class ActivateTestSubscriptionView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        if not settings.DEBUG:
+            return error_response(
+                message="Test subscription activation is unavailable.",
+                errors={
+                    "detail": [
+                        "This endpoint is only available in development."
+                    ]
+                },
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        plan_code = str(
+            request.data.get("plan", "")
+        ).strip().lower()
+
+        if not plan_code:
+            return error_response(
+                message="Plan is required.",
+                errors={
+                    "plan": [
+                        "Provide an active subscription plan code."
+                    ]
+                },
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
+        plan = (
+            Plan.objects
+            .filter(
+                code__iexact=plan_code,
+                is_active=True,
+            )
+            .first()
+        )
+
+        if plan is None:
+            return error_response(
+                message="Plan was not found.",
+                errors={
+                    "plan": [
+                        f"No active plan was found for code {plan_code}."
+                    ]
+                },
+                status_code=status.HTTP_404_NOT_FOUND,
+            )
+
+        billing_profile = (
+            BillingProfile.objects
+            .select_related("country")
+            .filter(user=request.user)
+            .first()
+        )
+
+        if billing_profile is None:
+            return error_response(
+                message="Billing profile is required.",
+                errors={
+                    "billing_profile": [
+                        "Select your billing country before subscribing."
+                    ]
+                },
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
+        has_local_price = plan.prices.filter(
+            country=billing_profile.country,
+            is_active=True,
+        ).exists()
+
+        if not has_local_price:
+            return error_response(
+                message="Plan is unavailable in your country.",
+                errors={
+                    "plan": [
+                        "This plan has no active price for your billing country."
+                    ]
+                },
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
+        subscription = activate_or_extend_subscription(
+            user=request.user,
+            plan=plan,
+        )
+
+        if not billing_profile.country_locked:
+            billing_profile.country_locked = True
+            billing_profile.save(
+                update_fields=[
+                    "country_locked",
+                    "updated_at",
+                ]
+            )
+
+        serializer = CurrentSubscriptionSerializer(subscription)
+
+        return success_response(
+            data={
+                "has_subscription": True,
+                "subscription": serializer.data,
+            },
+            message="Test subscription activated successfully.",
+            status_code=status.HTTP_201_CREATED,
         )

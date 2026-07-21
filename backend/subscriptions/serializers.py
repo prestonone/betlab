@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import BillingProfile, Country, Plan
+from .models import BillingProfile, Country, Plan, Subscription
 
 
 class CountrySerializer(serializers.ModelSerializer):
@@ -71,4 +71,33 @@ class BillingProfileSerializer(serializers.ModelSerializer):
             "currency_symbol",
             "checkout_enabled",
             "country_locked",
+        )
+
+
+class CurrentSubscriptionSerializer(serializers.ModelSerializer):
+    plan_code = serializers.CharField(source="plan.code", read_only=True)
+    plan_name = serializers.CharField(source="plan.name", read_only=True)
+    duration_days = serializers.IntegerField(
+        source="plan.duration_days",
+        read_only=True,
+    )
+    grace_period_days = serializers.IntegerField(
+        source="plan.grace_period_days",
+        read_only=True,
+    )
+
+    class Meta:
+        model = Subscription
+        fields = (
+            "id",
+            "plan_code",
+            "plan_name",
+            "status",
+            "source",
+            "starts_at",
+            "expires_at",
+            "grace_ends_at",
+            "auto_renew",
+            "duration_days",
+            "grace_period_days",
         )

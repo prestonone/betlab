@@ -93,3 +93,4 @@ dist/
 
 # macOS
 .DS_Store
+.aider*
