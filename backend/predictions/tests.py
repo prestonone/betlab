@@ -88,3 +88,72 @@ class ScheduledPredictionPublishingTests(TestCase):
         )
 
         self.assertIsNone(prediction.settled_at)
+
+class PredictionStatusTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="status-manager",
+            email="status@example.com",
+            password="test-password-123",
+        )
+        self.category = PredictionCategory.objects.create(
+            name="Status Tests",
+            slug="status-tests",
+        )
+
+    def create_prediction(self, **overrides):
+        values = {
+            "category": self.category,
+            "title": "Status Test Prediction",
+            "created_by": self.user,
+        }
+        values.update(overrides)
+        return Prediction.objects.create(**values)
+
+    def test_new_prediction_defaults_to_draft(self):
+        prediction = self.create_prediction()
+
+        self.assertEqual(prediction.status, Prediction.Status.DRAFT)
+        self.assertTrue(prediction.is_editable)
+        self.assertFalse(prediction.is_locked)
+        self.assertFalse(prediction.is_settled)
+
+    def test_scheduled_prediction_is_editable(self):
+        prediction = self.create_prediction(
+            status=Prediction.Status.SCHEDULED,
+        )
+
+        self.assertTrue(prediction.is_editable)
+
+    def test_published_prediction_is_editable_before_locking(self):
+        prediction = self.create_prediction(
+            status=Prediction.Status.PUBLISHED,
+            locked_at=None,
+        )
+
+        self.assertTrue(prediction.is_editable)
+
+    def test_locked_prediction_is_not_editable(self):
+        prediction = self.create_prediction(
+            status=Prediction.Status.LOCKED,
+            locked_at=timezone.now(),
+        )
+
+        self.assertFalse(prediction.is_editable)
+        self.assertTrue(prediction.is_locked)
+
+    def test_settled_prediction_is_not_editable(self):
+        prediction = self.create_prediction(
+            status=Prediction.Status.SETTLED,
+            settled_at=timezone.now(),
+        )
+
+        self.assertFalse(prediction.is_editable)
+        self.assertTrue(prediction.is_settled)
+
+    def test_cancelled_prediction_is_not_editable(self):
+        prediction = self.create_prediction(
+            status=Prediction.Status.CANCELLED,
+        )
+
+        self.assertFalse(prediction.is_editable)

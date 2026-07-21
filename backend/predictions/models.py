@@ -18,6 +18,14 @@ class PredictionCategory(models.Model):
 
 
 class Prediction(models.Model):
+    class Status(models.TextChoices):
+        DRAFT = "draft", "Draft"
+        SCHEDULED = "scheduled", "Scheduled"
+        PUBLISHED = "published", "Published"
+        LOCKED = "locked", "Locked"
+        SETTLED = "settled", "Settled"
+        CANCELLED = "cancelled", "Cancelled"
+
     class AccessLevel(models.TextChoices):
         FREE = "free", "Free"
         LAB = "lab", "Lab Access"
@@ -43,6 +51,12 @@ class Prediction(models.Model):
         max_length=10,
         choices=AccessLevel.choices,
         default=AccessLevel.LAB,
+    )
+
+    status = models.CharField(
+        max_length=12,
+        choices=Status.choices,
+        default=Status.DRAFT,
     )
 
     analysis = models.TextField(blank=True)
@@ -89,6 +103,26 @@ class Prediction(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+    @property
+    def is_editable(self) -> bool:
+        return (
+            self.status
+            in {
+                self.Status.DRAFT,
+                self.Status.SCHEDULED,
+                self.Status.PUBLISHED,
+            }
+            and self.locked_at is None
+        )
+
+    @property
+    def is_locked(self) -> bool:
+        return self.status == self.Status.LOCKED
+
+    @property
+    def is_settled(self) -> bool:
+        return self.status == self.Status.SETTLED
 
 
 class PredictionSelection(models.Model):
