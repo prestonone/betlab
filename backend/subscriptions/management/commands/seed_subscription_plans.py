@@ -63,7 +63,7 @@ COUNTRIES = [
 PLANS = [
     {
         "code": "starter-pass",
-        "name": "Starter Pass",
+        "name": "Daily Pass",
         "badge": "🥉",
         "description": (
             "Twenty-four hours of Bet Lab membership access."
@@ -87,7 +87,7 @@ PLANS = [
     },
     {
         "code": "pro-lab",
-        "name": "Pro Lab",
+        "name": "Monthly Lab",
         "badge": "🥇",
         "description": (
             "Thirty days of Bet Lab membership access."

@@ -1,5 +1,7 @@
 from rest_framework import viewsets
 
+from subscriptions.services import has_active_membership
+
 from .models import Prediction, PredictionCategory
 from .serializers import (
     PredictionCategorySerializer,
@@ -64,6 +66,11 @@ class PredictionViewSet(viewsets.ReadOnlyModelViewSet):
         if access_level:
             queryset = queryset.filter(
                 access_level=access_level
+            )
+
+        if not has_active_membership(self.request.user):
+            queryset = queryset.filter(
+                access_level=Prediction.AccessLevel.FREE
             )
 
         return queryset.order_by(

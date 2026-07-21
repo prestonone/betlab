@@ -53,7 +53,7 @@ Protected endpoints use JWT authentication:
 
 The billing profile stores the authenticated user's selected country and regional billing configuration. The country can be changed until the profile is locked after the appropriate payment milestone.
 
-## Current Backend Features
+## Current Features
 
 - JWT authentication
 - Versioned API routing
@@ -63,6 +63,11 @@ The billing profile stores the authenticated user's selected country and regiona
 - Authenticated billing profiles
 - Billing-country locking
 - Django administration
+- Backend-owned Paystack hosted checkout and verification
+- Signed, idempotent Paystack webhooks
+- Transaction-linked subscription activation
+- Subscription-protected Lab predictions
+- Production-safe environment configuration
 
 ## Development Checks
 
@@ -70,12 +75,12 @@ The billing profile stores the authenticated user's selected country and regiona
     python manage.py check
     python manage.py makemigrations --check --dry-run
     cd ..
+    npm run typecheck
+    npm run build
     git diff --check
     git status --short
 
-## Roadmap
-
-The next stages will connect regional plans and billing profiles to checkout, payment verification, subscription activation, and controlled prediction access.
+Production configuration, Paystack setup, and the final smoke-test checklist are documented in [`docs/PRODUCTION_READINESS.md`](docs/PRODUCTION_READINESS.md).
 
 ## Status
 

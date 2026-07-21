@@ -179,6 +179,7 @@ class BillingProfileView(APIView):
         if (
             not created
             and profile.country_locked
+            and profile.country_id != country.id
         ):
             return error_response(
                 message="Country can no longer be changed.",
@@ -190,7 +191,7 @@ class BillingProfileView(APIView):
                 status_code=status.HTTP_403_FORBIDDEN,
             )
 
-        if not created:
+        if not created and profile.country_id != country.id:
             profile.country = country
             profile.save(update_fields=["country", "updated_at"])
 

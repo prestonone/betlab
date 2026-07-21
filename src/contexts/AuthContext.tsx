@@ -5,6 +5,7 @@ import {
   useEffect,
   useMemo,
   useState,
+  type ReactElement,
   type ReactNode,
 } from "react";
 import {
@@ -40,7 +41,7 @@ interface AuthProviderProps {
 
 export function AuthProvider({
   children,
-}: AuthProviderProps): JSX.Element {
+}: AuthProviderProps): ReactElement {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 

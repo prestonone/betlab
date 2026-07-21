@@ -11,13 +11,19 @@ interface UseCurrentSubscriptionResult {
   refreshSubscription: () => Promise<void>;
 }
 
-export function useCurrentSubscription(): UseCurrentSubscriptionResult {
+export function useCurrentSubscription(enabled = true): UseCurrentSubscriptionResult {
   const [subscription, setSubscription] = useState<Subscription | null>(null);
   const [hasSubscription, setHasSubscription] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const refreshSubscription = useCallback(async (): Promise<void> => {
+    if (!enabled) {
+      setHasSubscription(false);
+      setSubscription(null);
+      setIsLoading(false);
+      return;
+    }
     setIsLoading(true);
     setError(null);
 
@@ -38,7 +44,7 @@ export function useCurrentSubscription(): UseCurrentSubscriptionResult {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [enabled]);
 
   useEffect(() => {
     void refreshSubscription();

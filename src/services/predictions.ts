@@ -22,18 +22,17 @@ export interface Prediction {
   analysis: string;
   access_level: string;
   result_status: "pending" | "won" | "lost" | "void";
-  published: boolean;
+  is_published: boolean;
   selections: PredictionSelection[];
 }
 
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+import { apiRequest } from "./api";
+import { getAccessToken } from "../utils/token";
 
 export async function getPredictions(): Promise<Prediction[]> {
-  const response = await fetch(`${API_BASE_URL}/predictions/`);
-
-  if (!response.ok) {
-    throw new Error(`Failed to fetch predictions: ${response.status}`);
-  }
-
-  return response.json();
+  return apiRequest<Prediction[]>(
+    "/api/v1/predictions/predictions/",
+    {},
+    Boolean(getAccessToken()),
+  );
 }

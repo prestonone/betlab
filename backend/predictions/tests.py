@@ -5,7 +5,9 @@ from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
 from django.test import RequestFactory, TestCase
+from django.urls import reverse
 from django.utils import timezone
+from rest_framework.test import APIClient
 
 from .admin import PredictionAdmin, PredictionSelectionInline
 from .models import (
@@ -13,6 +15,78 @@ from .models import (
     PredictionCategory,
     PredictionSelection,
 )
+from subscriptions.models import Plan, Subscription
+
+
+class PredictionAccessTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="api-member",
+            email="api-member@example.com",
+            password="test-password-123",
+        )
+        category = PredictionCategory.objects.create(
+            name="Access",
+            slug="access",
+        )
+        self.free_prediction = Prediction.objects.create(
+            category=category,
+            title="Free pick",
+            access_level=Prediction.AccessLevel.FREE,
+            status=Prediction.Status.PUBLISHED,
+            is_published=True,
+            published_at=timezone.now(),
+        )
+        self.lab_prediction = Prediction.objects.create(
+            category=category,
+            title="Lab pick",
+            access_level=Prediction.AccessLevel.LAB,
+            status=Prediction.Status.PUBLISHED,
+            is_published=True,
+            published_at=timezone.now(),
+        )
+        self.client = APIClient()
+        self.url = reverse("prediction-list")
+
+    def test_anonymous_user_only_sees_free_predictions(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual([item["title"] for item in response.data], ["Free pick"])
+
+    def test_active_member_sees_lab_predictions(self):
+        plan = Plan.objects.create(
+            code="weekly-lab",
+            name="Weekly Lab",
+            duration_days=7,
+        )
+        Subscription.objects.create(
+            user=self.user,
+            plan=plan,
+            status=Subscription.Status.ACTIVE,
+            starts_at=timezone.now(),
+            expires_at=timezone.now() + timedelta(days=7),
+        )
+        self.client.force_authenticate(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.data), 2)
+
+    def test_expired_member_only_sees_free_predictions(self):
+        plan = Plan.objects.create(
+            code="expired-plan",
+            name="Expired",
+            duration_days=1,
+        )
+        Subscription.objects.create(
+            user=self.user,
+            plan=plan,
+            status=Subscription.Status.ACTIVE,
+            starts_at=timezone.now() - timedelta(days=3),
+            expires_at=timezone.now() - timedelta(days=2),
+        )
+        self.client.force_authenticate(self.user)
+        response = self.client.get(self.url)
+        self.assertEqual([item["title"] for item in response.data], ["Free pick"])
 
 
 class ScheduledPredictionPublishingTests(TestCase):

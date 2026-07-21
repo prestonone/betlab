@@ -5,6 +5,7 @@ import {
   removeTokens,
 } from "../utils/token";
 import { refreshAccessToken } from "./auth";
+import { apiRequest } from "./api";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ??
@@ -96,4 +97,15 @@ export async function getCurrentSubscription(): Promise<CurrentSubscriptionRespo
   }
 
   return data as CurrentSubscriptionResponse;
+}
+
+export async function setBillingCountry(country: string): Promise<void> {
+  await apiRequest(
+    "/api/v1/subscriptions/billing-profile/",
+    {
+      method: "POST",
+      body: JSON.stringify({ country }),
+    },
+    true,
+  );
 }
