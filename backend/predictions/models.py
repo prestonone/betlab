@@ -1,5 +1,6 @@
 from django.conf import settings
 from django.db import models
+from django.utils import timezone
 
 
 class PredictionCategory(models.Model):
@@ -123,6 +124,146 @@ class Prediction(models.Model):
     @property
     def is_settled(self) -> bool:
         return self.status == self.Status.SETTLED
+
+    def schedule(self, scheduled_for) -> None:
+        if self.status not in {
+            self.Status.DRAFT,
+            self.Status.SCHEDULED,
+        }:
+            raise ValueError(
+                f"Cannot schedule a prediction with status '{self.status}'."
+            )
+
+        if scheduled_for <= timezone.now():
+            raise ValueError("Scheduled publication time must be in the future.")
+
+        self.status = self.Status.SCHEDULED
+        self.scheduled_for = scheduled_for
+        self.is_published = False
+        self.published_at = None
+        self.published_by = None
+
+        self.save(
+            update_fields=[
+                "status",
+                "scheduled_for",
+                "is_published",
+                "published_at",
+                "published_by",
+                "updated_at",
+            ]
+        )
+
+    def publish(self, user=None) -> None:
+        if self.status in {
+            self.Status.LOCKED,
+            self.Status.SETTLED,
+            self.Status.CANCELLED,
+        }:
+            raise ValueError(
+                f"Cannot publish a prediction with status '{self.status}'."
+            )
+
+        now = timezone.now()
+
+        self.status = self.Status.PUBLISHED
+        self.is_published = True
+        self.scheduled_for = None
+
+        if self.published_at is None:
+            self.published_at = now
+
+        if user is not None:
+            self.published_by = user
+
+        self.save(
+            update_fields=[
+                "status",
+                "is_published",
+                "scheduled_for",
+                "published_at",
+                "published_by",
+                "updated_at",
+            ]
+        )
+
+    def lock(self) -> None:
+        if self.status == self.Status.LOCKED:
+            return
+
+        if self.status != self.Status.PUBLISHED:
+            raise ValueError(
+                f"Cannot lock a prediction with status '{self.status}'."
+            )
+
+        self.status = self.Status.LOCKED
+        self.locked_at = timezone.now()
+
+        self.save(
+            update_fields=[
+                "status",
+                "locked_at",
+                "updated_at",
+            ]
+        )
+
+    def settle(self, result_status, note="") -> None:
+        valid_results = {
+            self.ResultStatus.WON,
+            self.ResultStatus.LOST,
+            self.ResultStatus.VOID,
+        }
+
+        if self.status != self.Status.LOCKED:
+            raise ValueError(
+                f"Cannot settle a prediction with status '{self.status}'."
+            )
+
+        if result_status not in valid_results:
+            raise ValueError(
+                "Settlement result must be won, lost, or void."
+            )
+
+        self.status = self.Status.SETTLED
+        self.result_status = result_status
+        self.result_note = note
+        self.settled_at = timezone.now()
+
+        self.save(
+            update_fields=[
+                "status",
+                "result_status",
+                "result_note",
+                "settled_at",
+                "updated_at",
+            ]
+        )
+
+    def cancel(self) -> None:
+        if self.status not in {
+            self.Status.DRAFT,
+            self.Status.SCHEDULED,
+        }:
+            raise ValueError(
+                f"Cannot cancel a prediction with status '{self.status}'."
+            )
+
+        self.status = self.Status.CANCELLED
+        self.is_published = False
+        self.scheduled_for = None
+        self.published_at = None
+        self.published_by = None
+
+        self.save(
+            update_fields=[
+                "status",
+                "is_published",
+                "scheduled_for",
+                "published_at",
+                "published_by",
+                "updated_at",
+            ]
+        )
 
 
 class PredictionSelection(models.Model):
