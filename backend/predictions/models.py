@@ -56,7 +56,22 @@ class Prediction(models.Model):
     result_note = models.CharField(max_length=255, blank=True)
 
     is_published = models.BooleanField(default=False)
+    scheduled_for = models.DateTimeField(
+        null=True,
+        blank=True,
+        help_text="Optional date and time when this prediction should be published.",
+    )
     published_at = models.DateTimeField(null=True, blank=True)
+    locked_at = models.DateTimeField(null=True, blank=True)
+    settled_at = models.DateTimeField(null=True, blank=True)
+
+    published_by = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="published_predictions",
+    )
 
     created_by = models.ForeignKey(
         settings.AUTH_USER_MODEL,

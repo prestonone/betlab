@@ -66,7 +66,9 @@ class PredictionAdmin(admin.ModelAdmin):
         "combined_odds",
         "result_badge",
         "is_published",
+        "scheduled_for",
         "published_at",
+        "published_by",
     )
 
     list_filter = (
@@ -74,6 +76,8 @@ class PredictionAdmin(admin.ModelAdmin):
         "access_level",
         "result_status",
         "is_published",
+        "scheduled_for",
+        "published_at",
         "created_at",
     )
 
@@ -91,6 +95,9 @@ class PredictionAdmin(admin.ModelAdmin):
         "created_at",
         "updated_at",
         "published_at",
+        "published_by",
+        "locked_at",
+        "settled_at",
     )
 
     fieldsets = (
@@ -109,7 +116,10 @@ class PredictionAdmin(admin.ModelAdmin):
             {
                 "fields": (
                     "is_published",
+                    "scheduled_for",
                     "published_at",
+                    "published_by",
+                    "locked_at",
                     "created_by",
                 )
             },
@@ -126,6 +136,7 @@ class PredictionAdmin(admin.ModelAdmin):
                 "fields": (
                     "result_status",
                     "result_note",
+                    "settled_at",
                 )
             },
         ),
@@ -166,11 +177,30 @@ class PredictionAdmin(admin.ModelAdmin):
         if not obj.created_by:
             obj.created_by = request.user
 
-        if obj.is_published and obj.published_at is None:
-            obj.published_at = timezone.now()
+        now = timezone.now()
 
-        if not obj.is_published:
+        if obj.scheduled_for and obj.scheduled_for > now:
+            obj.is_published = False
             obj.published_at = None
+            obj.published_by = None
+
+        elif obj.is_published:
+            if obj.published_at is None:
+                obj.published_at = now
+
+            if obj.published_by is None:
+                obj.published_by = request.user
+
+            obj.scheduled_for = None
+
+        else:
+            obj.published_at = None
+            obj.published_by = None
+
+        if obj.result_status == Prediction.ResultStatus.PENDING:
+            obj.settled_at = None
+        elif obj.settled_at is None:
+            obj.settled_at = now
 
         super().save_model(request, obj, form, change)
 
@@ -222,11 +252,13 @@ class PredictionAdmin(admin.ModelAdmin):
             label,
         )
 
-    @admin.action(description="Publish selected predictions")
+    @admin.action(description="Publish selected predictions now")
     def publish_predictions(self, request, queryset):
         updated = queryset.update(
             is_published=True,
+            scheduled_for=None,
             published_at=timezone.now(),
+            published_by=request.user,
         )
         self.message_user(
             request,
@@ -237,7 +269,9 @@ class PredictionAdmin(admin.ModelAdmin):
     def unpublish_predictions(self, request, queryset):
         updated = queryset.update(
             is_published=False,
+            scheduled_for=None,
             published_at=None,
+            published_by=None,
         )
         self.message_user(
             request,
@@ -248,6 +282,7 @@ class PredictionAdmin(admin.ModelAdmin):
     def mark_as_won(self, request, queryset):
         updated = queryset.update(
             result_status=Prediction.ResultStatus.WON,
+            settled_at=timezone.now(),
         )
         self.message_user(
             request,
@@ -258,6 +293,7 @@ class PredictionAdmin(admin.ModelAdmin):
     def mark_as_lost(self, request, queryset):
         updated = queryset.update(
             result_status=Prediction.ResultStatus.LOST,
+            settled_at=timezone.now(),
         )
         self.message_user(
             request,
@@ -268,6 +304,7 @@ class PredictionAdmin(admin.ModelAdmin):
     def mark_as_void(self, request, queryset):
         updated = queryset.update(
             result_status=Prediction.ResultStatus.VOID,
+            settled_at=timezone.now(),
         )
         self.message_user(
             request,
@@ -278,6 +315,7 @@ class PredictionAdmin(admin.ModelAdmin):
     def mark_as_pending(self, request, queryset):
         updated = queryset.update(
             result_status=Prediction.ResultStatus.PENDING,
+            settled_at=None,
         )
         self.message_user(
             request,
