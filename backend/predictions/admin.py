@@ -56,6 +56,51 @@ class PredictionSelectionInline(admin.TabularInline):
     ordering = ("selection_order", "match_time")
 
 
+    protected_statuses = {
+        Prediction.Status.LOCKED,
+        Prediction.Status.SETTLED,
+        Prediction.Status.CANCELLED,
+    }
+
+    def parent_is_protected(self, obj) -> bool:
+        return (
+            obj is not None
+            and obj.status in self.protected_statuses
+        )
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = tuple(
+            super().get_readonly_fields(request, obj)
+        )
+
+        if self.parent_is_protected(obj):
+            return tuple(
+                dict.fromkeys(
+                    (*readonly_fields, *self.fields)
+                )
+            )
+
+        return readonly_fields
+
+    def get_extra(self, request, obj=None, **kwargs):
+        if self.parent_is_protected(obj):
+            return 0
+
+        return super().get_extra(request, obj, **kwargs)
+
+    def has_add_permission(self, request, obj=None):
+        if self.parent_is_protected(obj):
+            return False
+
+        return super().has_add_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if self.parent_is_protected(obj):
+            return False
+
+        return super().has_delete_permission(request, obj)
+
+
 @admin.register(Prediction)
 class PredictionAdmin(admin.ModelAdmin):
     list_display = (
@@ -321,6 +366,44 @@ class PredictionAdmin(admin.ModelAdmin):
             request,
             f"{updated} prediction package(s) marked as pending.",
         )
+
+
+    protected_statuses = {
+        Prediction.Status.LOCKED,
+        Prediction.Status.SETTLED,
+        Prediction.Status.CANCELLED,
+    }
+
+    def object_is_protected(self, obj) -> bool:
+        return (
+            obj is not None
+            and obj.status in self.protected_statuses
+        )
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly_fields = tuple(
+            super().get_readonly_fields(request, obj)
+        )
+
+        if self.object_is_protected(obj):
+            model_fields = tuple(
+                field.name
+                for field in obj._meta.concrete_fields
+            )
+
+            return tuple(
+                dict.fromkeys(
+                    (*readonly_fields, *model_fields)
+                )
+            )
+
+        return readonly_fields
+
+    def has_delete_permission(self, request, obj=None):
+        if self.object_is_protected(obj):
+            return False
+
+        return super().has_delete_permission(request, obj)
 
 
 @admin.register(PredictionSelection)

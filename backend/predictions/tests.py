@@ -1,12 +1,18 @@
 from datetime import timedelta
 from io import StringIO
 
+from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.utils import timezone
 
-from .models import Prediction, PredictionCategory
+from .admin import PredictionAdmin, PredictionSelectionInline
+from .models import (
+    Prediction,
+    PredictionCategory,
+    PredictionSelection,
+)
 
 
 class ScheduledPredictionPublishingTests(TestCase):
@@ -328,3 +334,166 @@ class PredictionLifecycleMethodTests(TestCase):
             "Cannot cancel a prediction with status 'published'.",
         ):
             prediction.cancel()
+
+class AutomaticPredictionLockingTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_superuser(
+            username="locking-admin",
+            email="locking@example.com",
+            password="test-password-123",
+        )
+        self.category = PredictionCategory.objects.create(
+            name="Automatic Locking",
+            slug="automatic-locking",
+        )
+
+    def create_prediction(self, **overrides):
+        values = {
+            "category": self.category,
+            "title": "Automatic Locking Prediction",
+            "created_by": self.user,
+            "status": Prediction.Status.PUBLISHED,
+            "is_published": True,
+            "published_at": timezone.now() - timedelta(hours=2),
+        }
+        values.update(overrides)
+        return Prediction.objects.create(**values)
+
+    def create_selection(self, prediction, match_time):
+        return PredictionSelection.objects.create(
+            prediction=prediction,
+            league="Premier League",
+            home_team="Home Team",
+            away_team="Away Team",
+            market="Home Win",
+            odds="1.80",
+            match_time=match_time,
+            selection_order=1,
+        )
+
+    def test_due_published_prediction_is_locked(self):
+        prediction = self.create_prediction()
+        self.create_selection(
+            prediction,
+            timezone.now() - timedelta(minutes=1),
+        )
+        output = StringIO()
+
+        call_command(
+            "lock_due_predictions",
+            stdout=output,
+        )
+
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.LOCKED,
+        )
+        self.assertIsNotNone(prediction.locked_at)
+        self.assertIn(
+            "Locked 1 due prediction.",
+            output.getvalue(),
+        )
+
+    def test_future_prediction_is_not_locked(self):
+        prediction = self.create_prediction()
+        self.create_selection(
+            prediction,
+            timezone.now() + timedelta(hours=1),
+        )
+
+        call_command("lock_due_predictions")
+
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.PUBLISHED,
+        )
+        self.assertIsNone(prediction.locked_at)
+
+    def test_draft_prediction_is_not_locked(self):
+        prediction = self.create_prediction(
+            status=Prediction.Status.DRAFT,
+            is_published=False,
+            published_at=None,
+        )
+        self.create_selection(
+            prediction,
+            timezone.now() - timedelta(minutes=5),
+        )
+
+        call_command("lock_due_predictions")
+
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.DRAFT,
+        )
+        self.assertIsNone(prediction.locked_at)
+
+    def test_prediction_without_selections_is_not_locked(self):
+        prediction = self.create_prediction()
+
+        call_command("lock_due_predictions")
+
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.PUBLISHED,
+        )
+        self.assertIsNone(prediction.locked_at)
+
+    def test_locked_prediction_is_read_only_in_admin(self):
+        prediction = self.create_prediction(
+            status=Prediction.Status.LOCKED,
+            locked_at=timezone.now(),
+        )
+
+        request = RequestFactory().get("/")
+        request.user = self.user
+
+        prediction_admin = PredictionAdmin(
+            Prediction,
+            AdminSite(),
+        )
+        inline_admin = PredictionSelectionInline(
+            Prediction,
+            AdminSite(),
+        )
+
+        readonly_fields = prediction_admin.get_readonly_fields(
+            request,
+            prediction,
+        )
+
+        self.assertIn("title", readonly_fields)
+        self.assertIn("status", readonly_fields)
+        self.assertFalse(
+            prediction_admin.has_delete_permission(
+                request,
+                prediction,
+            )
+        )
+        self.assertFalse(
+            inline_admin.has_add_permission(
+                request,
+                prediction,
+            )
+        )
+        self.assertFalse(
+            inline_admin.has_delete_permission(
+                request,
+                prediction,
+            )
+        )
+        self.assertEqual(
+            inline_admin.get_extra(
+                request,
+                prediction,
+            ),
+            0,
+        )
