@@ -239,6 +239,65 @@ class Prediction(models.Model):
             ]
         )
 
+    def recalculate_result(self) -> str:
+        selection_results = list(
+            self.selections.values_list(
+                "result_status",
+                flat=True,
+            )
+        )
+
+        if not selection_results:
+            return self.ResultStatus.PENDING
+
+        if self.ResultStatus.PENDING in selection_results:
+            if self.status == self.Status.SETTLED:
+                self.status = self.Status.LOCKED
+                self.result_status = self.ResultStatus.PENDING
+                self.result_note = ""
+                self.settled_at = None
+
+                self.save(
+                    update_fields=[
+                        "status",
+                        "result_status",
+                        "result_note",
+                        "settled_at",
+                        "updated_at",
+                    ]
+                )
+
+            return self.ResultStatus.PENDING
+
+        if self.ResultStatus.LOST in selection_results:
+            calculated_result = self.ResultStatus.LOST
+        elif all(
+            result == self.ResultStatus.VOID
+            for result in selection_results
+        ):
+            calculated_result = self.ResultStatus.VOID
+        else:
+            calculated_result = self.ResultStatus.WON
+
+        if self.status == self.Status.LOCKED:
+            self.settle(calculated_result)
+        elif self.status == self.Status.SETTLED:
+            self.result_status = calculated_result
+
+            self.save(
+                update_fields=[
+                    "result_status",
+                    "updated_at",
+                ]
+            )
+        else:
+            raise ValueError(
+                "Prediction results can only be calculated while "
+                "the prediction is locked or settled."
+            )
+
+        return calculated_result
+
     def cancel(self) -> None:
         if self.status not in {
             self.Status.DRAFT,
@@ -267,6 +326,12 @@ class Prediction(models.Model):
 
 
 class PredictionSelection(models.Model):
+    class ResultStatus(models.TextChoices):
+        PENDING = "pending", "Pending"
+        WON = "won", "Won"
+        LOST = "lost", "Lost"
+        VOID = "void", "Void"
+
     prediction = models.ForeignKey(
         Prediction,
         on_delete=models.CASCADE,
@@ -286,6 +351,17 @@ class PredictionSelection(models.Model):
     match_time = models.DateTimeField()
     selection_order = models.PositiveIntegerField(default=1)
 
+    result_status = models.CharField(
+        max_length=20,
+        choices=ResultStatus.choices,
+        default=ResultStatus.PENDING,
+    )
+    result_note = models.TextField(blank=True)
+    settled_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
     class Meta:
         ordering = ["selection_order", "match_time"]
 
@@ -293,3 +369,63 @@ class PredictionSelection(models.Model):
         return (
             f"{self.home_team} vs {self.away_team} — {self.market}"
         )
+
+    @property
+    def is_settled(self) -> bool:
+        return self.result_status != self.ResultStatus.PENDING
+
+    def settle(self, result_status, note="") -> None:
+        valid_results = {
+            self.ResultStatus.WON,
+            self.ResultStatus.LOST,
+            self.ResultStatus.VOID,
+        }
+
+        if self.prediction.status != Prediction.Status.LOCKED:
+            raise ValueError(
+                "Selections can only be settled when their "
+                "prediction is locked."
+            )
+
+        if result_status not in valid_results:
+            raise ValueError(
+                "Selection result must be won, lost, or void."
+            )
+
+        self.result_status = result_status
+        self.result_note = note
+        self.settled_at = timezone.now()
+
+        self.save(
+            update_fields=[
+                "result_status",
+                "result_note",
+                "settled_at",
+            ]
+        )
+
+        self.prediction.recalculate_result()
+
+    def reset_result(self) -> None:
+        if self.prediction.status not in {
+            Prediction.Status.LOCKED,
+            Prediction.Status.SETTLED,
+        }:
+            raise ValueError(
+                "Selection results can only be reset when their "
+                "prediction is locked or settled."
+            )
+
+        self.result_status = self.ResultStatus.PENDING
+        self.result_note = ""
+        self.settled_at = None
+
+        self.save(
+            update_fields=[
+                "result_status",
+                "result_note",
+                "settled_at",
+            ]
+        )
+
+        self.prediction.recalculate_result()

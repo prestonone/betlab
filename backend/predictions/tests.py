@@ -497,3 +497,252 @@ class AutomaticPredictionLockingTests(TestCase):
             ),
             0,
         )
+
+class SelectionSettlementEngineTests(TestCase):
+    def setUp(self):
+        self.user = get_user_model().objects.create_user(
+            username="settlement-manager",
+            email="settlement@example.com",
+            password="test-password-123",
+        )
+        self.category = PredictionCategory.objects.create(
+            name="Settlement Tests",
+            slug="settlement-tests",
+        )
+
+    def create_prediction(self, **overrides):
+        values = {
+            "category": self.category,
+            "title": "Settlement Test Prediction",
+            "created_by": self.user,
+            "status": Prediction.Status.LOCKED,
+            "is_published": True,
+            "published_at": timezone.now() - timedelta(hours=2),
+            "locked_at": timezone.now() - timedelta(hours=1),
+        }
+        values.update(overrides)
+        return Prediction.objects.create(**values)
+
+    def create_selection(
+        self,
+        prediction,
+        selection_order=1,
+        **overrides,
+    ):
+        values = {
+            "prediction": prediction,
+            "league": "Premier League",
+            "home_team": f"Home Team {selection_order}",
+            "away_team": f"Away Team {selection_order}",
+            "market": "Home Win",
+            "odds": "1.80",
+            "match_time": timezone.now() - timedelta(hours=1),
+            "selection_order": selection_order,
+        }
+        values.update(overrides)
+        return PredictionSelection.objects.create(**values)
+
+    def test_new_selection_defaults_to_pending(self):
+        prediction = self.create_prediction()
+        selection = self.create_selection(prediction)
+
+        self.assertEqual(
+            selection.result_status,
+            PredictionSelection.ResultStatus.PENDING,
+        )
+        self.assertFalse(selection.is_settled)
+        self.assertIsNone(selection.settled_at)
+
+    def test_selection_can_be_settled_as_won(self):
+        prediction = self.create_prediction()
+        selection = self.create_selection(prediction)
+
+        selection.settle(
+            PredictionSelection.ResultStatus.WON,
+            note="Home team won.",
+        )
+        selection.refresh_from_db()
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            selection.result_status,
+            PredictionSelection.ResultStatus.WON,
+        )
+        self.assertEqual(
+            selection.result_note,
+            "Home team won.",
+        )
+        self.assertTrue(selection.is_settled)
+        self.assertIsNotNone(selection.settled_at)
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.SETTLED,
+        )
+        self.assertEqual(
+            prediction.result_status,
+            Prediction.ResultStatus.WON,
+        )
+
+    def test_selection_rejects_pending_settlement(self):
+        prediction = self.create_prediction()
+        selection = self.create_selection(prediction)
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "Selection result must be won, lost, or void.",
+        ):
+            selection.settle(
+                PredictionSelection.ResultStatus.PENDING
+            )
+
+    def test_selection_cannot_be_settled_before_locking(self):
+        prediction = self.create_prediction(
+            status=Prediction.Status.PUBLISHED,
+            locked_at=None,
+        )
+        selection = self.create_selection(prediction)
+
+        with self.assertRaisesMessage(
+            ValueError,
+            (
+                "Selections can only be settled when their "
+                "prediction is locked."
+            ),
+        ):
+            selection.settle(
+                PredictionSelection.ResultStatus.WON
+            )
+
+    def test_prediction_remains_pending_until_all_selections_settle(self):
+        prediction = self.create_prediction()
+        first = self.create_selection(prediction, 1)
+        second = self.create_selection(prediction, 2)
+
+        first.settle(PredictionSelection.ResultStatus.WON)
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.LOCKED,
+        )
+        self.assertEqual(
+            prediction.result_status,
+            Prediction.ResultStatus.PENDING,
+        )
+        self.assertIsNone(prediction.settled_at)
+
+        second.settle(PredictionSelection.ResultStatus.WON)
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.SETTLED,
+        )
+        self.assertEqual(
+            prediction.result_status,
+            Prediction.ResultStatus.WON,
+        )
+        self.assertIsNotNone(prediction.settled_at)
+
+    def test_any_lost_selection_makes_prediction_lost(self):
+        prediction = self.create_prediction()
+        first = self.create_selection(prediction, 1)
+        second = self.create_selection(prediction, 2)
+
+        first.settle(PredictionSelection.ResultStatus.WON)
+        second.settle(PredictionSelection.ResultStatus.LOST)
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            prediction.result_status,
+            Prediction.ResultStatus.LOST,
+        )
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.SETTLED,
+        )
+
+    def test_all_void_selections_make_prediction_void(self):
+        prediction = self.create_prediction()
+        first = self.create_selection(prediction, 1)
+        second = self.create_selection(prediction, 2)
+
+        first.settle(PredictionSelection.ResultStatus.VOID)
+        second.settle(PredictionSelection.ResultStatus.VOID)
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            prediction.result_status,
+            Prediction.ResultStatus.VOID,
+        )
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.SETTLED,
+        )
+
+    def test_won_and_void_selections_make_prediction_won(self):
+        prediction = self.create_prediction()
+        first = self.create_selection(prediction, 1)
+        second = self.create_selection(prediction, 2)
+
+        first.settle(PredictionSelection.ResultStatus.WON)
+        second.settle(PredictionSelection.ResultStatus.VOID)
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            prediction.result_status,
+            Prediction.ResultStatus.WON,
+        )
+
+    def test_reset_result_reopens_settled_prediction(self):
+        prediction = self.create_prediction()
+        first = self.create_selection(prediction, 1)
+        second = self.create_selection(prediction, 2)
+
+        first.settle(PredictionSelection.ResultStatus.WON)
+        second.settle(PredictionSelection.ResultStatus.WON)
+
+        prediction.refresh_from_db()
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.SETTLED,
+        )
+
+        second.reset_result()
+        second.refresh_from_db()
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            second.result_status,
+            PredictionSelection.ResultStatus.PENDING,
+        )
+        self.assertEqual(second.result_note, "")
+        self.assertIsNone(second.settled_at)
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.LOCKED,
+        )
+        self.assertEqual(
+            prediction.result_status,
+            Prediction.ResultStatus.PENDING,
+        )
+        self.assertIsNone(prediction.settled_at)
+
+    def test_prediction_without_selections_remains_pending(self):
+        prediction = self.create_prediction()
+
+        result = prediction.recalculate_result()
+        prediction.refresh_from_db()
+
+        self.assertEqual(
+            result,
+            Prediction.ResultStatus.PENDING,
+        )
+        self.assertEqual(
+            prediction.status,
+            Prediction.Status.LOCKED,
+        )
+        self.assertEqual(
+            prediction.result_status,
+            Prediction.ResultStatus.PENDING,
+        )
