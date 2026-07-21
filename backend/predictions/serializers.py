@@ -31,12 +31,18 @@ class PredictionSelectionSerializer(serializers.ModelSerializer):
             "odds",
             "match_time",
             "selection_order",
+            "result_status",
+            "result_note",
+            "settled_at",
         ]
 
 
 class PredictionSerializer(serializers.ModelSerializer):
     category = PredictionCategorySerializer(read_only=True)
-    selections = PredictionSelectionSerializer(many=True, read_only=True)
+    selections = PredictionSelectionSerializer(
+        many=True,
+        read_only=True,
+    )
 
     class Meta:
         model = Prediction
@@ -46,10 +52,14 @@ class PredictionSerializer(serializers.ModelSerializer):
             "title",
             "access_level",
             "analysis",
+            "status",
             "result_status",
             "result_note",
             "is_published",
+            "scheduled_for",
             "published_at",
+            "locked_at",
+            "settled_at",
             "created_at",
             "updated_at",
             "selections",
