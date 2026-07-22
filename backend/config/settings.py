@@ -86,7 +86,7 @@ ROOT_URLCONF = 'config.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -221,7 +221,7 @@ else:
 PAYSTACK_WEBHOOK_SECRET = os.getenv("PAYSTACK_WEBHOOK_SECRET", "")
 PAYSTACK_CALLBACK_URL = os.getenv(
     "PAYSTACK_CALLBACK_URL",
-    f"{FRONTEND_URL}/?payment=callback",
+    f"{FRONTEND_URL}/dashboard?payment=callback",
 )
 PAYSTACK_API_URL = os.getenv("PAYSTACK_API_URL", "https://api.paystack.co")
 

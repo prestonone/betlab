@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 import AnimatedFavicon from "../components/AnimatedFavicon";
 import AnimatedLogoMark from "../components/AnimatedLogoMark";
@@ -19,44 +20,65 @@ import VerifyEmailPage from "../pages/VerifyEmailPage";
 import { cn, type Page } from "./shared";
 
 
-function initialPage(): Page {
-  const params = new URLSearchParams(window.location.search);
-  if (params.get("payment") === "callback") {
-    return "dashboard";
-  }
-  if (params.get("reset") === "1") {
-    return "reset-password";
-  }
-  if (params.get("verify") === "1") {
-    return "verify-email";
-  }
+const PATH_FOR: Record<Page, string> = {
+  "home": "/",
+  "pricing": "/pricing",
+  "login": "/login",
+  "register": "/register",
+  "dashboard": "/dashboard",
+  "predictions": "/predictions",
+  "results": "/results",
+  "about": "/about",
+  "contact": "/contact",
+  "reset-password": "/reset-password",
+  "verify-email": "/verify-email",
+};
 
-  const storedPage = window.location.hash.replace(/^#\/?/, "") as Page;
-  const pages: Page[] = [
-    "home", "pricing", "login", "register", "dashboard",
-    "predictions", "results", "about", "contact",
-  ];
-  return pages.includes(storedPage) ? storedPage : "home";
+const PAGE_FOR_PATH: Record<string, Page> = Object.fromEntries(
+  Object.entries(PATH_FOR).map(([page, path]) => [path, page as Page]),
+);
+
+function pageForPathname(pathname: string): Page {
+  return PAGE_FOR_PATH[pathname] ?? "home";
 }
+
+const TITLE_FOR: Record<Page, string> = {
+  "home": "Bet Lab | Football Predictions & Betting Intelligence",
+  "pricing": "Pricing | Bet Lab",
+  "login": "Sign In | Bet Lab",
+  "register": "Get Lab Access | Bet Lab",
+  "dashboard": "Dashboard | Bet Lab",
+  "predictions": "Today's Predictions | Bet Lab",
+  "results": "Results | Bet Lab",
+  "about": "About | Bet Lab",
+  "contact": "Contact | Bet Lab",
+  "reset-password": "Reset Password | Bet Lab",
+  "verify-email": "Verify Email | Bet Lab",
+};
 
 
 export default function App() {
-  const [page, setPage] = useState<Page>(initialPage);
+  const location = useLocation();
+  const navigate = useNavigate();
+  const page = pageForPathname(location.pathname);
   const { isAuthenticated: authed, isLoading: authLoading, logout } = useAuth();
 
   useEffect(() => {
     if (!authLoading && page === "dashboard" && !authed) {
-      setPage("login");
+      navigate("/login", { replace: true });
     }
-  }, [authLoading, authed, page]);
+  }, [authLoading, authed, page, navigate]);
+
+  useEffect(() => {
+    document.title = TITLE_FOR[page];
+  }, [page]);
 
   const setAuthed = (value: boolean) => {
     if (!value) logout();
   };
 
   const nav = (nextPage: Page) => {
-    setPage(nextPage);
-    window.history.replaceState(null, "", `${window.location.pathname}#/${nextPage}`);
+    navigate(PATH_FOR[nextPage]);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

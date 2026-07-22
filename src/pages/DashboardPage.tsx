@@ -62,7 +62,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
           kind: "success",
           message: `${payment.plan_name} is now active.`,
         });
-        window.history.replaceState(null, "", "#/dashboard");
+        window.history.replaceState(null, "", "/dashboard");
       })
       .catch((error) => {
         if (!active) return;

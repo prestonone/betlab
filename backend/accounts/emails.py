@@ -16,7 +16,7 @@ def _uid_for(user) -> str:
 def send_verification_email(user) -> None:
     uid = _uid_for(user)
     token = email_verification_token.make_token(user)
-    link = f"{settings.FRONTEND_URL}/?verify=1&uid={uid}&token={token}"
+    link = f"{settings.FRONTEND_URL}/verify-email?uid={uid}&token={token}"
 
     html, text = verification_email(link)
     send_email(
@@ -30,7 +30,7 @@ def send_verification_email(user) -> None:
 def send_password_reset_email(user) -> None:
     uid = _uid_for(user)
     token = default_token_generator.make_token(user)
-    link = f"{settings.FRONTEND_URL}/?reset=1&uid={uid}&token={token}"
+    link = f"{settings.FRONTEND_URL}/reset-password?uid={uid}&token={token}"
 
     html, text = password_reset_email(link)
     send_email(
