@@ -109,40 +109,11 @@ export const RESULTS: Result[] = [
   { id: 12, date: "13 Jul", league: "Serie A", match: "Roma vs Lazio", prediction: "Under 2.5 Goals", odds: 1.85, result: "void", profit: 0 },
 ];
 
-export const PERF_DATA = [
-  { day: "Jul 1", winRate: 64, roi: 8.2 },
-  { day: "Jul 3", winRate: 68, roi: 11.4 },
-  { day: "Jul 5", winRate: 71, roi: 13.8 },
-  { day: "Jul 7", winRate: 69, roi: 12.1 },
-  { day: "Jul 9", winRate: 74, roi: 16.5 },
-  { day: "Jul 11", winRate: 72, roi: 18.2 },
-  { day: "Jul 13", winRate: 78, roi: 20.4 },
-  { day: "Jul 15", winRate: 75, roi: 19.8 },
-  { day: "Jul 17", winRate: 80, roi: 22.1 },
-  { day: "Jul 19", winRate: 82, roi: 23.4 },
-];
-
-export const LEAGUE_PERF = [
-  { league: "EPL", winRate: 81, predictions: 42 },
-  { league: "UCL", winRate: 76, predictions: 28 },
-  { league: "La Liga", winRate: 79, predictions: 35 },
-  { league: "Bundesliga", winRate: 74, predictions: 30 },
-  { league: "Serie A", winRate: 72, predictions: 26 },
-  { league: "Ligue 1", winRate: 85, predictions: 18 },
-];
-
 export const TESTIMONIALS = [
   { name: "Clear Daily Picks", role: "Member experience", avatar: "DP", rating: 5, quote: "See the match, selected market, odds, confidence and short analysis without sorting through a cluttered list of games." },
   { name: "Transparent Results", role: "Trust by design", avatar: "TR", rating: 5, quote: "Every published selection remains in the results history after the match, whether it wins, loses or is void." },
   { name: "Simple Lab Access", role: "Built for Nigeria", avatar: "LA", rating: 5, quote: "Choose a daily, weekly or monthly plan and receive immediate member access after successful payment verification." },
 ];
-
-export const USER = {
-  name: "Idongesit Preston", initials: "IP",
-  email: "member@betlab.ng", plan: "Monthly Lab",
-  expiry: "19 Oct 2026", daysLeft: 92,
-  winRate: 78, roi: 23.4, streak: 7, totalPredictions: 847,
-};
 
 export const NOTIFICATIONS = [
   { icon: "✅", text: "Bayern vs Barcelona prediction confirmed: WON", time: "12m ago", unread: true },
