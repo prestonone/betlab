@@ -19,6 +19,7 @@ def _request(path: str, *, payload: dict | None = None) -> dict:
         headers={
             "Authorization": f"Bearer {settings.PAYSTACK_SECRET_KEY}",
             "Content-Type": "application/json",
+            "User-Agent": "BetLab-Backend/1.0",
         },
         method="POST" if payload is not None else "GET",
     )

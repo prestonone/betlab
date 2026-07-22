@@ -32,7 +32,7 @@ def env_list(name: str, default: str = "") -> list[str]:
     return [value.strip() for value in os.getenv(name, default).split(",") if value.strip()]
 
 
-DEBUG = env_bool("DEBUG", True)
+DEBUG = env_bool("DEBUG", False)
 SECRET_KEY = os.getenv("SECRET_KEY", "")
 if not SECRET_KEY:
     if not DEBUG:
@@ -40,6 +40,10 @@ if not SECRET_KEY:
     SECRET_KEY = "django-insecure-local-development-only"
 
 ALLOWED_HOSTS = env_list("ALLOWED_HOSTS", "127.0.0.1,localhost")
+
+RENDER_EXTERNAL_HOSTNAME = os.getenv("RENDER_EXTERNAL_HOSTNAME", "").strip()
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 
 # Application definition
@@ -178,6 +182,8 @@ CORS_ALLOWED_ORIGINS = env_list(
     "http://localhost:5173,http://127.0.0.1:5173",
 )
 CSRF_TRUSTED_ORIGINS = env_list("CSRF_TRUSTED_ORIGINS")
+if RENDER_EXTERNAL_HOSTNAME:
+    CSRF_TRUSTED_ORIGINS.append(f"https://{RENDER_EXTERNAL_HOSTNAME}")
 
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
@@ -204,10 +210,20 @@ SIMPLE_JWT = {
 }
 
 FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:5173").rstrip("/")
-PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY", "")
+
+PAYSTACK_MODE = os.getenv("PAYSTACK_MODE", "test").strip().lower()
+if PAYSTACK_MODE == "live":
+    PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_LIVE_SECRET_KEY", "")
+    PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_LIVE_PUBLIC_KEY", "")
+else:
+    PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_TEST_SECRET_KEY", "")
+    PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_TEST_PUBLIC_KEY", "")
 PAYSTACK_WEBHOOK_SECRET = os.getenv("PAYSTACK_WEBHOOK_SECRET", "")
 PAYSTACK_CALLBACK_URL = os.getenv(
     "PAYSTACK_CALLBACK_URL",
     f"{FRONTEND_URL}/?payment=callback",
 )
 PAYSTACK_API_URL = os.getenv("PAYSTACK_API_URL", "https://api.paystack.co")
+
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@betlabhq.com")

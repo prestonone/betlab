@@ -12,6 +12,7 @@ import {
   saveTokens,
   updateAccessToken,
 } from "../utils/token";
+import { apiRequest } from "./api";
 
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ??
@@ -172,4 +173,38 @@ export async function getCurrentUser(): Promise<User> {
 
 export function logout(): void {
   removeTokens();
+}
+
+export async function requestPasswordReset(email: string): Promise<{ detail: string }> {
+  return request<{ detail: string }>("/api/v1/auth/password-reset/", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  });
+}
+
+export async function confirmPasswordReset(payload: {
+  uid: string;
+  token: string;
+  new_password: string;
+  new_password_confirm: string;
+}): Promise<{ detail: string }> {
+  return request<{ detail: string }>("/api/v1/auth/password-reset/confirm/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function verifyEmail(payload: { uid: string; token: string }): Promise<{ detail: string }> {
+  return request<{ detail: string }>("/api/v1/auth/verify-email/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function resendVerificationEmail(): Promise<{ detail: string }> {
+  return apiRequest<{ detail: string }>(
+    "/api/v1/auth/verify-email/resend/",
+    { method: "POST" },
+    true,
+  );
 }

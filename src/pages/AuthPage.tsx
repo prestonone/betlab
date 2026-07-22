@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { BarChart2, ArrowRight, Lock, Mail, Eye, EyeOff, AlertCircle } from "lucide-react";
+import { BarChart2, ArrowRight, Lock, Mail, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import { Page, cn, GoldBtn } from "../app/shared";
 import { useAuth } from "../contexts/AuthContext";
-import { AuthApiError } from "../services/auth";
+import { AuthApiError, requestPasswordReset } from "../services/auth";
 import { initializePayment } from "../services/payments";
 import { setBillingCountry } from "../services/subscriptions";
 
@@ -17,6 +17,31 @@ export default function AuthPage({ mode, nav }: {
   const [form, setForm] = useState({ name: "", email: "", pass: "", plan: "Weekly Lab" });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [showForgot, setShowForgot] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
+  const [forgotError, setForgotError] = useState("");
+  const [forgotSubmitting, setForgotSubmitting] = useState(false);
+
+  const submitForgot = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setForgotError("");
+    setForgotSubmitting(true);
+
+    try {
+      await requestPasswordReset(forgotEmail.trim());
+      setForgotSent(true);
+    } catch (requestError) {
+      setForgotError(
+        requestError instanceof AuthApiError || requestError instanceof Error
+          ? requestError.message
+          : "Unable to connect to Bet Lab. Please confirm the backend is running.",
+      );
+    } finally {
+      setForgotSubmitting(false);
+    }
+  };
 
   const go = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -99,14 +124,69 @@ export default function AuthPage({ mode, nav }: {
         </div>
 
         {/* Tab toggle */}
-        <div className="flex bg-card border border-[#D4AF37]/12 rounded-lg p-1 mb-6">
-          {(["login", "register"] as const).map(t => (
-            <button key={t} onClick={() => { setTab(t); setStep(1); setError(""); }} className={cn("flex-1 py-2 rounded text-[13px] font-medium transition-all capitalize cursor-pointer", tab === t ? "bg-[#D4AF37] text-[#070E1A]" : "text-white/40 hover:text-white")}>
-              {t === "login" ? "Sign In" : "Register"}
-            </button>
-          ))}
-        </div>
+        {!showForgot && (
+          <div className="flex bg-card border border-[#D4AF37]/12 rounded-lg p-1 mb-6">
+            {(["login", "register"] as const).map(t => (
+              <button key={t} onClick={() => { setTab(t); setStep(1); setError(""); }} className={cn("flex-1 py-2 rounded text-[13px] font-medium transition-all capitalize cursor-pointer", tab === t ? "bg-[#D4AF37] text-[#070E1A]" : "text-white/40 hover:text-white")}>
+                {t === "login" ? "Sign In" : "Register"}
+              </button>
+            ))}
+          </div>
+        )}
 
+        {showForgot ? (
+          <div className="bg-card border border-[#D4AF37]/12 rounded-xl p-7">
+            {forgotSent ? (
+              <div className="text-center py-2">
+                <div className="w-11 h-11 rounded-full bg-emerald-500/12 border border-emerald-500/30 flex items-center justify-center mx-auto mb-3">
+                  <CheckCircle2 size={20} className="text-emerald-400" />
+                </div>
+                <p className="font-['Rajdhani',sans-serif] font-bold text-white text-lg mb-1">Check your email</p>
+                <p className="text-[12px] text-white/40 mb-5">If an account exists for that address, a reset link is on its way.</p>
+                <button
+                  type="button"
+                  onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(""); }}
+                  className="text-[11px] text-[#D4AF37]/60 hover:text-[#D4AF37] cursor-pointer"
+                >
+                  Back to sign in
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={submitForgot} className="space-y-4">
+                <div>
+                  <p className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">Reset your password</p>
+                  <p className="text-[12px] text-white/35 mb-4">Enter your account email and we&apos;ll send you a reset link.</p>
+                  <label className="block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35 mb-1.5">Email</label>
+                  <div className="relative">
+                    <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                    <input type="email" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} required placeholder="you@example.com"
+                      className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-3.5 py-2.5 text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors" />
+                  </div>
+                </div>
+
+                {forgotError && (
+                  <div role="alert" className="flex items-start gap-2 rounded-lg border border-red-400/20 bg-red-400/5 px-3.5 py-3">
+                    <AlertCircle size={14} className="mt-0.5 shrink-0 text-red-400" />
+                    <p className="text-[12px] leading-relaxed text-red-300">{forgotError}</p>
+                  </div>
+                )}
+
+                <GoldBtn full size="md">
+                  {forgotSubmitting ? "Please wait..." : "Send Reset Link"}
+                  {!forgotSubmitting && <ArrowRight size={14} />}
+                </GoldBtn>
+
+                <button
+                  type="button"
+                  onClick={() => setShowForgot(false)}
+                  className="w-full text-center text-[11px] text-white/35 hover:text-white/60 cursor-pointer"
+                >
+                  Back to sign in
+                </button>
+              </form>
+            )}
+          </div>
+        ) : (
         <div className="bg-card border border-[#D4AF37]/12 rounded-xl p-7">
           <form onSubmit={go} className="space-y-4">
             {tab === "register" && step === 1 && (
@@ -169,7 +249,7 @@ export default function AuthPage({ mode, nav }: {
                   <input type="checkbox" className="w-3 h-3 accent-[#D4AF37]" />
                   <span className="text-[11px] text-white/35">Remember me</span>
                 </label>
-                <button type="button" className="text-[11px] text-[#D4AF37]/60 hover:text-[#D4AF37] cursor-pointer">Forgot password?</button>
+                <button type="button" onClick={() => setShowForgot(true)} className="text-[11px] text-[#D4AF37]/60 hover:text-[#D4AF37] cursor-pointer">Forgot password?</button>
               </div>
             )}
 
@@ -201,6 +281,7 @@ export default function AuthPage({ mode, nav }: {
           </form>
           <p className="mt-5 text-center font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">Secure authentication powered by Bet Lab</p>
         </div>
+        )}
       </div>
     </div>
   );

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, Settings, Menu, X, Target, Activity, CheckCircle2, XCircle, Minus, Flame, LayoutDashboard, List, LineChart, History } from "lucide-react";
+import { TrendingUp, Settings, Menu, X, Target, Activity, CheckCircle2, XCircle, Minus, Flame, LayoutDashboard, LineChart, History, MailWarning } from "lucide-react";
 import { Page, DashSection, PREDICTIONS, RESULTS, PERF_DATA, LEAGUE_PERF, USER, cn, GOLD, Chip, PredCard } from "../app/shared";
+import { useAuth } from "../contexts/AuthContext";
 import { useCurrentSubscription } from "../hooks/useCurrentSubscription";
+import { resendVerificationEmail } from "../services/auth";
 import { verifyPayment } from "../services/payments";
 
 export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
@@ -12,6 +14,19 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
     kind: "pending" | "success" | "error";
     message: string;
   } | null>(null);
+
+  const { user } = useAuth();
+  const [resendState, setResendState] = useState<"idle" | "sending" | "sent" | "error">("idle");
+
+  const resendVerification = async () => {
+    setResendState("sending");
+    try {
+      await resendVerificationEmail();
+      setResendState("sent");
+    } catch {
+      setResendState("error");
+    }
+  };
 
   const {
     subscription,
@@ -62,7 +77,6 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
 
   const navItems: { icon: React.ReactNode; label: string; s: DashSection }[] = [
     { icon: <LayoutDashboard size={15} />, label: "Overview", s: "overview" },
-    { icon: <List size={15} />, label: "Predictions", s: "predictions" },
     { icon: <History size={15} />, label: "Results", s: "results" },
     { icon: <LineChart size={15} />, label: "Performance", s: "performance" },
   ];
@@ -160,6 +174,25 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
               paymentNotice.kind === "error" && "border-rose-500/25 bg-rose-500/8 text-rose-300",
             )} role="status">
               {paymentNotice.message}
+            </div>
+          )}
+          {user && !user.is_email_verified && (
+            <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-4 py-3 text-[12px] text-[#D4AF37]" role="status">
+              <MailWarning size={15} className="flex-shrink-0" />
+              <span className="flex-1">
+                {resendState === "sent"
+                  ? "Verification email sent — check your inbox."
+                  : "Please verify your email address to secure your account."}
+              </span>
+              {resendState !== "sent" && (
+                <button
+                  onClick={resendVerification}
+                  disabled={resendState === "sending"}
+                  className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-[#D4AF37] underline underline-offset-2 hover:text-[#D4AF37]/80 disabled:opacity-50 cursor-pointer"
+                >
+                  {resendState === "sending" ? "Sending..." : resendState === "error" ? "Retry" : "Resend email"}
+                </button>
+              )}
             </div>
           )}
           {/* Page header */}
@@ -262,24 +295,11 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-['Rajdhani',sans-serif] font-bold text-[22px] text-white">Today&apos;s Top Picks</h3>
-                  <button onClick={() => setSection("predictions")} className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/60 hover:text-[#D4AF37] uppercase tracking-widest cursor-pointer">View all →</button>
+                  <button onClick={() => nav("predictions")} className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/60 hover:text-[#D4AF37] uppercase tracking-widest cursor-pointer">View all →</button>
                 </div>
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {PREDICTIONS.slice(0, 3).map(p => <PredCard key={p.id} pred={p} />)}
                 </div>
-              </div>
-            </div>
-          )}
-
-          {/* ── Section: Predictions ────────────────────────── */}
-          {section === "predictions" && (
-            <div>
-              <div className="flex items-center justify-between mb-5">
-                <h2 className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-white">Today&apos;s Predictions</h2>
-                <Chip label="6 live" variant="emerald" />
-              </div>
-              <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                {PREDICTIONS.map(p => <PredCard key={p.id} pred={p} />)}
               </div>
             </div>
           )}

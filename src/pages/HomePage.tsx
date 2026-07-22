@@ -1,5 +1,6 @@
 import { TrendingUp, Shield, Star, Check, Target, Users, Award, ArrowRight, Lock, Activity, ChevronRight, CheckCircle2 } from "lucide-react";
 import { Page, PREDICTIONS, TESTIMONIALS, cn, useCounter, GOLD, GoldBtn, SectionEyebrow, LiveTicker, PredCard } from "../app/shared";
+import FootballAnimation from "../components/FootballAnimation";
 
 export default function HomePage({ nav }: { nav: (p: Page) => void }) {
   const wins = useCounter(6, 1200);
@@ -36,6 +37,8 @@ export default function HomePage({ nav }: { nav: (p: Page) => void }) {
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0B1220]" />
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent" />
         </div>
+
+        <FootballAnimation />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 w-full py-20 lg:py-28">
           <div className="grid lg:grid-cols-[1fr_420px] gap-16 items-center">
@@ -90,15 +93,15 @@ export default function HomePage({ nav }: { nav: (p: Page) => void }) {
             <div className="hidden lg:block relative h-[520px]">
               <div className="absolute inset-0 flex items-center justify-center">
                 {/* Back card */}
-                <div className="absolute top-0 right-2 w-[340px] rotate-[2deg] opacity-35 pointer-events-none scale-95">
+                <div className="absolute top-0 right-2 w-[340px] pointer-events-none animate-fan-back">
                   <PredCard pred={PREDICTIONS[2]} />
                 </div>
                 {/* Mid card */}
-                <div className="absolute top-14 right-0 w-[340px] rotate-[0.5deg] opacity-60 pointer-events-none scale-[0.97]">
+                <div className="absolute top-14 right-0 w-[340px] pointer-events-none animate-fan-mid">
                   <PredCard pred={PREDICTIONS[1]} />
                 </div>
                 {/* Front card */}
-                <div className="absolute top-24 right-4 w-[350px] z-10">
+                <div className="absolute top-24 right-4 w-[350px] z-10 animate-fan-front">
                   <PredCard pred={PREDICTIONS[0]} />
                 </div>
                 {/* Result badge */}

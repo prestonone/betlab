@@ -7,9 +7,10 @@ import type { Prediction as ApiPrediction } from "../services/predictions";
 export type Page =
   | "home" | "pricing" | "login" | "register"
   | "dashboard" | "predictions" | "results"
-  | "about" | "contact";
+  | "about" | "contact"
+  | "reset-password" | "verify-email";
 
-export type DashSection = "overview" | "predictions" | "results" | "performance";
+export type DashSection = "overview" | "results" | "performance";
 export type PredCategory = "Banker" | "Sure 2" | "Sure 3" | "Sure 5" | "Rollover";
 export type PredStatus = "pending" | "won" | "lost" | "void";
 

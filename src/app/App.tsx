@@ -10,8 +10,11 @@ import ContactPage from "../pages/ContactPage";
 import DashboardPage from "../pages/DashboardPage";
 import HomePage from "../pages/HomePage";
 import PredictionsPage from "../pages/PredictionsPage";
+import PredictionsMarketingPage from "../pages/PredictionsMarketingPage";
 import PricingPage from "../pages/PricingPage";
+import ResetPasswordPage from "../pages/ResetPasswordPage";
 import ResultsPage from "../pages/ResultsPage";
+import VerifyEmailPage from "../pages/VerifyEmailPage";
 import { cn, type Page } from "./shared";
 
 
@@ -19,6 +22,12 @@ function initialPage(): Page {
   const params = new URLSearchParams(window.location.search);
   if (params.get("payment") === "callback") {
     return "dashboard";
+  }
+  if (params.get("reset") === "1") {
+    return "reset-password";
+  }
+  if (params.get("verify") === "1") {
+    return "verify-email";
   }
 
   const storedPage = window.location.hash.replace(/^#\/?/, "") as Page;
@@ -46,7 +55,7 @@ export default function App() {
 
   const nav = (nextPage: Page) => {
     setPage(nextPage);
-    window.history.replaceState(null, "", `#/${nextPage}`);
+    window.history.replaceState(null, "", `${window.location.pathname}#/${nextPage}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -77,10 +86,14 @@ export default function App() {
         {page === "login" && <AuthPage mode="login" nav={nav} />}
         {page === "register" && <AuthPage mode="register" nav={nav} />}
         {page === "dashboard" && <DashboardPage nav={nav} />}
-        {page === "predictions" && <PredictionsPage nav={nav} authed={authed} />}
+        {page === "predictions" && (authed
+          ? <PredictionsPage nav={nav} authed={authed} />
+          : <PredictionsMarketingPage nav={nav} />)}
         {page === "results" && <ResultsPage />}
         {page === "about" && <AboutPage nav={nav} />}
         {page === "contact" && <ContactPage />}
+        {page === "reset-password" && <ResetPasswordPage nav={nav} />}
+        {page === "verify-email" && <VerifyEmailPage nav={nav} />}
       </div>
 
       {!isDash && <Footer nav={nav} />}

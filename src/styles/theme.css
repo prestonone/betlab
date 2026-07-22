@@ -168,8 +168,36 @@
     from { transform: scaleX(0); }
     to { transform: scaleX(1); }
   }
+  @keyframes football-flight {
+    0%   { transform: translate(-10vw, 55vh) scale(0.4) rotate(0deg); opacity: 0; }
+    6%   { opacity: 1; }
+    16%  { transform: translate(10vw, 6vh) scale(0.8) rotate(240deg); }
+    30%  { transform: translate(22vw, 52vh) scale(0.9) rotate(430deg); }
+    43%  { transform: translate(35vw, 16vh) scale(0.95) rotate(620deg); }
+    56%  { transform: translate(47vw, 48vh) scale(1) rotate(800deg); }
+    67%  { transform: translate(57vw, 26vh) scale(1) rotate(950deg); }
+    77%  { transform: translate(65vw, 46vh) scale(1) rotate(1080deg); opacity: 1; }
+    100% { transform: translate(135vw, -55vh) scale(0.3) rotate(1500deg); opacity: 0; }
+  }
+
+  @keyframes fan-back {
+    0%, 38%, 62%, 100% { transform: translate(0, 0) rotate(2deg) scale(0.95); opacity: 0.35; }
+    46%, 54% { transform: translate(-46px, -14px) rotate(-9deg) scale(1); opacity: 0.85; }
+  }
+  @keyframes fan-mid {
+    0%, 38%, 62%, 100% { transform: translate(0, 0) rotate(0.5deg) scale(0.97); opacity: 0.6; }
+    46%, 54% { transform: translate(0, -22px) rotate(-2deg) scale(1); opacity: 0.9; }
+  }
+  @keyframes fan-front {
+    0%, 38%, 62%, 100% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+    46%, 54% { transform: translate(38px, -8px) rotate(7deg) scale(1.02); opacity: 1; }
+  }
 
   .animate-fade-up { animation: fade-up 0.5s ease both; }
+  .animate-football-flight { animation: football-flight 3.1s cubic-bezier(0.33, 1, 0.68, 1) both; }
+  .animate-fan-back { animation: fan-back 9s ease-in-out infinite; }
+  .animate-fan-mid { animation: fan-mid 9s ease-in-out infinite; }
+  .animate-fan-front { animation: fan-front 9s ease-in-out infinite; }
   .animate-fade-in { animation: fade-in 0.4s ease both; }
   .animate-ticker { animation: ticker-scroll 28s linear infinite; }
   .delay-100 { animation-delay: 0.1s; }
