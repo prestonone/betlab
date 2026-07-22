@@ -21,6 +21,24 @@ const PLAN_MARKETING: Record<string, { period: string; inc: string[]; exc: strin
   "pro-lab": {
     period: "/month",
     inc: ["Everything in Weekly Lab", "Weekend Mega and Jackpot", "Performance dashboard", "Priority notifications", "Best member value"],
+    exc: ["Quarterly performance report"],
+    highlight: false,
+  },
+  "quarterly-elite": {
+    period: "/quarter",
+    inc: ["Everything in Monthly Lab", "Quarterly performance report", "Early access to new markets", "Priority support"],
+    exc: ["Direct analyst access"],
+    highlight: false,
+  },
+  "half-year-elite": {
+    period: "/6 months",
+    inc: ["Everything in Quarterly Elite", "Exclusive mid-season briefings", "Direct analyst access", "Locked-in renewal rate"],
+    exc: ["Founding member badge"],
+    highlight: false,
+  },
+  "founders-circle": {
+    period: "/year",
+    inc: ["Everything in Half-Year Elite", "Full year of Lab access", "Founding member badge", "Lifetime price lock", "Direct line to the analyst desk"],
     exc: [],
     highlight: false,
   },
@@ -86,7 +104,7 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
           <h1 className="font-['Rajdhani',sans-serif] font-bold text-[56px] sm:text-[68px] text-white mb-4">
             TRANSPARENT PRICING
           </h1>
-          <p className="text-white/40 mb-8 text-[14px]">Choose daily, weekly or monthly access. Payments will be processed securely in Nigerian naira.</p>
+          <p className="text-white/40 mb-8 text-[14px]">From daily access to a full year of membership. Payments will be processed securely in Nigerian naira.</p>
 
         </div>
 
@@ -97,7 +115,7 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
           <p className="text-center text-[12px] text-white/35 mb-8">Loading pricing...</p>
         )}
 
-        <div className="grid md:grid-cols-3 gap-4 mb-20">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-20">
           {plans.map((plan, i) => {
             return (
               <div key={i} className={cn(
