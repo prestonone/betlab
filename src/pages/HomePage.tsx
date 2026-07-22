@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { TrendingUp, Shield, Star, Check, Target, Users, Award, ArrowRight, Lock, Activity, ChevronRight, CheckCircle2 } from "lucide-react";
-import { Page, PREDICTIONS, TESTIMONIALS, cn, useCounter, GOLD, GoldBtn, SectionEyebrow, LiveTicker, PredCard } from "../app/shared";
+import { Page, PREDICTIONS, TESTIMONIALS, cn, useCounter, GoldBtn, SectionEyebrow, LiveTicker, PredCard } from "../app/shared";
 import FootballAnimation from "../components/FootballAnimation";
 import { getPlans } from "../services/subscriptions";
 import type { Plan } from "../types/subscriptions";
@@ -45,15 +45,7 @@ export default function HomePage({ nav }: { nav: (p: Page) => void }) {
     <div>
       {/* ── Hero ─────────────────────────────────────────────── */}
       <section className="relative min-h-screen flex items-center overflow-hidden pt-[60px]">
-        {/* Grid backdrop */}
         <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 opacity-[0.035]"
-            style={{
-              backgroundImage: `linear-gradient(${GOLD} 1px, transparent 1px), linear-gradient(90deg, ${GOLD} 1px, transparent 1px)`,
-              backgroundSize: "52px 52px",
-              animation: "grid-drift 18s linear infinite",
-            }}
-          />
           <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-[#0B1220]" />
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/20 to-transparent" />
         </div>
