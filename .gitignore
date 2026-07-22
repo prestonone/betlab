@@ -65,6 +65,7 @@ db.sqlite3
 # Editors
 .idea/
 .vscode/
+.claude/
 
 # Test and tooling caches
 .pytest_cache/
