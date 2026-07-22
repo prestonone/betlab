@@ -26,6 +26,13 @@ function earliestKickoff(pred: ApiPrediction): Date | null {
   return new Date(Math.min(...times.map(d => d.getTime())));
 }
 
+function greetingForHour(hour: number): string {
+  if (hour < 5) return "Good night";
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
+}
+
 export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
   const [section, setSection] = useState<DashSection>("overview");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -56,6 +63,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
 
   const [predictions, setPredictions] = useState<ApiPrediction[]>([]);
   const [predictionsError, setPredictionsError] = useState("");
+  const greeting = greetingForHour(new Date().getHours());
 
   useEffect(() => {
     let active = true;
@@ -310,7 +318,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
             <div>
               <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-[0.2em] mb-1">Dashboard · {section}</p>
               <h1 className="font-['Rajdhani',sans-serif] font-bold text-[38px] text-white leading-none">
-                Good morning, <span className="text-[#D4AF37]">{(displayNameFor(user).split(" ")[0]) || "there"}.</span>
+                {greeting}, <span className="text-[#D4AF37]">{(displayNameFor(user).split(" ")[0]) || "there"}.</span>
               </h1>
               <p className="text-[12px] text-white/35 mt-1">
                 {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · {stats.todaysPicks.length} predictions live today

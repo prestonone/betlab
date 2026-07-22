@@ -56,6 +56,27 @@ export default function AuthPage({ mode, nav }: {
     }
   };
 
+  const createAccount = async () => {
+    const username =
+      form.name
+        .trim()
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_")
+        .replace(/^_+|_+$/g, "") ||
+      form.email
+        .split("@")[0]
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "_") ||
+      "member";
+
+    await register({
+      username,
+      email: form.email.trim(),
+      password: form.pass,
+      password_confirm: form.pass,
+    });
+  };
+
   const go = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -73,40 +94,45 @@ export default function AuthPage({ mode, nav }: {
           email: form.email.trim(),
           password: form.pass,
         });
+
+        const storedPlan = sessionStorage.getItem("betlab_checkout_plan");
+        if (storedPlan) {
+          await setBillingCountry("NG");
+          const payment = await initializePayment(storedPlan);
+          sessionStorage.removeItem("betlab_checkout_plan");
+          sessionStorage.removeItem("betlab_checkout_plan_name");
+          window.location.assign(payment.authorization_url);
+          return;
+        }
+
+        nav("dashboard");
       } else {
-        const username =
-          form.name
-            .trim()
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "_")
-            .replace(/^_+|_+$/g, "") ||
-          form.email
-            .split("@")[0]
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, "_") ||
-          "member";
-
-        await register({
-          username,
-          email: form.email.trim(),
-          password: form.pass,
-          password_confirm: form.pass,
-        });
-      }
-
-      const selectedPlan = tab === "register"
-        ? form.plan
-        : sessionStorage.getItem("betlab_checkout_plan");
-
-      if (selectedPlan) {
+        await createAccount();
         await setBillingCountry("NG");
-        const payment = await initializePayment(selectedPlan);
-        sessionStorage.removeItem("betlab_checkout_plan");
-        sessionStorage.removeItem("betlab_checkout_plan_name");
+        const payment = await initializePayment(form.plan);
         window.location.assign(payment.authorization_url);
-        return;
       }
+    } catch (requestError) {
+      if (requestError instanceof AuthApiError || requestError instanceof Error) {
+        setError(requestError.message);
+      } else {
+        setError(
+          "Unable to connect to Bet Lab. Please confirm the backend is running.",
+        );
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
+  const continueFree = async () => {
+    setError("");
+    setIsSubmitting(true);
+
+    try {
+      await createAccount();
+      sessionStorage.removeItem("betlab_checkout_plan");
+      sessionStorage.removeItem("betlab_checkout_plan_name");
       nav("dashboard");
     } catch (requestError) {
       if (requestError instanceof AuthApiError || requestError instanceof Error) {
@@ -290,9 +316,20 @@ export default function AuthPage({ mode, nav }: {
                   ? "Sign In"
                   : step === 1
                     ? "Continue"
-                    : "Create Account"}
+                    : "Create Account & Pay"}
               {!isSubmitting && <ArrowRight size={14} />}
             </GoldBtn>
+
+            {tab === "register" && step === 2 && (
+              <button
+                type="button"
+                onClick={() => void continueFree()}
+                disabled={isSubmitting}
+                className="w-full text-center text-[11px] text-white/35 hover:text-white/60 transition-colors cursor-pointer disabled:opacity-50"
+              >
+                Continue for free instead
+              </button>
+            )}
           </form>
           <p className="mt-5 text-center font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">Secure authentication powered by Bet Lab</p>
         </div>
