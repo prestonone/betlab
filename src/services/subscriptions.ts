@@ -1,4 +1,4 @@
-import type { CurrentSubscriptionResponse } from "../types/subscriptions";
+import type { CurrentSubscriptionResponse, Plan, PlansResponse } from "../types/subscriptions";
 import {
   getAccessToken,
   getRefreshToken,
@@ -97,6 +97,20 @@ export async function getCurrentSubscription(): Promise<CurrentSubscriptionRespo
   }
 
   return data as CurrentSubscriptionResponse;
+}
+
+export async function getPlans(country = "NG"): Promise<Plan[]> {
+  const response = await fetch(
+    `${API_BASE_URL}/api/v1/subscriptions/plans/?country=${encodeURIComponent(country)}`,
+  );
+
+  const data = await readResponse(response);
+
+  if (!response.ok) {
+    throw new SubscriptionApiError(getErrorMessage(data), response.status);
+  }
+
+  return (data as PlansResponse).data;
 }
 
 export async function setBillingCountry(country: string): Promise<void> {

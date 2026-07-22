@@ -1,11 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowRight, Lock, Mail, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import AnimatedLogoMark from "../components/AnimatedLogoMark";
 import { Page, cn, GoldBtn } from "../app/shared";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthApiError, requestPasswordReset } from "../services/auth";
 import { initializePayment } from "../services/payments";
-import { setBillingCountry } from "../services/subscriptions";
+import { getPlans, setBillingCountry } from "../services/subscriptions";
+import type { Plan } from "../types/subscriptions";
 
 export default function AuthPage({ mode, nav }: {
   mode: "login" | "register";
@@ -15,9 +16,20 @@ export default function AuthPage({ mode, nav }: {
   const [tab, setTab] = useState<"login" | "register">(mode);
   const [step, setStep] = useState(1);
   const [showPass, setShowPass] = useState(false);
-  const [form, setForm] = useState({ name: "", email: "", pass: "", plan: "Weekly Lab" });
+  const [form, setForm] = useState({ name: "", email: "", pass: "", plan: "weekly-lab" });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [plans, setPlans] = useState<Plan[]>([]);
+  const [plansError, setPlansError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    getPlans("NG")
+      .then(data => { if (active) setPlans(data); })
+      .catch(() => { if (active) setPlansError("Unable to load plans."); });
+    return () => { active = false; };
+  }, []);
 
   const [showForgot, setShowForgot] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
@@ -83,7 +95,7 @@ export default function AuthPage({ mode, nav }: {
       }
 
       const selectedPlan = tab === "register"
-        ? ({ "Daily Pass": "starter-pass", "Weekly Lab": "weekly-lab", "Monthly Lab": "pro-lab" } as const)[form.plan as "Daily Pass" | "Weekly Lab" | "Monthly Lab"]
+        ? form.plan
         : sessionStorage.getItem("betlab_checkout_plan");
 
       if (selectedPlan) {
@@ -222,22 +234,26 @@ export default function AuthPage({ mode, nav }: {
             {tab === "register" && step === 2 && (
               <div className="space-y-3">
                 <p className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white">Select Your Plan</p>
-                {["Daily Pass", "Weekly Lab", "Monthly Lab"].map(p => {
-                  const prices: Record<string, string> = { "Daily Pass": "₦1,000/day", "Weekly Lab": "₦3,500/week", "Monthly Lab": "₦10,000/month" };
-                  const descs: Record<string, string> = { "Daily Pass": "24-hour access", "Weekly Lab": "7-day access", "Monthly Lab": "30-day access" };
-                  return (
-                    <label key={p} className={cn("flex items-center gap-3.5 p-3.5 rounded-lg border cursor-pointer transition-all", form.plan === p ? "border-[#D4AF37]/40 bg-[#D4AF37]/5" : "border-[#D4AF37]/8 hover:border-[#D4AF37]/20")}>
-                      <input type="radio" name="plan" value={p} checked={form.plan === p} onChange={() => setForm({ ...form, plan: p })} className="accent-[#D4AF37]" />
-                      <div className="flex-1 flex items-center justify-between">
-                        <div>
-                          <span className="font-['Rajdhani',sans-serif] font-bold text-white text-[16px]">{p}</span>
-                          <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 mt-0.5 uppercase">{descs[p]}</p>
-                        </div>
-                        <span className="font-['Rajdhani',sans-serif] font-bold text-[#D4AF37] text-[16px]">{prices[p]}</span>
+                {plansError && (
+                  <p className="text-[12px] text-rose-400">{plansError}</p>
+                )}
+                {!plansError && plans.length === 0 && (
+                  <p className="text-[12px] text-white/35">Loading plans...</p>
+                )}
+                {plans.map(p => (
+                  <label key={p.code} className={cn("flex items-center gap-3.5 p-3.5 rounded-lg border cursor-pointer transition-all", form.plan === p.code ? "border-[#D4AF37]/40 bg-[#D4AF37]/5" : "border-[#D4AF37]/8 hover:border-[#D4AF37]/20")}>
+                    <input type="radio" name="plan" value={p.code} checked={form.plan === p.code} onChange={() => setForm({ ...form, plan: p.code })} className="accent-[#D4AF37]" />
+                    <div className="flex-1 flex items-center justify-between">
+                      <div>
+                        <span className="font-['Rajdhani',sans-serif] font-bold text-white text-[16px]">{p.name}</span>
+                        <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 mt-0.5 uppercase">{p.duration_days}-day access</p>
                       </div>
-                    </label>
-                  );
-                })}
+                      <span className="font-['Rajdhani',sans-serif] font-bold text-[#D4AF37] text-[16px]">
+                        {p.currency_symbol}{Math.round(parseFloat(p.price)).toLocaleString()}
+                      </span>
+                    </div>
+                  </label>
+                ))}
                 <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 text-center pt-1 uppercase tracking-widest">Access begins after payment verification</p>
               </div>
             )}

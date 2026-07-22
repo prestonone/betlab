@@ -1,10 +1,27 @@
+import { useEffect, useState } from "react";
 import { TrendingUp, Shield, Star, Check, Target, Users, Award, ArrowRight, Lock, Activity, ChevronRight, CheckCircle2 } from "lucide-react";
 import { Page, PREDICTIONS, TESTIMONIALS, cn, useCounter, GOLD, GoldBtn, SectionEyebrow, LiveTicker, PredCard } from "../app/shared";
 import FootballAnimation from "../components/FootballAnimation";
+import { getPlans } from "../services/subscriptions";
+import type { Plan } from "../types/subscriptions";
+
+const PLAN_MARKETING: Record<string, { sub: string; features: string[]; highlight: boolean }> = {
+  "starter-pass": { sub: "/day", features: ["All daily Lab picks", "Banker and Rollover", "Results access", "Instant activation"], highlight: false },
+  "weekly-lab": { sub: "/week", features: ["All prediction categories", "Daily analysis notes", "Priority updates", "Complete results log"], highlight: true },
+  "pro-lab": { sub: "/month", features: ["Everything in Weekly Lab", "Weekend Mega and Jackpot", "Performance dashboard", "Best member value"], highlight: false },
+};
 
 export default function HomePage({ nav }: { nav: (p: Page) => void }) {
   const wins = useCounter(6, 1200);
   const members = useCounter(3, 1200);
+
+  const [apiPlans, setApiPlans] = useState<Plan[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    getPlans("NG").then(data => { if (active) setApiPlans(data); }).catch(() => {});
+    return () => { active = false; };
+  }, []);
 
   const features = [
     { icon: <Activity size={20} />, title: "Statistical Modelling", desc: "50+ variables per prediction — xG, press intensity, set-piece efficiency, travel fatigue, squad depth and form cycles." },
@@ -15,11 +32,14 @@ export default function HomePage({ nav }: { nav: (p: Page) => void }) {
     { icon: <TrendingUp size={20} />, title: "Live Performance Tracking", desc: "Real-time ROI tracking, win rate trends and personal performance benchmarks in your subscriber dashboard." },
   ];
 
-  const plans = [
-    { name: "Daily Pass", price: "₦1,000", sub: "/day", picks: "24-hour access", features: ["All daily Lab picks", "Banker and Rollover", "Results access", "Instant activation"], highlight: false },
-    { name: "Weekly Lab", price: "₦3,500", sub: "/week", picks: "7-day access", features: ["All prediction categories", "Daily analysis notes", "Priority updates", "Complete results log"], highlight: true },
-    { name: "Monthly Lab", price: "₦10,000", sub: "/month", picks: "30-day access", features: ["Everything in Weekly Lab", "Weekend Mega and Jackpot", "Performance dashboard", "Best member value"], highlight: false },
-  ];
+  const plans = apiPlans
+    .filter(p => p.code in PLAN_MARKETING)
+    .map(p => ({
+      name: p.name,
+      price: `${p.currency_symbol}${Math.round(parseFloat(p.price)).toLocaleString()}`,
+      picks: `${p.duration_days}-day access`,
+      ...PLAN_MARKETING[p.code],
+    }));
 
   return (
     <div>

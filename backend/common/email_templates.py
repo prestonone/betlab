@@ -14,7 +14,7 @@ def _logo_url() -> str:
 
 def _button(label: str, url: str) -> str:
     return f"""
-    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px 0;">
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:28px auto;">
       <tr>
         <td style="background:{GOLD};border-radius:6px;">
           <a href="{url}" style="display:inline-block;padding:13px 30px;font-family:Arial,Helvetica,sans-serif;
@@ -57,7 +57,7 @@ def _base_email(*, preheader: str, body_html: str) -> str:
               </td>
             </tr>
             <tr>
-              <td style="padding:32px;font-family:Arial,Helvetica,sans-serif;color:#EDF0F5;">
+              <td style="padding:32px;font-family:Arial,Helvetica,sans-serif;color:#EDF0F5;text-align:center;">
                 {body_html}
               </td>
             </tr>

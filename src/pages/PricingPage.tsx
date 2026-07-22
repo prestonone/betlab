@@ -1,12 +1,44 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Check, ChevronDown, Minus } from "lucide-react";
 import { Page, cn, GoldBtn, SectionEyebrow } from "../app/shared";
 import { initializePayment } from "../services/payments";
-import { setBillingCountry } from "../services/subscriptions";
+import { getPlans, setBillingCountry } from "../services/subscriptions";
+import type { Plan } from "../types/subscriptions";
+
+const PLAN_MARKETING: Record<string, { period: string; inc: string[]; exc: string[]; highlight: boolean }> = {
+  "starter-pass": {
+    period: "/day",
+    inc: ["All daily Lab picks", "Banker and Rollover", "Results access", "Instant activation"],
+    exc: ["Weekend Mega", "Monthly performance dashboard"],
+    highlight: false,
+  },
+  "weekly-lab": {
+    period: "/week",
+    inc: ["All prediction categories", "Daily analysis notes", "Sure 2 and Sure 5", "Rollover updates", "Complete results log"],
+    exc: ["Monthly performance dashboard"],
+    highlight: true,
+  },
+  "pro-lab": {
+    period: "/month",
+    inc: ["Everything in Weekly Lab", "Weekend Mega and Jackpot", "Performance dashboard", "Priority notifications", "Best member value"],
+    exc: [],
+    highlight: false,
+  },
+};
 
 export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; authed: boolean }) {
   const [checkoutPlan, setCheckoutPlan] = useState("");
   const [checkoutError, setCheckoutError] = useState("");
+  const [apiPlans, setApiPlans] = useState<Plan[]>([]);
+  const [plansError, setPlansError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    getPlans("NG")
+      .then(data => { if (active) setApiPlans(data); })
+      .catch(() => { if (active) setPlansError("Unable to load current pricing."); });
+    return () => { active = false; };
+  }, []);
 
   const checkout = async (code: string, name: string) => {
     if (!authed) {
@@ -28,23 +60,15 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
     }
   };
 
-  const plans = [
-    {
-      code: "starter-pass", name: "Daily Pass", price: "₦1,000", period: "/day", picks: "24-hour access",
-      inc: ["All daily Lab picks", "Banker and Rollover", "Results access", "Instant activation"],
-      exc: ["Weekend Mega", "Monthly performance dashboard"], highlight: false,
-    },
-    {
-      code: "weekly-lab", name: "Weekly Lab", price: "₦3,500", period: "/week", picks: "7-day access",
-      inc: ["All prediction categories", "Daily analysis notes", "Sure 2 and Sure 5", "Rollover updates", "Complete results log"],
-      exc: ["Monthly performance dashboard"], highlight: true,
-    },
-    {
-      code: "pro-lab", name: "Monthly Lab", price: "₦10,000", period: "/month", picks: "30-day access",
-      inc: ["Everything in Weekly Lab", "Weekend Mega and Jackpot", "Performance dashboard", "Priority notifications", "Best member value"],
-      exc: [], highlight: false,
-    },
-  ];
+  const plans = apiPlans
+    .filter(p => p.code in PLAN_MARKETING)
+    .map(p => ({
+      code: p.code,
+      name: p.name,
+      price: `${p.currency_symbol}${Math.round(parseFloat(p.price)).toLocaleString()}`,
+      picks: `${p.duration_days}-day access`,
+      ...PLAN_MARKETING[p.code],
+    }));
 
   const faqs = [
     { q: "Is Bet Lab a gambling service?", a: "No. Bet Lab is a sports analytics subscription platform. We provide research and predictions. We are not a bookmaker and do not accept any form of wager." },
@@ -65,6 +89,13 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
           <p className="text-white/40 mb-8 text-[14px]">Choose daily, weekly or monthly access. Payments will be processed securely in Nigerian naira.</p>
 
         </div>
+
+        {plansError && (
+          <p role="alert" className="text-center text-[12px] text-rose-300 mb-8">{plansError}</p>
+        )}
+        {!plansError && plans.length === 0 && (
+          <p className="text-center text-[12px] text-white/35 mb-8">Loading pricing...</p>
+        )}
 
         <div className="grid md:grid-cols-3 gap-4 mb-20">
           {plans.map((plan, i) => {

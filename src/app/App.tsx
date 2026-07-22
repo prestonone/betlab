@@ -70,6 +70,12 @@ export default function App() {
   }, [authLoading, authed, page, navigate]);
 
   useEffect(() => {
+    if (!authLoading && authed && (page === "login" || page === "register")) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [authLoading, authed, page, navigate]);
+
+  useEffect(() => {
     document.title = TITLE_FOR[page];
   }, [page]);
 
