@@ -22,7 +22,9 @@ The platform is under active development and focuses on authenticated prediction
 
 ### Backend
 
-    source venv/bin/activate
+    python3 -m venv .venv
+    source .venv/bin/activate
+    python -m pip install -r backend/requirements.txt
     cd backend
     python manage.py migrate
     python manage.py runserver

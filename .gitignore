@@ -15,6 +15,7 @@ __pycache__/
 # -----------------------------
 node_modules/
 dist/
+backend/staticfiles/
 
 # Logs
 npm-debug.log*
