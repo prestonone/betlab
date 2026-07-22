@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { BarChart2, ArrowRight, Lock, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Lock, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
+import AnimatedLogoMark from "../components/AnimatedLogoMark";
 import { Page, GoldBtn } from "../app/shared";
 import { AuthApiError, confirmPasswordReset } from "../services/auth";
 
@@ -45,9 +46,7 @@ export default function ResetPasswordPage({ nav }: { nav: (p: Page) => void }) {
     <div className="min-h-screen pt-[60px] flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-[400px]">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-lg bg-[#D4AF37] flex items-center justify-center mx-auto mb-4">
-            <BarChart2 size={22} className="text-[#070E1A]" />
-          </div>
+          <AnimatedLogoMark size={48} radius={10} className="mx-auto mb-4" />
           <h1 className="font-['Rajdhani',sans-serif] font-bold text-[36px] text-white mb-1">RESET PASSWORD</h1>
           <p className="text-[12px] text-white/35">Choose a new password for your account</p>
         </div>

@@ -1,4 +1,4 @@
-import { BarChart2 } from "lucide-react";
+import AnimatedLogoMark from "../AnimatedLogoMark";
 
 type Page =
   | "home"
@@ -17,9 +17,7 @@ export default function Footer({ nav }: { nav: (p: Page) => void }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-14 grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
         <div>
           <div className="flex items-center gap-2 mb-4">
-            <div className="w-6 h-6 rounded bg-[#D4AF37] flex items-center justify-center">
-              <BarChart2 size={12} className="text-[#070E1A]" />
-            </div>
+            <AnimatedLogoMark size={24} radius={4} />
             <span className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white tracking-wide">BET<span className="text-[#D4AF37]">LAB</span></span>
           </div>
           <p className="text-[12px] text-white/35 leading-relaxed mb-4">Premium football intelligence platform. Data-driven predictions for serious analysts.</p>

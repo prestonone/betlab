@@ -198,6 +198,19 @@
   .animate-fan-back { animation: fan-back 9s ease-in-out infinite; }
   .animate-fan-mid { animation: fan-mid 9s ease-in-out infinite; }
   .animate-fan-front { animation: fan-front 9s ease-in-out infinite; }
+
+  @keyframes logo-bar-pulse {
+    0%, 100% { transform: scaleY(0.5); }
+    50% { transform: scaleY(1); }
+  }
+  .logo-bar {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: logo-bar-pulse 1.6s ease-in-out infinite;
+  }
+  .logo-bar-1 { animation-delay: 0s; }
+  .logo-bar-2 { animation-delay: 0.2s; }
+  .logo-bar-3 { animation-delay: 0.4s; }
   .animate-fade-in { animation: fade-in 0.4s ease both; }
   .animate-ticker { animation: ticker-scroll 28s linear infinite; }
   .delay-100 { animation-delay: 0.1s; }

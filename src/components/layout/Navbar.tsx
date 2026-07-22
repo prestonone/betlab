@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { BarChart2, Bell, LogOut, Menu, X } from "lucide-react";
+import { Bell, LogOut, Menu, X } from "lucide-react";
 import { Page, USER, NOTIFICATIONS, cn, GoldBtn } from "../../app/shared";
+import AnimatedLogoMark from "../AnimatedLogoMark";
 
 export default function Navbar({ page, nav, authed, setAuthed }: {
   page: Page; nav: (p: Page) => void;
@@ -19,9 +20,7 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-6">
         {/* Logo */}
         <button onClick={() => nav("home")} className="flex items-center gap-2.5 cursor-pointer flex-shrink-0">
-          <div className="w-7 h-7 rounded-[5px] bg-[#D4AF37] flex items-center justify-center">
-            <BarChart2 size={14} className="text-[#070E1A]" />
-          </div>
+          <AnimatedLogoMark size={28} radius={5} />
           <span className="font-['Rajdhani',sans-serif] font-bold text-[20px] tracking-[0.05em] text-white">
             BET<span className="text-[#D4AF37]">LAB</span>
           </span>

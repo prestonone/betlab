@@ -11,16 +11,20 @@ class EmailSendError(Exception):
     """Raised when a transactional email could not be sent via Resend."""
 
 
-def send_email(*, to: str, subject: str, html: str) -> None:
+def send_email(*, to: str, subject: str, html: str, text: str = "") -> None:
     if not settings.RESEND_API_KEY:
         raise EmailSendError("RESEND_API_KEY is not configured.")
 
-    body = json.dumps({
+    payload = {
         "from": settings.DEFAULT_FROM_EMAIL,
         "to": [to],
         "subject": subject,
         "html": html,
-    }).encode("utf-8")
+    }
+    if text:
+        payload["text"] = text
+
+    body = json.dumps(payload).encode("utf-8")
 
     email_request = request.Request(
         "https://api.resend.com/emails",

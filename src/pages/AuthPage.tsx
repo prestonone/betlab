@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { BarChart2, ArrowRight, Lock, Mail, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Lock, Mail, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
+import AnimatedLogoMark from "../components/AnimatedLogoMark";
 import { Page, cn, GoldBtn } from "../app/shared";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthApiError, requestPasswordReset } from "../services/auth";
@@ -112,9 +113,7 @@ export default function AuthPage({ mode, nav }: {
     <div className="min-h-screen pt-[60px] flex items-center justify-center px-4 py-16">
       <div className="w-full max-w-[400px]">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-lg bg-[#D4AF37] flex items-center justify-center mx-auto mb-4">
-            <BarChart2 size={22} className="text-[#070E1A]" />
-          </div>
+          <AnimatedLogoMark size={48} radius={10} className="mx-auto mb-4" />
           <h1 className="font-['Rajdhani',sans-serif] font-bold text-[36px] text-white mb-1">
             {tab === "login" ? "WELCOME BACK" : "JOIN BET LAB"}
           </h1>

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { BarChart2 } from "lucide-react";
 
+import AnimatedFavicon from "../components/AnimatedFavicon";
+import AnimatedLogoMark from "../components/AnimatedLogoMark";
 import Footer from "../components/layout/Footer";
 import Navbar from "../components/layout/Navbar";
 import { useAuth } from "../contexts/AuthContext";
@@ -65,9 +66,7 @@ export default function App() {
     return (
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
-          <div className="w-10 h-10 rounded-lg bg-[#D4AF37] flex items-center justify-center mx-auto mb-3">
-            <BarChart2 size={18} className="text-[#070E1A]" />
-          </div>
+          <AnimatedLogoMark size={40} radius={8} className="mx-auto mb-3" />
           <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35">
             Restoring secure session
           </p>
@@ -78,6 +77,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <AnimatedFavicon />
       <Navbar page={page} nav={nav} authed={authed} setAuthed={setAuthed} />
 
       <div className={cn("animate-fade-in")}>
