@@ -11,7 +11,8 @@ const PLAN_MARKETING: Record<string, { sub: string; features: string[]; highligh
   "pro-lab": { sub: "/month", features: ["Everything in Weekly Lab", "Weekend Mega and Jackpot", "Performance dashboard", "Best member value"], highlight: false },
 };
 
-export default function HomePage({ nav }: { nav: (p: Page) => void }) {
+export default function HomePage({ nav, authed }: { nav: (p: Page) => void; authed: boolean }) {
+  const goToAccess = () => nav(authed ? "pricing" : "register");
   const wins = useCounter(6, 1200);
   const members = useCounter(3, 1200);
 
@@ -74,7 +75,7 @@ export default function HomePage({ nav }: { nav: (p: Page) => void }) {
               </p>
 
               <div className="flex flex-wrap gap-3 mb-14 animate-fade-up delay-300">
-                <GoldBtn onClick={() => nav("register")} size="lg">
+                <GoldBtn onClick={goToAccess} size="lg">
                   Get Lab Access <ArrowRight size={16} />
                 </GoldBtn>
                 <GoldBtn onClick={() => nav("predictions")} size="lg" outline>
@@ -176,7 +177,7 @@ export default function HomePage({ nav }: { nav: (p: Page) => void }) {
           </div>
           <div className="mt-8 text-center">
             <p className="text-[12px] text-white/30 mb-4 font-[JetBrains_Mono,monospace]">+ 3 more predictions available to subscribers today</p>
-            <GoldBtn onClick={() => nav("register")} size="md">
+            <GoldBtn onClick={goToAccess} size="md">
               Unlock All Predictions <Lock size={13} />
             </GoldBtn>
           </div>
@@ -221,8 +222,8 @@ export default function HomePage({ nav }: { nav: (p: Page) => void }) {
                   ))}
                 </ul>
                 {plan.highlight
-                  ? <GoldBtn onClick={() => nav("register")} full size="md">Get Lab Access</GoldBtn>
-                  : <GoldBtn onClick={() => nav("register")} full size="md" outline>Get Lab Access</GoldBtn>
+                  ? <GoldBtn onClick={goToAccess} full size="md">Get Lab Access</GoldBtn>
+                  : <GoldBtn onClick={goToAccess} full size="md" outline>Get Lab Access</GoldBtn>
                 }
               </div>
             </div>
@@ -271,8 +272,8 @@ export default function HomePage({ nav }: { nav: (p: Page) => void }) {
             DAILY PICKS.<br />SIMPLE LAB ACCESS.
           </h2>
           <p className="text-white/40 mb-8 max-w-md mx-auto text-[14px]">Create an account, choose an access plan and receive carefully selected daily football picks in one simple dashboard.</p>
-          <GoldBtn onClick={() => nav("register")} size="lg">
-            Create Your Account <ArrowRight size={16} />
+          <GoldBtn onClick={goToAccess} size="lg">
+            {authed ? "Choose Your Plan" : "Create Your Account"} <ArrowRight size={16} />
           </GoldBtn>
         </div>
       </section>

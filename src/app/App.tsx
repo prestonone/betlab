@@ -109,7 +109,7 @@ export default function App() {
       <Navbar page={page} nav={nav} authed={authed} setAuthed={setAuthed} />
 
       <div className={cn("animate-fade-in")}>
-        {page === "home" && <HomePage nav={nav} />}
+        {page === "home" && <HomePage nav={nav} authed={authed} />}
         {page === "pricing" && <PricingPage nav={nav} authed={authed} />}
         {page === "login" && <AuthPage mode="login" nav={nav} />}
         {page === "register" && <AuthPage mode="register" nav={nav} />}

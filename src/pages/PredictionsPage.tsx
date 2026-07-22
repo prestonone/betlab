@@ -118,7 +118,7 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
             </div>
             <h3 className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-white mb-2">5 MORE PICKS TODAY</h3>
             <p className="text-[13px] text-white/35 mb-6">Subscribe to access the full daily intelligence feed</p>
-            <GoldBtn onClick={() => nav("register")} size="md">Get Lab Access <ArrowRight size={14} /></GoldBtn>
+            <GoldBtn onClick={() => nav("pricing")} size="md">Get Lab Access <ArrowRight size={14} /></GoldBtn>
           </div>
         )}
       </div>
