@@ -23,6 +23,7 @@ export interface Prediction {
   access_level: string;
   result_status: "pending" | "won" | "lost" | "void";
   is_published: boolean;
+  settled_at: string | null;
   selections: PredictionSelection[];
 }
 

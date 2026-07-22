@@ -1,9 +1,28 @@
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Bell, LogOut, Menu, X } from "lucide-react";
-import { Page, NOTIFICATIONS, cn, GoldBtn, displayNameFor, initialsFor } from "../../app/shared";
+import { Page, cn, GoldBtn, displayNameFor, initialsFor } from "../../app/shared";
 import AnimatedLogoMark from "../AnimatedLogoMark";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCurrentSubscription } from "../../hooks/useCurrentSubscription";
+import { getPredictions, type Prediction as ApiPrediction } from "../../services/predictions";
+
+function timeAgo(date: Date): string {
+  const mins = Math.floor((Date.now() - date.getTime()) / 60000);
+  if (mins < 1) return "just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  return days === 1 ? "Yesterday" : `${days}d ago`;
+}
+
+function referenceTime(pred: ApiPrediction): Date | null {
+  if (pred.settled_at) return new Date(pred.settled_at);
+  const times = pred.selections
+    .map(s => new Date(s.match_time))
+    .filter(d => !Number.isNaN(d.getTime()));
+  return times.length ? new Date(Math.max(...times.map(d => d.getTime()))) : null;
+}
 
 export default function Navbar({ page, nav, authed, setAuthed }: {
   page: Page; nav: (p: Page) => void;
@@ -11,13 +30,57 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
-  const unread = NOTIFICATIONS.filter(n => n.unread).length;
 
   const { user } = useAuth();
   const { subscription, hasSubscription } = useCurrentSubscription(authed);
   const displayName = displayNameFor(user);
   const initials = initialsFor(displayName || "?");
   const planLabel = hasSubscription && subscription ? subscription.plan_name : "No active plan";
+
+  const [predictions, setPredictions] = useState<ApiPrediction[]>([]);
+
+  useEffect(() => {
+    if (!authed) return;
+    let active = true;
+    getPredictions().then(data => { if (active) setPredictions(data); }).catch(() => {});
+    return () => { active = false; };
+  }, [authed]);
+
+  const notifications = useMemo(() => {
+    const items: { icon: string; text: string; at: Date | null }[] = [];
+
+    const settledRecent = predictions
+      .filter(p => p.result_status === "won" || p.result_status === "lost")
+      .sort((a, b) => (referenceTime(b)?.getTime() ?? 0) - (referenceTime(a)?.getTime() ?? 0))
+      .slice(0, 3);
+    for (const p of settledRecent) {
+      items.push({
+        icon: p.result_status === "won" ? "✅" : "⚠️",
+        text: `${p.title} confirmed: ${p.result_status.toUpperCase()}`,
+        at: referenceTime(p),
+      });
+    }
+
+    const liveToday = predictions.filter(p => p.result_status === "pending").length;
+    if (liveToday > 0) {
+      items.push({ icon: "📊", text: `${liveToday} prediction${liveToday === 1 ? "" : "s"} live right now`, at: null });
+    }
+
+    if (hasSubscription && subscription) {
+      items.push({ icon: "🏆", text: `${subscription.plan_name} membership is active`, at: null });
+    }
+
+    return items
+      .sort((a, b) => (b.at?.getTime() ?? 0) - (a.at?.getTime() ?? 0))
+      .slice(0, 6)
+      .map(item => ({
+        ...item,
+        time: item.at ? timeAgo(item.at) : "",
+        unread: item.at ? Date.now() - item.at.getTime() < 24 * 60 * 60 * 1000 : false,
+      }));
+  }, [predictions, hasSubscription, subscription]);
+
+  const unread = notifications.filter(n => n.unread).length;
 
   const links = authed
     ? [{ label: "Dashboard", p: "dashboard" as Page }, { label: "Predictions", p: "predictions" as Page }, { label: "Live Scores", p: "results" as Page }]
@@ -63,12 +126,15 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
                       <span className="font-[JetBrains_Mono,monospace] text-[10px] text-[#D4AF37] uppercase tracking-widest">Notifications</span>
                       {unread > 0 && <span className="font-[JetBrains_Mono,monospace] text-[10px] text-white/30">{unread} unread</span>}
                     </div>
-                    {NOTIFICATIONS.map((n, i) => (
+                    {notifications.length === 0 && (
+                      <p className="px-4 py-6 text-[12px] text-white/30 text-center">Nothing new right now.</p>
+                    )}
+                    {notifications.map((n, i) => (
                       <div key={i} className={cn("px-4 py-3 border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors cursor-pointer flex gap-3", n.unread && "bg-[#D4AF37]/[0.03]")}>
                         <span className="text-sm mt-0.5 flex-shrink-0">{n.icon}</span>
                         <div>
                           <p className="text-[12px] text-white/75 leading-snug">{n.text}</p>
-                          <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white/25 mt-1">{n.time}</p>
+                          {n.time && <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white/25 mt-1">{n.time}</p>}
                         </div>
                         {n.unread && <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] flex-shrink-0 mt-1.5 ml-auto" />}
                       </div>

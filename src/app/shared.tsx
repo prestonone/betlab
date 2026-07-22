@@ -115,13 +115,6 @@ export const TESTIMONIALS = [
   { name: "Simple Lab Access", role: "Built for Nigeria", avatar: "LA", rating: 5, quote: "Choose a daily, weekly or monthly plan and receive immediate member access after successful payment verification." },
 ];
 
-export const NOTIFICATIONS = [
-  { icon: "✅", text: "Bayern vs Barcelona prediction confirmed: WON", time: "12m ago", unread: true },
-  { icon: "📊", text: "Today&apos;s 6 predictions are now live", time: "1h ago", unread: true },
-  { icon: "🏆", text: "Weekly performance summary: +18.2% ROI", time: "3h ago", unread: false },
-  { icon: "⚠️", text: "La Liga: Sevilla vs Villarreal — LOST", time: "Yesterday", unread: false },
-];
-
 // ─── Utility ──────────────────────────────────────────────────────────────────
 
 export function cn(...c: (string | undefined | false | null)[]) {
