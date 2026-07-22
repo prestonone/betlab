@@ -157,6 +157,19 @@ export function cn(...c: (string | undefined | false | null)[]) {
   return c.filter(Boolean).join(" ");
 }
 
+export function displayNameFor(user: { first_name: string; last_name: string; username: string } | null | undefined): string {
+  if (!user) return "";
+  const full = `${user.first_name} ${user.last_name}`.trim();
+  return full || user.username;
+}
+
+export function initialsFor(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
 export function formatKickoff(iso: string) {
   const d = new Date(iso);
   return d.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) + " · " +

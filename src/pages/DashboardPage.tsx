@@ -1,11 +1,30 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, Settings, Menu, X, Target, Activity, CheckCircle2, XCircle, Minus, Flame, LayoutDashboard, LineChart, History, MailWarning } from "lucide-react";
-import { Page, DashSection, PREDICTIONS, RESULTS, PERF_DATA, LEAGUE_PERF, USER, cn, GOLD, Chip, PredCard } from "../app/shared";
+import { Page, DashSection, cn, GOLD, Chip, ApiPredictionCard, displayNameFor } from "../app/shared";
 import { useAuth } from "../contexts/AuthContext";
 import { useCurrentSubscription } from "../hooks/useCurrentSubscription";
 import { resendVerificationEmail } from "../services/auth";
 import { verifyPayment } from "../services/payments";
+import { getPredictions, type Prediction as ApiPrediction } from "../services/predictions";
+
+function combinedOdds(pred: ApiPrediction): number {
+  return pred.selections.reduce((total, s) => total * Number(s.odds), 1);
+}
+
+function unitProfit(pred: ApiPrediction): number {
+  if (pred.result_status === "won") return Math.round((combinedOdds(pred) - 1) * 100);
+  if (pred.result_status === "lost") return -100;
+  return 0;
+}
+
+function earliestKickoff(pred: ApiPrediction): Date | null {
+  const times = pred.selections
+    .map(s => new Date(s.match_time))
+    .filter(d => !Number.isNaN(d.getTime()));
+  if (times.length === 0) return null;
+  return new Date(Math.min(...times.map(d => d.getTime())));
+}
 
 export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
   const [section, setSection] = useState<DashSection>("overview");
@@ -34,6 +53,97 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
     isLoading,
     refreshSubscription,
   } = useCurrentSubscription();
+
+  const [predictions, setPredictions] = useState<ApiPrediction[]>([]);
+  const [predictionsError, setPredictionsError] = useState("");
+
+  useEffect(() => {
+    let active = true;
+    getPredictions()
+      .then(data => { if (active) setPredictions(data); })
+      .catch(() => { if (active) setPredictionsError("Unable to load predictions."); });
+    return () => { active = false; };
+  }, []);
+
+  const stats = useMemo(() => {
+    const settled = predictions
+      .filter(p => p.result_status !== "pending")
+      .sort((a, b) => (earliestKickoff(a)?.getTime() ?? 0) - (earliestKickoff(b)?.getTime() ?? 0));
+    const decided = settled.filter(p => p.result_status !== "void");
+    const won = decided.filter(p => p.result_status === "won");
+
+    const winRate = decided.length > 0 ? Math.round((won.length / decided.length) * 100) : 0;
+    const totalProfit = settled.reduce((sum, p) => sum + unitProfit(p), 0);
+    const roi = settled.length > 0 ? +(totalProfit / settled.length).toFixed(1) : 0;
+
+    let streak = 0;
+    for (let i = decided.length - 1; i >= 0; i--) {
+      if (decided[i].result_status === "won") streak++;
+      else break;
+    }
+
+    const byDay = new Map<string, ApiPrediction[]>();
+    for (const p of settled) {
+      const day = earliestKickoff(p);
+      const key = day ? day.toISOString().slice(0, 10) : "unknown";
+      if (!byDay.has(key)) byDay.set(key, []);
+      byDay.get(key)!.push(p);
+    }
+    const days = Array.from(byDay.keys()).sort();
+
+    let cumWon = 0;
+    let cumDecided = 0;
+    let cumProfit = 0;
+    let cumCount = 0;
+    const trend = days.map(day => {
+      for (const p of byDay.get(day)!) {
+        if (p.result_status !== "void") {
+          cumDecided++;
+          if (p.result_status === "won") cumWon++;
+        }
+        cumProfit += unitProfit(p);
+        cumCount++;
+      }
+      return {
+        day: new Date(day).toLocaleDateString("en-GB", { day: "2-digit", month: "short" }),
+        winRate: cumDecided > 0 ? Math.round((cumWon / cumDecided) * 100) : 0,
+        roi: cumCount > 0 ? +(cumProfit / cumCount).toFixed(1) : 0,
+      };
+    });
+
+    const leagueMap = new Map<string, { won: number; decided: number; count: number }>();
+    for (const p of settled) {
+      const leagues = new Set(p.selections.map(s => s.league));
+      for (const league of leagues) {
+        const entry = leagueMap.get(league) ?? { won: 0, decided: 0, count: 0 };
+        entry.count++;
+        if (p.result_status !== "void") {
+          entry.decided++;
+          if (p.result_status === "won") entry.won++;
+        }
+        leagueMap.set(league, entry);
+      }
+    }
+    const leaguePerf = Array.from(leagueMap.entries())
+      .map(([league, e]) => ({
+        league,
+        winRate: e.decided > 0 ? Math.round((e.won / e.decided) * 100) : 0,
+        predictions: e.count,
+      }))
+      .sort((a, b) => b.predictions - a.predictions)
+      .slice(0, 6);
+
+    return {
+      settled,
+      todaysPicks: predictions.filter(p => p.result_status === "pending"),
+      winRate,
+      roi,
+      streak,
+      totalSettled: settled.length,
+      trend,
+      leaguePerf,
+    };
+  }, [predictions]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -200,9 +310,11 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
             <div>
               <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-[0.2em] mb-1">Dashboard · {section}</p>
               <h1 className="font-['Rajdhani',sans-serif] font-bold text-[38px] text-white leading-none">
-                Good morning, <span className="text-[#D4AF37]">{USER.name.split(" ")[0]}.</span>
+                Good morning, <span className="text-[#D4AF37]">{(displayNameFor(user).split(" ")[0]) || "there"}.</span>
               </h1>
-              <p className="text-[12px] text-white/35 mt-1">Saturday, 19 July 2026 · 6 predictions live today</p>
+              <p className="text-[12px] text-white/35 mt-1">
+                {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · {stats.todaysPicks.length} predictions live today
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1.5 border border-emerald-500/20 bg-emerald-500/8 rounded-full px-3 py-1.5">
@@ -215,10 +327,10 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
           {/* KPI strip */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-8">
             {[
-              { label: "Today's Picks", value: "6", sub: "3 high confidence", icon: <Target size={15} />, c: "text-[#D4AF37]" },
-              { label: "Win Rate (30d)", value: `${USER.winRate}%`, sub: "↑ 4pp vs last month", icon: <TrendingUp size={15} />, c: "text-emerald-400" },
-              { label: "Running ROI", value: `+${USER.roi}%`, sub: "Flat-stake basis", icon: <Activity size={15} />, c: "text-emerald-400" },
-              { label: "Win Streak", value: `${USER.streak}W`, sub: `Best: 12 wins`, icon: <Flame size={15} />, c: "text-[#D4AF37]" },
+              { label: "Today's Picks", value: `${stats.todaysPicks.length}`, sub: `${stats.totalSettled} settled all-time`, icon: <Target size={15} />, c: "text-[#D4AF37]" },
+              { label: "Win Rate", value: `${stats.winRate}%`, sub: "Won ÷ (won+lost)", icon: <TrendingUp size={15} />, c: "text-emerald-400" },
+              { label: "Running ROI", value: `${stats.roi >= 0 ? "+" : ""}${stats.roi}%`, sub: "Flat-stake basis", icon: <Activity size={15} />, c: stats.roi >= 0 ? "text-emerald-400" : "text-rose-400" },
+              { label: "Win Streak", value: `${stats.streak}W`, sub: "Consecutive wins", icon: <Flame size={15} />, c: "text-[#D4AF37]" },
             ].map((k, i) => (
               <div key={i} className="bg-card border border-[#D4AF37]/8 rounded-lg p-4 hover:border-[#D4AF37]/18 transition-colors group">
                 <div className="flex items-start justify-between mb-3">
@@ -242,10 +354,10 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                       <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest mb-1">Performance</p>
                       <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white">Win Rate — July 2026</h3>
                     </div>
-                    <Chip label="+18pp MoM" variant="emerald" />
+                    <Chip label={`${stats.trend.length} days tracked`} variant="emerald" />
                   </div>
                   <ResponsiveContainer width="100%" height={180}>
-                    <AreaChart data={PERF_DATA} margin={{ top: 2, right: 2, bottom: 0, left: -22 }}>
+                    <AreaChart data={stats.trend} margin={{ top: 2, right: 2, bottom: 0, left: -22 }}>
                       <defs>
                         <linearGradient id="gGold" x1="0" y1="0" x2="0" y2="1">
                           <stop offset="0%" stopColor={GOLD} stopOpacity={0.25} />
@@ -253,7 +365,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                         </linearGradient>
                       </defs>
                       <XAxis dataKey="day" tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} />
-                      <YAxis tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} domain={[55, 95]} />
+                      <YAxis tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} domain={[0, 100]} />
                       <Tooltip contentStyle={{ background: "#111C2E", border: "1px solid rgba(212,175,55,0.18)", borderRadius: 6, fontSize: 11, fontFamily: "JetBrains Mono,monospace" }} itemStyle={{ color: GOLD }} labelStyle={{ color: "rgba(255,255,255,0.4)" }} />
                       <Area type="monotone" dataKey="winRate" stroke={GOLD} strokeWidth={1.5} fill="url(#gGold)" dot={false} />
                     </AreaChart>
@@ -264,26 +376,35 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                 <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
                   <h3 className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white mb-4">Recent Results</h3>
                   <div className="space-y-3">
-                    {RESULTS.slice(0, 7).map(r => (
-                      <div key={r.id} className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-2 min-w-0">
-                          {r.result === "won"
-                            ? <CheckCircle2 size={12} className="text-emerald-400 flex-shrink-0" />
-                            : r.result === "lost"
-                            ? <XCircle size={12} className="text-rose-400 flex-shrink-0" />
-                            : <Minus size={12} className="text-white/20 flex-shrink-0" />
-                          }
-                          <div className="min-w-0">
-                            <p className="text-[11px] text-white/55 truncate">{r.match.split(" vs ")[0]}</p>
-                            <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20">{r.date}</p>
+                    {stats.settled.length === 0 && (
+                      <p className="text-[11px] text-white/25">No settled predictions yet.</p>
+                    )}
+                    {stats.settled.slice(-7).reverse().map(p => {
+                      const profit = unitProfit(p);
+                      const kickoff = earliestKickoff(p);
+                      return (
+                        <div key={p.id} className="flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            {p.result_status === "won"
+                              ? <CheckCircle2 size={12} className="text-emerald-400 flex-shrink-0" />
+                              : p.result_status === "lost"
+                              ? <XCircle size={12} className="text-rose-400 flex-shrink-0" />
+                              : <Minus size={12} className="text-white/20 flex-shrink-0" />
+                            }
+                            <div className="min-w-0">
+                              <p className="text-[11px] text-white/55 truncate">{p.title}</p>
+                              <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20">
+                                {kickoff ? kickoff.toLocaleDateString("en-GB", { day: "2-digit", month: "short" }) : "—"}
+                              </p>
+                            </div>
                           </div>
+                          <span className={cn("font-[JetBrains_Mono,monospace] text-[11px] font-bold flex-shrink-0",
+                            profit > 0 ? "text-emerald-400" : profit < 0 ? "text-rose-400" : "text-white/20")}>
+                            {profit > 0 ? `+${profit}` : profit === 0 ? "—" : profit}
+                          </span>
                         </div>
-                        <span className={cn("font-[JetBrains_Mono,monospace] text-[11px] font-bold flex-shrink-0",
-                          r.profit > 0 ? "text-emerald-400" : r.profit < 0 ? "text-rose-400" : "text-white/20")}>
-                          {r.profit > 0 ? `+${r.profit}` : r.profit === 0 ? "—" : r.profit}
-                        </span>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                   <button onClick={() => setSection("results")} className="mt-4 w-full text-center font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/50 hover:text-[#D4AF37] transition-colors cursor-pointer pt-3 border-t border-white/[0.04] uppercase tracking-widest">
                     View all results →
@@ -297,8 +418,12 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                   <h3 className="font-['Rajdhani',sans-serif] font-bold text-[22px] text-white">Today&apos;s Top Picks</h3>
                   <button onClick={() => nav("predictions")} className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/60 hover:text-[#D4AF37] uppercase tracking-widest cursor-pointer">View all →</button>
                 </div>
+                {predictionsError && <p className="text-[12px] text-rose-400">{predictionsError}</p>}
+                {!predictionsError && stats.todaysPicks.length === 0 && (
+                  <p className="text-[12px] text-white/30">No live predictions right now — check back soon.</p>
+                )}
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {PREDICTIONS.slice(0, 3).map(p => <PredCard key={p.id} pred={p} />)}
+                  {stats.todaysPicks.slice(0, 3).map(p => <ApiPredictionCard key={p.id} pred={p} />)}
                 </div>
               </div>
             </div>
@@ -310,38 +435,48 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
               <div className="flex items-center justify-between mb-5">
                 <h2 className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-white">Results Log</h2>
                 <div className="flex items-center gap-2">
-                  <span className="font-[JetBrains_Mono,monospace] text-[11px] text-emerald-400">8W</span>
+                  <span className="font-[JetBrains_Mono,monospace] text-[11px] text-emerald-400">{stats.settled.filter(p => p.result_status === "won").length}W</span>
                   <span className="text-white/15">/</span>
-                  <span className="font-[JetBrains_Mono,monospace] text-[11px] text-rose-400">2L</span>
+                  <span className="font-[JetBrains_Mono,monospace] text-[11px] text-rose-400">{stats.settled.filter(p => p.result_status === "lost").length}L</span>
                   <span className="text-white/15">/</span>
-                  <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white/25">1V</span>
-                  <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20 ml-1">(last 11)</span>
+                  <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white/25">{stats.settled.filter(p => p.result_status === "void").length}V</span>
+                  <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20 ml-1">(all-time)</span>
                 </div>
               </div>
               <div className="bg-card border border-[#D4AF37]/8 rounded-lg overflow-hidden">
-                {RESULTS.map((r, i) => (
-                  <div key={r.id} className={cn(
-                    "flex items-center gap-4 px-5 py-3.5 hover:bg-white/[0.015] transition-colors",
-                    i < RESULTS.length - 1 && "border-b border-white/[0.04]"
-                  )}>
-                    <span className="font-[JetBrains_Mono,monospace] text-[10px] text-white/25 w-12 flex-shrink-0">{r.date}</span>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-[13px] text-white/70 truncate">{r.match}</p>
-                      <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 mt-0.5">{r.prediction} · {r.league}</p>
-                    </div>
-                    <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white/40 flex-shrink-0">{r.odds}</span>
-                    <div className="flex items-center gap-1.5 w-14 flex-shrink-0">
-                      <div className={cn("w-1.5 h-1.5 rounded-full", r.result === "won" ? "bg-emerald-500" : r.result === "lost" ? "bg-rose-500" : "bg-white/15")} />
-                      <span className={cn("font-[JetBrains_Mono,monospace] text-[10px] uppercase", r.result === "won" ? "text-emerald-400" : r.result === "lost" ? "text-rose-400" : "text-white/20")}>
-                        {r.result}
+                {stats.settled.length === 0 && (
+                  <p className="text-[12px] text-white/30 px-5 py-6">No settled predictions yet.</p>
+                )}
+                {stats.settled.slice().reverse().map((p, i) => {
+                  const profit = unitProfit(p);
+                  const kickoff = earliestKickoff(p);
+                  const leagues = Array.from(new Set(p.selections.map(s => s.league))).join(", ");
+                  return (
+                    <div key={p.id} className={cn(
+                      "flex items-center gap-4 px-5 py-3.5 hover:bg-white/[0.015] transition-colors",
+                      i < stats.settled.length - 1 && "border-b border-white/[0.04]"
+                    )}>
+                      <span className="font-[JetBrains_Mono,monospace] text-[10px] text-white/25 w-12 flex-shrink-0">
+                        {kickoff ? kickoff.toLocaleDateString("en-GB", { day: "2-digit", month: "short" }) : "—"}
+                      </span>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[13px] text-white/70 truncate">{p.title}</p>
+                        <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 mt-0.5">{p.category.name} · {leagues}</p>
+                      </div>
+                      <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white/40 flex-shrink-0">{combinedOdds(p).toFixed(2)}</span>
+                      <div className="flex items-center gap-1.5 w-14 flex-shrink-0">
+                        <div className={cn("w-1.5 h-1.5 rounded-full", p.result_status === "won" ? "bg-emerald-500" : p.result_status === "lost" ? "bg-rose-500" : "bg-white/15")} />
+                        <span className={cn("font-[JetBrains_Mono,monospace] text-[10px] uppercase", p.result_status === "won" ? "text-emerald-400" : p.result_status === "lost" ? "text-rose-400" : "text-white/20")}>
+                          {p.result_status}
+                        </span>
+                      </div>
+                      <span className={cn("font-[JetBrains_Mono,monospace] text-[11px] font-bold w-14 text-right flex-shrink-0",
+                        profit > 0 ? "text-emerald-400" : profit < 0 ? "text-rose-400" : "text-white/20")}>
+                        {profit > 0 ? `+${profit}u` : profit === 0 ? "VOID" : `${profit}u`}
                       </span>
                     </div>
-                    <span className={cn("font-[JetBrains_Mono,monospace] text-[11px] font-bold w-14 text-right flex-shrink-0",
-                      r.profit > 0 ? "text-emerald-400" : r.profit < 0 ? "text-rose-400" : "text-white/20")}>
-                      {r.profit > 0 ? `+${r.profit}u` : r.profit === 0 ? "VOID" : `${r.profit}u`}
-                    </span>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}
@@ -351,9 +486,9 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
             <div className="space-y-5">
               <div className="grid sm:grid-cols-3 gap-4">
                 {[
-                  { label: "Total Predictions", value: USER.totalPredictions.toLocaleString(), sub: "Since Jan 2026" },
-                  { label: "Overall Win Rate", value: `${USER.winRate}%`, sub: "All markets, all leagues" },
-                  { label: "Total ROI", value: `+${USER.roi}%`, sub: "Flat-stake, 1 unit/pred" },
+                  { label: "Total Predictions", value: stats.totalSettled.toLocaleString(), sub: "Settled, all-time" },
+                  { label: "Overall Win Rate", value: `${stats.winRate}%`, sub: "All markets, all leagues" },
+                  { label: "Total ROI", value: `${stats.roi >= 0 ? "+" : ""}${stats.roi}%`, sub: "Flat-stake, 1 unit/pred" },
                 ].map((s, i) => (
                   <div key={i} className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
                     <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest mb-2">{s.label}</p>
@@ -366,32 +501,39 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
               {/* ROI chart */}
               <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white">Cumulative ROI — July 2026</h3>
+                  <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white">Cumulative ROI</h3>
                   <Chip label="Flat stake" variant="ghost" />
                 </div>
-                <ResponsiveContainer width="100%" height={200}>
-                  <AreaChart data={PERF_DATA} margin={{ top: 2, right: 2, bottom: 0, left: -22 }}>
-                    <defs>
-                      <linearGradient id="gROI" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="0%" stopColor="#10B981" stopOpacity={0.25} />
-                        <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <XAxis dataKey="day" tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} />
-                    <YAxis tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} />
-                    <Tooltip contentStyle={{ background: "#111C2E", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 6, fontSize: 11, fontFamily: "JetBrains Mono,monospace" }} itemStyle={{ color: "#10B981" }} />
-                    <Area type="monotone" dataKey="roi" stroke="#10B981" strokeWidth={1.5} fill="url(#gROI)" dot={false} />
-                  </AreaChart>
-                </ResponsiveContainer>
+                {stats.trend.length === 0 ? (
+                  <p className="text-[12px] text-white/30 py-10 text-center">Not enough settled predictions yet to chart a trend.</p>
+                ) : (
+                  <ResponsiveContainer width="100%" height={200}>
+                    <AreaChart data={stats.trend} margin={{ top: 2, right: 2, bottom: 0, left: -22 }}>
+                      <defs>
+                        <linearGradient id="gROI" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#10B981" stopOpacity={0.25} />
+                          <stop offset="100%" stopColor="#10B981" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <XAxis dataKey="day" tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} />
+                      <YAxis tick={{ fill: "rgba(255,255,255,0.25)", fontSize: 10, fontFamily: "JetBrains Mono,monospace" }} axisLine={false} tickLine={false} />
+                      <Tooltip contentStyle={{ background: "#111C2E", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 6, fontSize: 11, fontFamily: "JetBrains Mono,monospace" }} itemStyle={{ color: "#10B981" }} />
+                      <Area type="monotone" dataKey="roi" stroke="#10B981" strokeWidth={1.5} fill="url(#gROI)" dot={false} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                )}
               </div>
 
               {/* League breakdown */}
               <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
                 <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-5">Win Rate by League</h3>
                 <div className="space-y-3">
-                  {LEAGUE_PERF.map(l => (
+                  {stats.leaguePerf.length === 0 && (
+                    <p className="text-[12px] text-white/30">No settled predictions yet.</p>
+                  )}
+                  {stats.leaguePerf.map(l => (
                     <div key={l.league} className="flex items-center gap-4">
-                      <span className="font-[JetBrains_Mono,monospace] text-[10px] text-white/40 uppercase w-14 flex-shrink-0">{l.league}</span>
+                      <span className="font-[JetBrains_Mono,monospace] text-[10px] text-white/40 uppercase w-14 flex-shrink-0 truncate">{l.league}</span>
                       <div className="flex-1 h-1.5 bg-white/8 rounded-full overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-700"
                           style={{ width: `${l.winRate}%`, background: l.winRate >= 80 ? "#10B981" : l.winRate >= 75 ? GOLD : "rgba(255,255,255,0.3)" }} />

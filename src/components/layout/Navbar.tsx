@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Bell, LogOut, Menu, X } from "lucide-react";
-import { Page, USER, NOTIFICATIONS, cn, GoldBtn } from "../../app/shared";
+import { Page, NOTIFICATIONS, cn, GoldBtn, displayNameFor, initialsFor } from "../../app/shared";
 import AnimatedLogoMark from "../AnimatedLogoMark";
+import { useAuth } from "../../contexts/AuthContext";
+import { useCurrentSubscription } from "../../hooks/useCurrentSubscription";
 
 export default function Navbar({ page, nav, authed, setAuthed }: {
   page: Page; nav: (p: Page) => void;
@@ -10,6 +12,12 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
   const unread = NOTIFICATIONS.filter(n => n.unread).length;
+
+  const { user } = useAuth();
+  const { subscription, hasSubscription } = useCurrentSubscription(authed);
+  const displayName = displayNameFor(user);
+  const initials = initialsFor(displayName || "?");
+  const planLabel = hasSubscription && subscription ? subscription.plan_name : "No active plan";
 
   const links = authed
     ? [{ label: "Dashboard", p: "dashboard" as Page }, { label: "Predictions", p: "predictions" as Page }, { label: "Live Scores", p: "results" as Page }]
@@ -72,11 +80,11 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
               {/* User pill */}
               <div className="flex items-center gap-2.5 pl-2.5 border-l border-white/8">
                 <div className="w-7 h-7 rounded-full bg-[#D4AF37]/18 border border-[#D4AF37]/30 flex items-center justify-center">
-                  <span className="text-[#D4AF37] text-[10px] font-bold">{USER.initials}</span>
+                  <span className="text-[#D4AF37] text-[10px] font-bold">{initials}</span>
                 </div>
                 <div className="hidden sm:block">
-                  <p className="text-[12px] font-medium text-white leading-none">{USER.name.split(" ")[0]}</p>
-                  <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] mt-0.5">{USER.plan}</p>
+                  <p className="text-[12px] font-medium text-white leading-none">{displayName.split(" ")[0]}</p>
+                  <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] mt-0.5">{planLabel}</p>
                 </div>
                 <button onClick={() => { setAuthed(false); nav("home"); }} className="ml-1 text-white/25 hover:text-white/60 transition-colors cursor-pointer">
                   <LogOut size={13} />
