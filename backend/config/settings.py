@@ -194,6 +194,28 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
 SECURE_HSTS_PRELOAD = not DEBUG
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
+# These two already match Django's own defaults (nosniff since 3.0,
+# same-origin referrer policy since 3.0) - made explicit here so a future
+# Django upgrade can't silently change them without it being visible in a diff.
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_REFERRER_POLICY = "same-origin"
+
+# X-Frame-Options: DENY is set by django.middleware.clickjacking.XFrameOptionsMiddleware
+# (already in MIDDLEWARE) using its own default; no extra setting needed.
+
+# Content-Security-Policy and Permissions-Policy are intentionally NOT enabled
+# here. Both frontend and backend serve pages that legitimately use inline
+# styles (Tailwind arbitrary values, the animated favicon's canvas-generated
+# data: URI, print stylesheets), so a CSP added without deploying and
+# manually testing every page first could silently break real features in
+# production. Recommended starting point, to be tested on a staging deploy
+# before enabling here:
+#   default-src 'self'; img-src 'self' data: https:; style-src 'self'
+#   'unsafe-inline'; script-src 'self'; connect-src 'self' https://api.paystack.co;
+#   frame-ancestors 'none'
+# This is deliberately left as an unapplied recommendation - see
+# docs/legal-compliance.md for the full rationale.
+
 # Django REST Framework
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (

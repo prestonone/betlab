@@ -64,7 +64,7 @@ class AuthenticationApiTests(TestCase):
         for acceptance in UserPolicyAcceptance.objects.filter(user=user):
             self.assertEqual(acceptance.acceptance_source, UserPolicyAcceptance.Source.WEB_SIGNUP)
             self.assertIsNotNone(acceptance.accepted_at)
-            self.assertEqual(acceptance.policy.version, "1.0")
+            self.assertEqual(acceptance.policy.version, acceptance.policy.__class__.current(acceptance.policy.policy_type).version)
 
         consent = MarketingConsent.objects.get(user=user)
         self.assertEqual(consent.status, MarketingConsent.Status.OPTED_OUT)

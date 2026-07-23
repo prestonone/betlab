@@ -1,13 +1,11 @@
 export type PolicySlug =
   | "terms-of-service"
-  | "terms-of-use"
   | "privacy"
   | "refund-policy"
   | "disclaimer"
   | "cookies"
   | "copyright"
   | "acceptable-use"
-  | "risk-disclosure"
   | "responsible-gambling"
   | "aml-kyc"
   | "methodology";

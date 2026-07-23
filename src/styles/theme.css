@@ -221,3 +221,25 @@
   .delay-600 { animation-delay: 0.6s; }
   .delay-700 { animation-delay: 0.7s; }
 }
+
+@media print {
+  header, footer, .print\:hidden { display: none !important; }
+  body { background: #ffffff !important; }
+  .legal-print-surface {
+    background: #ffffff !important;
+    color: #111111 !important;
+  }
+  .legal-print-surface h1, .legal-print-surface h2 {
+    color: #0B1220 !important;
+  }
+  .legal-print-surface p, .legal-print-surface li {
+    color: #222222 !important;
+  }
+  .legal-print-surface a {
+    color: #7a5c14 !important;
+    text-decoration: underline;
+  }
+  @page {
+    margin: 2cm;
+  }
+}

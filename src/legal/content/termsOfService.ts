@@ -7,7 +7,7 @@ export const termsOfService: LegalDocument = {
   title: "Terms of Service",
   shortTitle: "Terms of Service",
   summary: "The contract between you and Bet Lab governing your use of the platform, your subscription, and our respective rights and responsibilities.",
-  version: "1.0",
+  version: "2.0",
   effectiveDate: EFFECTIVE_DATE,
   sections: [
     {
@@ -15,7 +15,7 @@ export const termsOfService: LegalDocument = {
       heading: "1. Introduction and Definitions",
       blocks: [
         { type: "paragraphs", items: [
-          "These Terms of Service (\"Terms\") govern your access to and use of Bet Lab, a football intelligence and sports-analysis subscription platform operated at betlabhq.com (the \"Website\", the \"Platform\", or the \"Service\").",
+          "These Terms of Service (\"Terms\") govern your access to and use of Bet Lab, a football intelligence and sports-analysis subscription platform operated at betlabhq.com (the \"Website\", the \"Platform\", or the \"Service\"). These Terms also serve as Bet Lab's Terms of Use, covering both the contract between you and Bet Lab and the practical rules for day-to-day use of the Platform.",
         ] },
         { type: "list", items: [
           "\"Bet Lab\" means the business operating the Platform.",
@@ -36,7 +36,7 @@ export const termsOfService: LegalDocument = {
       heading: "2. Acceptance of Terms",
       blocks: [
         { type: "paragraphs", items: [
-          "By accessing the Platform, creating an Account, or purchasing a Subscription, you agree to be bound by these Terms and by our Terms of Use, Privacy Policy, Refund and Subscription Policy, Disclaimer and Responsible Use Policy, and Risk Disclosure Statement, each incorporated by reference.",
+          "By accessing the Platform, creating an Account, or purchasing a Subscription, you agree to be bound by these Terms and by our Privacy Policy, Refund and Subscription Policy, Disclaimer and Risk Disclosure, and other referenced policies, each incorporated by reference.",
           "If you do not agree to these Terms, do not use the Platform.",
         ] },
       ],
@@ -62,10 +62,10 @@ export const termsOfService: LegalDocument = {
         { type: "list", items: [
           "You are responsible for the accuracy of the information you register with and for keeping it up to date.",
           "You are responsible for maintaining the confidentiality of your password and for all activity that occurs under your Account.",
-          "You must notify us promptly at " + "support@betlabhq.com" + " if you suspect unauthorised access to your Account.",
+          "You must notify us promptly at support@betlabhq.com if you suspect unauthorised access to your Account.",
           "Accounts are intended for use by one individual. Sharing login credentials or Subscription access with others is not permitted.",
           "You may request account deactivation at any time by contacting support.",
-          "We may suspend or terminate an Account for the reasons set out in Section 13 (Suspension and Termination).",
+          "We may suspend or terminate an Account for the reasons set out in Section 16 (Suspension and Termination).",
         ] },
       ],
     },
@@ -91,7 +91,7 @@ export const termsOfService: LegalDocument = {
           "Past prediction performance does not guarantee future results.",
           "Odds, team news and match information may change after a Prediction is published. You are responsible for independently verifying time-sensitive information before making any decision.",
         ] },
-        { type: "callout", variant: "info", text: "See our dedicated Risk Disclosure Statement and Prediction Methodology page for a full explanation of how Predictions are produced and what their limitations are." },
+        { type: "callout", variant: "info", text: "See our dedicated Disclaimer and Risk Disclosure and Prediction Methodology page for a full explanation of how Predictions are produced and what their limitations are." },
       ],
     },
     {
@@ -137,24 +137,31 @@ export const termsOfService: LegalDocument = {
       heading: "10. Intellectual Property",
       blocks: [
         { type: "paragraphs", items: [
-          "The Bet Lab name, logo, branding, website design, source code, Prediction content, written analysis, graphics, databases and compilations of statistics are the property of Bet Lab or its licensors and are protected by copyright, trademark and other intellectual-property laws.",
+          "The Bet Lab name, logo, branding, website design, source code, Prediction content, written analysis, graphics, databases and compilations of statistics are the property of Bet Lab or its licensors and are protected by copyright, trademark and other intellectual-property laws. See our separate Copyright and Intellectual Property Policy for detail.",
           "Subject to your compliance with these Terms, Bet Lab grants you a limited, personal, non-exclusive, non-transferable licence to view Content for your own personal, non-commercial use.",
         ] },
       ],
     },
     {
       id: "restrictions",
-      heading: "11. Restrictions",
+      heading: "11. Restrictions and Acceptable Use",
       blocks: [
         { type: "paragraphs", items: ["You must not:"] },
         { type: "list", items: [
           "Resell, republish or redistribute Predictions or Premium Content, including in paid Telegram/WhatsApp groups or on social media.",
-          "Share Subscription access or credentials with people who have not paid for their own Subscription.",
-          "Scrape, crawl or use bots or automated tools to extract Content.",
-          "Attempt credential stuffing, reverse engineering, or circumvention of access controls.",
-          "Engage in fraud, impersonation, or malicious activity, or interfere with Platform security.",
+          "Share Subscription access or credentials with people who have not paid for their own Subscription. Each Account and Subscription is for one individual, and we may apply device or session controls to detect and limit shared-account use.",
+          "Screenshot or otherwise copy Premium Content for republication, or use Bet Lab Content to build a competing dataset or product.",
+          "Scrape, crawl, or use bots or other automated means to access the Platform or its API, or attempt to circumvent rate limits or other technical access controls.",
+          "Reverse engineer the Platform's software, or conduct security testing against the Platform without our prior written permission.",
+          "Attempt credential stuffing, phishing, malware distribution, denial-of-service attacks, or other malicious activity, or otherwise interfere with Platform security.",
+          "Commit fraud or payment abuse, including chargeback abuse.",
+          "Harass, threaten, or abuse other users or Bet Lab staff.",
+          "Impersonate Bet Lab or any other person or entity, or misrepresent a relationship or partnership with Bet Lab.",
           "Infringe Bet Lab's or any third party's intellectual property.",
-          "Use the Platform for any unlawful purpose.",
+          "Use the Platform for any unlawful purpose, including operating an unlicensed gambling business.",
+        ] },
+        { type: "paragraphs", items: [
+          "Depending on severity, breaches of this section may result in a warning, temporary suspension, permanent suspension, content takedown, and/or referral for legal action where appropriate. To report suspected abuse of the Platform or misuse of Bet Lab Content, email support@betlabhq.com.",
         ] },
       ],
     },
@@ -191,27 +198,19 @@ export const termsOfService: LegalDocument = {
     },
     {
       id: "liability",
-      heading: "15. Limitation of Liability",
+      heading: "15. Limitation of Liability and Indemnity",
       blocks: [
         { type: "paragraphs", items: [
           "To the maximum extent permitted by Applicable Law, Bet Lab's total liability arising out of or relating to these Terms or the Service is limited to the amount you paid to Bet Lab in the twelve months preceding the event giving rise to the claim.",
           "Nothing in these Terms excludes or limits liability for fraud, wilful misconduct, death or personal injury caused by negligence, or any other liability that cannot lawfully be excluded or limited under Applicable Law.",
-          "We are not liable for losses you incur from betting or gambling decisions made independently of the Platform, whether or not informed by our Content. See our Risk Disclosure Statement.",
-        ] },
-      ],
-    },
-    {
-      id: "indemnity",
-      heading: "16. Indemnity",
-      blocks: [
-        { type: "paragraphs", items: [
+          "We are not liable for losses you incur from betting or gambling decisions made independently of the Platform, whether or not informed by our Content. See our Disclaimer and Risk Disclosure.",
           "You agree to indemnify Bet Lab against reasonable losses, damages and expenses arising from your breach of these Terms or your misuse of the Platform, except to the extent caused by Bet Lab's own breach or negligence.",
         ] },
       ],
     },
     {
       id: "suspension",
-      heading: "17. Suspension and Termination",
+      heading: "16. Suspension and Termination",
       blocks: [
         { type: "paragraphs", items: ["We may suspend or terminate your Account, with or without notice where reasonably necessary, for:"] },
         { type: "list", items: [
@@ -219,28 +218,28 @@ export const termsOfService: LegalDocument = {
           "Account sharing or reselling Content.",
           "Intellectual-property violations.",
           "Security threats to the Platform or other users.",
-          "Any other prohibited use under these Terms or our Acceptable Use Policy.",
+          "Any other prohibited use under Section 11.",
           "Compliance with a legal obligation.",
         ] },
         { type: "paragraphs", items: [
-          "Where we suspend or terminate an Account, you may contact " + "support@betlabhq.com" + " to request an explanation or to appeal the decision.",
+          "Where we suspend or terminate an Account, you may contact support@betlabhq.com to request an explanation or to appeal the decision.",
         ] },
       ],
     },
     {
       id: "governing-law",
-      heading: "18. Governing Law and Disputes",
+      heading: "17. Governing Law and Disputes",
       blocks: [
         { type: "list", items: [
           "These Terms are governed by the laws of the Federal Republic of Nigeria, without regard to conflict-of-law principles.",
-          "If a dispute arises, please contact us first at " + "legal@betlabhq.com" + " so we can attempt to resolve it informally and in good faith.",
+          "If a dispute arises, please contact us first at legal@betlabhq.com so we can attempt to resolve it informally and in good faith.",
           "Subject to any mandatory consumer-protection rights you may have in your own jurisdiction, the courts of Nigeria shall have jurisdiction over any dispute that cannot be resolved informally.",
         ] },
       ],
     },
     {
       id: "amendments",
-      heading: "19. Amendments",
+      heading: "18. Amendments",
       blocks: [
         { type: "list", items: [
           "We may update these Terms from time to time. Each version carries a version number and effective date.",
@@ -251,7 +250,7 @@ export const termsOfService: LegalDocument = {
     },
     {
       id: "contact",
-      heading: "20. Contact Information",
+      heading: "19. Contact Information",
       blocks: [
         { type: "list", items: [
           "Business name: Bet Lab",

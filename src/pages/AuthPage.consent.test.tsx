@@ -34,20 +34,20 @@ async function goToStep2(user: ReturnType<typeof userEvent.setup>) {
 }
 
 describe("AuthPage registration consent", () => {
-  it("renders all consent checkboxes unticked by default", async () => {
+  it("renders exactly one combined mandatory checkbox plus refund and marketing checkboxes, all unticked", async () => {
     const user = userEvent.setup();
     renderRegister();
     await goToStep2(user);
 
+    // consent-all (combined mandatory) + consent-refund + consent-marketing
     const checkboxes = screen.getAllByRole("checkbox");
-    // 4 mandatory + 1 optional marketing checkbox
-    expect(checkboxes.length).toBeGreaterThanOrEqual(5);
+    expect(checkboxes).toHaveLength(3);
     for (const box of checkboxes) {
       expect(box).not.toBeChecked();
     }
   });
 
-  it("blocks free registration until mandatory consent is given", async () => {
+  it("blocks free registration until the combined mandatory consent is given", async () => {
     const user = userEvent.setup();
     renderRegister();
     await goToStep2(user);
@@ -59,14 +59,12 @@ describe("AuthPage registration consent", () => {
     ).toBeInTheDocument();
   });
 
-  it("does not require marketing consent to proceed past the consent gate", async () => {
+  it("recording one checkbox accepts terms, privacy and age/risk together, and does not require marketing consent", async () => {
     const user = userEvent.setup();
     renderRegister();
     await goToStep2(user);
 
     await user.click(screen.getByLabelText(/terms of service/i, { selector: "input" }));
-    await user.click(screen.getByLabelText(/privacy policy/i, { selector: "input" }));
-    await user.click(screen.getByLabelText(/risk disclosure/i, { selector: "input" }));
     // Marketing checkbox deliberately left unchecked.
 
     await user.click(screen.getByRole("button", { name: /continue for free instead/i }));
@@ -86,5 +84,8 @@ describe("AuthPage registration consent", () => {
     const termsLink = screen.getByRole("link", { name: "Terms of Service" });
     expect(termsLink).toHaveAttribute("target", "_blank");
     expect(termsLink).toHaveAttribute("href", "/legal/terms-of-service");
+
+    const disclaimerLink = screen.getByRole("link", { name: "Disclaimer and Risk Disclosure" });
+    expect(disclaimerLink).toHaveAttribute("href", "/legal/disclaimer");
   });
 });

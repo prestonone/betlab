@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { LEGAL_DOCUMENTS, getLegalDocument } from "./registry";
 
 describe("legal document registry", () => {
-  it("contains exactly the 12 required policy documents", () => {
-    expect(LEGAL_DOCUMENTS).toHaveLength(12);
+  it("contains exactly the 10 required policy documents (Terms of Service/Use merged; Disclaimer/Risk Disclosure merged)", () => {
+    expect(LEGAL_DOCUMENTS).toHaveLength(10);
   });
 
   it("has a unique slug per document", () => {

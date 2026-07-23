@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import AnimatedLogoMark from "../AnimatedLogoMark";
+import type { PolicySlug } from "../../legal/types";
 
 type Page =
   | "home"
@@ -15,7 +16,7 @@ type Page =
 
 export default function Footer({ nav }: { nav: (p: Page) => void }) {
   const navigate = useNavigate();
-  const goToPolicy = (slug: string) => {
+  const goToPolicy = (slug: PolicySlug) => {
     navigate(`/legal/${slug}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -47,20 +48,20 @@ export default function Footer({ nav }: { nav: (p: Page) => void }) {
         <div className="lg:col-span-2">
           <h4 className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.2em] text-[#D4AF37] mb-4">Legal &amp; Policies</h4>
           <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5">
-            {[
-              ["Terms of Service", "terms-of-service"],
-              ["Terms of Use", "terms-of-use"],
-              ["Privacy Policy", "privacy"],
-              ["Refund & Subscription", "refund-policy"],
-              ["Disclaimer", "disclaimer"],
-              ["Risk Disclosure", "risk-disclosure"],
-              ["Responsible Gambling", "responsible-gambling"],
-              ["Cookie Policy", "cookies"],
-              ["Copyright Policy", "copyright"],
-              ["Acceptable Use", "acceptable-use"],
-              ["AML/KYC Statement", "aml-kyc"],
-              ["Prediction Methodology", "methodology"],
-            ].map(([label, slug]) => (
+            {(
+              [
+                ["Terms of Service", "terms-of-service"],
+                ["Privacy Policy", "privacy"],
+                ["Refund & Subscription", "refund-policy"],
+                ["Disclaimer & Risk Disclosure", "disclaimer"],
+                ["Responsible Gambling", "responsible-gambling"],
+                ["Cookie Policy", "cookies"],
+                ["Copyright Policy", "copyright"],
+                ["Acceptable Use", "acceptable-use"],
+                ["AML/KYC Statement", "aml-kyc"],
+                ["Prediction Methodology", "methodology"],
+              ] as [string, PolicySlug][]
+            ).map(([label, slug]) => (
               <li key={slug}>
                 <button onClick={() => goToPolicy(slug)} className="text-[12px] text-white/35 hover:text-white/75 transition-colors cursor-pointer text-left">
                   {label}

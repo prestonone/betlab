@@ -41,11 +41,6 @@
     <priority>0.2</priority>
   </url>
   <url>
-    <loc>https://www.betlabhq.com/legal/terms-of-use</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  <url>
     <loc>https://www.betlabhq.com/legal/privacy</loc>
     <changefreq>monthly</changefreq>
     <priority>0.2</priority>
@@ -57,11 +52,6 @@
   </url>
   <url>
     <loc>https://www.betlabhq.com/legal/disclaimer</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.2</priority>
-  </url>
-  <url>
-    <loc>https://www.betlabhq.com/legal/risk-disclosure</loc>
     <changefreq>monthly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -94,5 +84,15 @@
     <loc>https://www.betlabhq.com/legal/methodology</loc>
     <changefreq>monthly</changefreq>
     <priority>0.2</priority>
+  </url>
+  <url>
+    <loc>https://www.betlabhq.com/legal/changes</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.1</priority>
+  </url>
+  <url>
+    <loc>https://www.betlabhq.com/legal/contact</loc>
+    <changefreq>yearly</changefreq>
+    <priority>0.1</priority>
   </url>
 </urlset>

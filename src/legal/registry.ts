@@ -1,24 +1,20 @@
 import type { LegalDocument, PolicySlug } from "./types";
 import { termsOfService } from "./content/termsOfService";
-import { termsOfUse } from "./content/termsOfUse";
 import { privacyPolicy } from "./content/privacyPolicy";
 import { refundPolicy } from "./content/refundPolicy";
 import { disclaimer } from "./content/disclaimer";
 import { cookiePolicy } from "./content/cookiePolicy";
 import { copyrightPolicy } from "./content/copyrightPolicy";
 import { acceptableUse } from "./content/acceptableUse";
-import { riskDisclosure } from "./content/riskDisclosure";
 import { responsibleGambling } from "./content/responsibleGambling";
 import { amlKyc } from "./content/amlKyc";
 import { methodology } from "./content/methodology";
 
 export const LEGAL_DOCUMENTS: LegalDocument[] = [
   termsOfService,
-  termsOfUse,
   privacyPolicy,
   refundPolicy,
   disclaimer,
-  riskDisclosure,
   responsibleGambling,
   cookiePolicy,
   copyrightPolicy,

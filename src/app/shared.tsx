@@ -11,7 +11,7 @@ export type Page =
   | "reset-password" | "verify-email"
   | "legal";
 
-export type DashSection = "overview" | "results" | "performance";
+export type DashSection = "overview" | "results" | "performance" | "legal";
 export type PredCategory = "Banker" | "Sure 2" | "Sure 3" | "Sure 5" | "Rollover";
 export type PredStatus = "pending" | "won" | "lost" | "void";
 
@@ -186,19 +186,19 @@ export function Chip({ label, variant }: {
   );
 }
 
-export function GoldBtn({ children, onClick, size = "md", outline = false, full = false, className }: {
+export function GoldBtn({ children, onClick, size = "md", outline = false, full = false, disabled = false, className }: {
   children: React.ReactNode; onClick?: () => void;
-  size?: "sm" | "md" | "lg"; outline?: boolean; full?: boolean; className?: string;
+  size?: "sm" | "md" | "lg"; outline?: boolean; full?: boolean; disabled?: boolean; className?: string;
 }) {
   const sz = { sm: "px-4 py-1.5 text-sm", md: "px-6 py-2.5 text-sm", lg: "px-8 py-3.5 text-base" };
-  const base = cn("inline-flex items-center gap-2 rounded font-semibold transition-all duration-200 cursor-pointer", sz[size], full && "w-full justify-center", className);
+  const base = cn("inline-flex items-center gap-2 rounded font-semibold transition-all duration-200 cursor-pointer", sz[size], full && "w-full justify-center", disabled && "opacity-50 cursor-not-allowed", className);
   if (outline) return (
-    <button onClick={onClick} className={cn(base, "border border-[#D4AF37]/45 text-[#D4AF37] hover:bg-[#D4AF37]/8 hover:border-[#D4AF37]")}>
+    <button onClick={onClick} disabled={disabled} className={cn(base, "border border-[#D4AF37]/45 text-[#D4AF37] hover:bg-[#D4AF37]/8 hover:border-[#D4AF37]")}>
       {children}
     </button>
   );
   return (
-    <button onClick={onClick} className={cn(base, "bg-[#D4AF37] text-[#070E1A] hover:bg-[#E8C84A] hover:shadow-[0_0_28px_rgba(212,175,55,0.4)]")}>
+    <button onClick={onClick} disabled={disabled} className={cn(base, "bg-[#D4AF37] text-[#070E1A] hover:bg-[#E8C84A] hover:shadow-[0_0_28px_rgba(212,175,55,0.4)]")}>
       {children}
     </button>
   );

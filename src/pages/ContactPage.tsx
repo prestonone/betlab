@@ -1,10 +1,34 @@
 import { useState } from "react";
-import { Check, Users, Mail, Globe, Send } from "lucide-react";
+import { Check, LifeBuoy, Scale, ShieldCheck, Send, AlertCircle } from "lucide-react";
 import { GoldBtn, SectionEyebrow } from "../app/shared";
+import { LEGAL_SUPPORT_EMAIL, LEGAL_EMAIL, LEGAL_PRIVACY_EMAIL } from "../legal/config";
+import { submitLegalContact } from "../services/legal";
+import { ApiError } from "../services/api";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setIsSubmitting(true);
+    try {
+      await submitLegalContact({
+        category: "general",
+        name: form.name,
+        email: form.email,
+        message: form.subject ? `Subject: ${form.subject}\n\n${form.message}` : form.message,
+      });
+      setSent(true);
+    } catch (requestError) {
+      setError(requestError instanceof ApiError ? requestError.message : "We could not send your message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <div className="pt-[60px]">
@@ -23,10 +47,10 @@ export default function ContactPage() {
                   <Check size={24} className="text-emerald-400" />
                 </div>
                 <h3 className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-white mb-2">Message Sent</h3>
-                <p className="text-[12px] text-white/35">We&apos;ll respond within 24 hours.</p>
+                <p className="text-[12px] text-white/35">We aim to respond within a reasonable time.</p>
               </div>
             ) : (
-              <form onSubmit={e => { e.preventDefault(); setSent(true); }} className="space-y-4">
+              <form onSubmit={submit} className="space-y-4">
                 <div className="grid sm:grid-cols-2 gap-4">
                   <div>
                     <label className="block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/30 mb-1.5">Name</label>
@@ -49,8 +73,14 @@ export default function ContactPage() {
                   <textarea value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} required rows={6} placeholder="Tell us more..."
                     className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded px-3.5 py-2.5 text-[13px] text-white placeholder-white/18 focus:outline-none focus:border-[#D4AF37]/40 transition-colors resize-none" />
                 </div>
-                <GoldBtn full size="md">
-                  Send Message <Send size={13} />
+                {error && (
+                  <div role="alert" className="flex items-start gap-2 text-[12px] text-red-400">
+                    <AlertCircle size={14} aria-hidden="true" className="shrink-0 mt-0.5" />
+                    <p>{error}</p>
+                  </div>
+                )}
+                <GoldBtn full size="md" disabled={isSubmitting}>
+                  {isSubmitting ? "Sending..." : "Send Message"} <Send size={13} aria-hidden="true" />
                 </GoldBtn>
               </form>
             )}
@@ -61,9 +91,9 @@ export default function ContactPage() {
             <div className="bg-card border border-[#D4AF37]/8 rounded-xl p-5">
               <h3 className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white mb-4">Contact Details</h3>
               {[
-                { icon: <Mail size={14} />, label: "General", val: "hello@betlab.io" },
-                { icon: <Users size={14} />, label: "Partnerships", val: "partners@betlab.io" },
-                { icon: <Globe size={14} />, label: "Press", val: "press@betlab.io" },
+                { icon: <LifeBuoy size={14} aria-hidden="true" />, label: "Support", val: LEGAL_SUPPORT_EMAIL },
+                { icon: <Scale size={14} aria-hidden="true" />, label: "Legal", val: LEGAL_EMAIL },
+                { icon: <ShieldCheck size={14} aria-hidden="true" />, label: "Privacy", val: LEGAL_PRIVACY_EMAIL },
               ].map((c, i) => (
                 <div key={i} className="flex items-center gap-3 py-3 border-b border-white/[0.04] last:border-0">
                   <div className="w-7 h-7 rounded bg-[#D4AF37]/8 flex items-center justify-center text-[#D4AF37] flex-shrink-0">{c.icon}</div>
@@ -88,5 +118,3 @@ export default function ContactPage() {
     </div>
   );
 }
-
-// ─── APP ──────────────────────────────────────────────────────────────────────

@@ -1,12 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
-import { TrendingUp, Settings, Menu, X, Target, Activity, CheckCircle2, XCircle, Minus, Flame, LayoutDashboard, LineChart, History, MailWarning } from "lucide-react";
+import { TrendingUp, Settings, Menu, X, Target, Activity, CheckCircle2, XCircle, Minus, Flame, LayoutDashboard, LineChart, History, MailWarning, ShieldCheck, Download } from "lucide-react";
 import { Page, DashSection, cn, GOLD, Chip, ApiPredictionCard, displayNameFor } from "../app/shared";
 import { useAuth } from "../contexts/AuthContext";
 import { useCurrentSubscription } from "../hooks/useCurrentSubscription";
 import { resendVerificationEmail } from "../services/auth";
 import { verifyPayment } from "../services/payments";
 import { getPredictions, type Prediction as ApiPrediction } from "../services/predictions";
+import { getMyConsent, updateMarketingConsent, type MyConsentData } from "../services/legal";
+import { ApiError } from "../services/api";
 
 function combinedOdds(pred: ApiPrediction): number {
   return pred.selections.reduce((total, s) => total * Number(s.odds), 1);
@@ -197,7 +199,37 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
     { icon: <LayoutDashboard size={15} />, label: "Overview", s: "overview" },
     { icon: <History size={15} />, label: "Results", s: "results" },
     { icon: <LineChart size={15} />, label: "Performance", s: "performance" },
+    { icon: <ShieldCheck size={15} />, label: "Legal & Privacy", s: "legal" },
   ];
+
+  const [consent, setConsent] = useState<MyConsentData | null>(null);
+  const [consentError, setConsentError] = useState("");
+  const [isUpdatingMarketing, setIsUpdatingMarketing] = useState(false);
+
+  useEffect(() => {
+    if (section !== "legal" || consent || consentError) return;
+    let active = true;
+    getMyConsent()
+      .then(data => { if (active) setConsent(data); })
+      .catch((requestError: unknown) => {
+        if (!active) return;
+        setConsentError(requestError instanceof ApiError ? requestError.message : "Unable to load your legal & privacy record.");
+      });
+    return () => { active = false; };
+  }, [section, consent, consentError]);
+
+  const toggleMarketing = async () => {
+    if (!consent) return;
+    setIsUpdatingMarketing(true);
+    try {
+      const updated = await updateMarketingConsent(consent.marketing_consent.status !== "opted_in");
+      setConsent({ ...consent, marketing_consent: updated });
+    } catch {
+      setConsentError("Could not update your marketing preference. Please try again.");
+    } finally {
+      setIsUpdatingMarketing(false);
+    }
+  };
 
   const accessEndsAt = subscription?.status === "grace"
     ? subscription.grace_ends_at
@@ -555,6 +587,79 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                   ))}
                 </div>
               </div>
+            </div>
+          )}
+
+          {section === "legal" && (
+            <div className="space-y-5">
+              {consentError && (
+                <p role="alert" className="text-[12px] text-red-400">{consentError}</p>
+              )}
+
+              {!consent && !consentError && (
+                <p className="text-[12px] text-white/30">Loading your legal &amp; privacy record...</p>
+              )}
+
+              {consent && (
+                <>
+                  <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
+                    <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">Policies You've Accepted</h3>
+                    <p className="text-[12px] text-white/35 mb-5">The most recent version of each policy you've agreed to, and when.</p>
+                    {consent.acceptances.length === 0 ? (
+                      <p className="text-[12px] text-white/30">No policy acceptances on record yet.</p>
+                    ) : (
+                      <div className="space-y-2">
+                        {consent.acceptances.map(a => (
+                          <div key={a.policy_type} className="flex items-center justify-between gap-3 py-2 border-b border-white/[0.05] last:border-0">
+                            <div className="min-w-0">
+                              <p className="text-[13px] text-white/75 truncate">{a.policy_type_display}</p>
+                              <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">
+                                v{a.version} &middot; {new Date(a.accepted_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => nav("legal")}
+                              className="shrink-0 font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-[#D4AF37]/60 hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors cursor-pointer"
+                            >
+                              View
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
+                    <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">Marketing Communications</h3>
+                    <p className="text-[12px] text-white/35 mb-4">
+                      {consent.marketing_consent.status === "opted_in"
+                        ? "You're currently opted in to marketing emails."
+                        : "You're currently opted out of marketing emails."}
+                    </p>
+                    <button
+                      onClick={toggleMarketing}
+                      disabled={isUpdatingMarketing}
+                      className="font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-widest text-[#070E1A] bg-[#D4AF37] hover:bg-[#e0bd4a] disabled:opacity-50 rounded-full px-4 py-2 transition-colors cursor-pointer focus-visible:outline focus-visible:outline-2 focus-visible:outline-white"
+                    >
+                      {isUpdatingMarketing
+                        ? "Updating..."
+                        : consent.marketing_consent.status === "opted_in" ? "Opt Out" : "Opt In"}
+                    </button>
+                  </div>
+
+                  <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
+                    <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">Consent History</h3>
+                    <p className="text-[12px] text-white/35 mb-4">A downloadable export of your full consent history is coming soon.</p>
+                    <button
+                      disabled
+                      aria-disabled="true"
+                      className="flex items-center gap-1.5 font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/25 border border-white/10 rounded-full px-4 py-2 cursor-not-allowed"
+                    >
+                      <Download size={12} aria-hidden="true" /> Download (Coming Soon)
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>

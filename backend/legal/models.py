@@ -50,6 +50,10 @@ class PolicyDocument(models.Model):
         blank=True,
         help_text="Optional integrity hash of the published content for this version.",
     )
+    change_summary = models.TextField(
+        blank=True,
+        help_text="Human-readable summary of what changed in this version, for the public change log.",
+    )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

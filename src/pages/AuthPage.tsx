@@ -320,31 +320,14 @@ export default function AuthPage({ mode, nav }: {
 
                 <div className="space-y-2.5 pt-2 border-t border-white/[0.05]">
                   <ConsentCheckbox
-                    id="consent-terms"
-                    checked={consent.acceptedTerms}
-                    onChange={v => setConsent({ ...consent, acceptedTerms: v })}
+                    id="consent-all"
+                    checked={consent.acceptedTerms && consent.acknowledgedPrivacy && consent.confirmedAgeAndRisk}
+                    onChange={v => setConsent({ ...consent, acceptedTerms: v, acknowledgedPrivacy: v, confirmedAgeAndRisk: v })}
                   >
-                    I have read and agree to the{" "}
-                    <PolicyLink slug="terms-of-service">Terms of Service</PolicyLink> and{" "}
-                    <PolicyLink slug="terms-of-use">Terms of Use</PolicyLink>.
-                  </ConsentCheckbox>
-
-                  <ConsentCheckbox
-                    id="consent-privacy"
-                    checked={consent.acknowledgedPrivacy}
-                    onChange={v => setConsent({ ...consent, acknowledgedPrivacy: v })}
-                  >
-                    I acknowledge the <PolicyLink slug="privacy">Privacy Policy</PolicyLink> and understand how Bet Lab processes my personal information.
-                  </ConsentCheckbox>
-
-                  <ConsentCheckbox
-                    id="consent-age-risk"
-                    checked={consent.confirmedAgeAndRisk}
-                    onChange={v => setConsent({ ...consent, confirmedAgeAndRisk: v })}
-                  >
-                    I confirm that I am at least 18 years old, understand that Bet Lab provides analytical opinions rather than guaranteed outcomes, and agree to the{" "}
-                    <PolicyLink slug="risk-disclosure">Risk Disclosure</PolicyLink> and{" "}
-                    <PolicyLink slug="disclaimer">Responsible Use Policy</PolicyLink>.
+                    I confirm that I am at least 18 years old and I have read and agree to the{" "}
+                    <PolicyLink slug="terms-of-service">Terms of Service</PolicyLink>,{" "}
+                    <PolicyLink slug="privacy">Privacy Policy</PolicyLink>, and{" "}
+                    <PolicyLink slug="disclaimer">Disclaimer and Risk Disclosure</PolicyLink>.
                   </ConsentCheckbox>
 
                   <ConsentCheckbox

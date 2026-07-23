@@ -33,12 +33,14 @@ Outstanding items that need a real business decision or fact from the Bet Lab ow
 
 ## Content review
 
-- [ ] All 12 policy documents reviewed by the business owner for accuracy against how Bet Lab actually operates
+- [ ] All 10 policy documents reviewed by the business owner for accuracy against how Bet Lab actually operates (originally 12 — Terms of Service now also serves as Terms of Use, and Disclaimer now also serves as Risk Disclosure; see `docs/legal-compliance.md#document-merge`)
 - [ ] Policy effective date approved (currently set to the implementation date — confirm this is acceptable or specify a different go-live date)
 - [ ] Legal review completed by a qualified adviser, particularly for the Terms of Service governing-law/dispute-resolution section and the AML/KYC Statement, before relying on these documents in a real dispute
 
 ## Deployment verification
 
-- [ ] Production migration completed (already done as part of this implementation — 12 policy documents confirmed live in the production database)
-- [ ] Production signup tested end-to-end with the new consent checkboxes
+- [ ] Production migration `legal 0001`/`0002` completed (already done as part of this implementation)
+- [ ] Production migration `legal 0003`/`0004` completed (adds `change_summary` and publishes the Terms of Service / Disclaimer v2.0 merge — run `python manage.py showmigrations legal` on Render to confirm all four are applied)
+- [ ] Production signup tested end-to-end with the new single combined consent checkbox
 - [ ] Live checkout tested after Paystack live-mode approval, confirming the refund-policy acknowledgement gate behaves correctly with real payment keys
+- [ ] `/legal/contact` and `/contact` tested end-to-end in production, confirming email actually arrives at `legal@betlabhq.com`

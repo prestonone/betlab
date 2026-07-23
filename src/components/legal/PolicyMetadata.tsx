@@ -13,6 +13,12 @@ export default function PolicyMetadata({ version, effectiveDate }: { version: st
       <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/40 border border-white/10 px-2.5 py-1 rounded-full">
         Effective {formatted}
       </span>
+      <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/40 border border-white/10 px-2.5 py-1 rounded-full">
+        Last Updated {formatted}
+      </span>
+      <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-emerald-400 border border-emerald-500/25 bg-emerald-500/8 px-2.5 py-1 rounded-full">
+        Current
+      </span>
     </div>
   );
 }
