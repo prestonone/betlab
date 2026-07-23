@@ -17,6 +17,7 @@ import PricingPage from "../pages/PricingPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import ResultsPage from "../pages/ResultsPage";
 import VerifyEmailPage from "../pages/VerifyEmailPage";
+import LegalRouter from "../pages/legal/LegalRouter";
 import { cn, type Page } from "./shared";
 
 
@@ -32,6 +33,7 @@ const PATH_FOR: Record<Page, string> = {
   "contact": "/contact",
   "reset-password": "/reset-password",
   "verify-email": "/verify-email",
+  "legal": "/legal",
 };
 
 const PAGE_FOR_PATH: Record<string, Page> = Object.fromEntries(
@@ -39,6 +41,7 @@ const PAGE_FOR_PATH: Record<string, Page> = Object.fromEntries(
 );
 
 function pageForPathname(pathname: string): Page {
+  if (pathname === "/legal" || pathname.startsWith("/legal/")) return "legal";
   return PAGE_FOR_PATH[pathname] ?? "home";
 }
 
@@ -54,6 +57,7 @@ const TITLE_FOR: Record<Page, string> = {
   "contact": "Contact | Bet Lab",
   "reset-password": "Reset Password | Bet Lab",
   "verify-email": "Verify Email | Bet Lab",
+  "legal": "Legal Centre | Bet Lab",
 };
 
 
@@ -122,6 +126,7 @@ export default function App() {
         {page === "contact" && <ContactPage />}
         {page === "reset-password" && <ResetPasswordPage nav={nav} />}
         {page === "verify-email" && <VerifyEmailPage nav={nav} />}
+        {page === "legal" && <LegalRouter />}
       </div>
 
       {!isDash && <Footer nav={nav} />}

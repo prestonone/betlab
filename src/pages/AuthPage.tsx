@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { ArrowRight, Lock, Mail, Eye, EyeOff, AlertCircle, CheckCircle2 } from "lucide-react";
 import AnimatedLogoMark from "../components/AnimatedLogoMark";
+import ConsentCheckbox from "../components/legal/ConsentCheckbox";
+import PolicyLink from "../components/legal/PolicyLink";
+import ResponsibleUseWarning from "../components/legal/ResponsibleUseWarning";
 import { Page, cn, GoldBtn } from "../app/shared";
 import { useAuth } from "../contexts/AuthContext";
 import { AuthApiError, requestPasswordReset } from "../services/auth";
@@ -19,6 +22,14 @@ export default function AuthPage({ mode, nav }: {
   const [form, setForm] = useState({ name: "", email: "", pass: "", plan: "weekly-lab" });
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [consent, setConsent] = useState({
+    acceptedTerms: false,
+    acknowledgedPrivacy: false,
+    confirmedAgeAndRisk: false,
+    acceptedRefundPolicy: false,
+    marketingConsent: false,
+  });
 
   const [plans, setPlans] = useState<Plan[]>([]);
   const [plansError, setPlansError] = useState("");
@@ -74,8 +85,14 @@ export default function AuthPage({ mode, nav }: {
       email: form.email.trim(),
       password: form.pass,
       password_confirm: form.pass,
+      accepted_terms: consent.acceptedTerms,
+      acknowledged_privacy: consent.acknowledgedPrivacy,
+      confirmed_age_and_risk: consent.confirmedAgeAndRisk,
+      marketing_consent: consent.marketingConsent,
     });
   };
+
+  const mandatoryConsentGiven = consent.acceptedTerms && consent.acknowledgedPrivacy && consent.confirmedAgeAndRisk;
 
   const go = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -107,9 +124,20 @@ export default function AuthPage({ mode, nav }: {
 
         nav("dashboard");
       } else {
+        if (!mandatoryConsentGiven) {
+          setError("Please accept the Terms, Privacy Policy, and Risk Disclosure before continuing.");
+          setIsSubmitting(false);
+          return;
+        }
+        if (!consent.acceptedRefundPolicy) {
+          setError("Please review and acknowledge the Refund and Subscription Policy before checking out.");
+          setIsSubmitting(false);
+          return;
+        }
+
         await createAccount();
         await setBillingCountry("NG");
-        const payment = await initializePayment(form.plan);
+        const payment = await initializePayment(form.plan, true);
         window.location.assign(payment.authorization_url);
       }
     } catch (requestError) {
@@ -127,6 +155,12 @@ export default function AuthPage({ mode, nav }: {
 
   const continueFree = async () => {
     setError("");
+
+    if (!mandatoryConsentGiven) {
+      setError("Please accept the Terms, Privacy Policy, and Risk Disclosure before continuing.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
@@ -281,6 +315,56 @@ export default function AuthPage({ mode, nav }: {
                   </label>
                 ))}
                 <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 text-center pt-1 uppercase tracking-widest">Access begins after payment verification</p>
+
+                <ResponsibleUseWarning />
+
+                <div className="space-y-2.5 pt-2 border-t border-white/[0.05]">
+                  <ConsentCheckbox
+                    id="consent-terms"
+                    checked={consent.acceptedTerms}
+                    onChange={v => setConsent({ ...consent, acceptedTerms: v })}
+                  >
+                    I have read and agree to the{" "}
+                    <PolicyLink slug="terms-of-service">Terms of Service</PolicyLink> and{" "}
+                    <PolicyLink slug="terms-of-use">Terms of Use</PolicyLink>.
+                  </ConsentCheckbox>
+
+                  <ConsentCheckbox
+                    id="consent-privacy"
+                    checked={consent.acknowledgedPrivacy}
+                    onChange={v => setConsent({ ...consent, acknowledgedPrivacy: v })}
+                  >
+                    I acknowledge the <PolicyLink slug="privacy">Privacy Policy</PolicyLink> and understand how Bet Lab processes my personal information.
+                  </ConsentCheckbox>
+
+                  <ConsentCheckbox
+                    id="consent-age-risk"
+                    checked={consent.confirmedAgeAndRisk}
+                    onChange={v => setConsent({ ...consent, confirmedAgeAndRisk: v })}
+                  >
+                    I confirm that I am at least 18 years old, understand that Bet Lab provides analytical opinions rather than guaranteed outcomes, and agree to the{" "}
+                    <PolicyLink slug="risk-disclosure">Risk Disclosure</PolicyLink> and{" "}
+                    <PolicyLink slug="disclaimer">Responsible Use Policy</PolicyLink>.
+                  </ConsentCheckbox>
+
+                  <ConsentCheckbox
+                    id="consent-refund"
+                    checked={consent.acceptedRefundPolicy}
+                    onChange={v => setConsent({ ...consent, acceptedRefundPolicy: v })}
+                  >
+                    I have reviewed the <PolicyLink slug="refund-policy">Refund and Subscription Policy</PolicyLink> and understand the applicable billing, cancellation and refund terms.
+                    <span className="text-white/25"> (required only if paying now)</span>
+                  </ConsentCheckbox>
+
+                  <ConsentCheckbox
+                    id="consent-marketing"
+                    checked={consent.marketingConsent}
+                    onChange={v => setConsent({ ...consent, marketingConsent: v })}
+                    required={false}
+                  >
+                    I would like to receive product updates, offers and football-insight emails from Bet Lab.
+                  </ConsentCheckbox>
+                </div>
               </div>
             )}
 

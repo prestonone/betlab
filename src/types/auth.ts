@@ -26,6 +26,10 @@ export interface RegisterPayload {
   email: string;
   password: string;
   password_confirm: string;
+  accepted_terms: boolean;
+  acknowledged_privacy: boolean;
+  confirmed_age_and_risk: boolean;
+  marketing_consent?: boolean;
 }
 
 export interface ApiErrorResponse {

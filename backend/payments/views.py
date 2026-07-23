@@ -12,6 +12,8 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.views import APIView
 
 from common.api import error_response, success_response
+from legal.models import PolicyDocument, UserPolicyAcceptance
+from legal.services import PolicyNotConfigured, has_current_acceptance, record_acceptance
 
 from .models import Payment
 from .paystack import PaystackError, initialize_transaction, verify_transaction
@@ -38,6 +40,29 @@ class InitializePaymentView(APIView):
         plan_code = str(request.data.get("plan", "")).strip().lower()
         if not plan_code:
             return _payment_error("Plan is required.")
+
+        already_acknowledged = has_current_acceptance(
+            user=request.user,
+            policy_type=PolicyDocument.PolicyType.REFUND_POLICY,
+        )
+        if not already_acknowledged:
+            if not request.data.get("accepted_refund_policy"):
+                return _payment_error(
+                    "You must review and acknowledge the Refund and Subscription Policy before checking out."
+                )
+            try:
+                record_acceptance(
+                    user=request.user,
+                    policy_type=PolicyDocument.PolicyType.REFUND_POLICY,
+                    source=UserPolicyAcceptance.Source.CHECKOUT,
+                    request=request,
+                )
+            except PolicyNotConfigured:
+                logger.error("Checkout blocked: refund policy is not configured.")
+                return _payment_error(
+                    "Checkout is temporarily unavailable. Please try again shortly.",
+                    status.HTTP_503_SERVICE_UNAVAILABLE,
+                )
 
         try:
             plan, price = get_checkout_price(user=request.user, plan_code=plan_code)

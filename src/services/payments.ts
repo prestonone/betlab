@@ -22,10 +22,10 @@ export interface VerifiedPayment {
   status: "pending" | "success" | "failed" | "abandoned";
 }
 
-export async function initializePayment(plan: string): Promise<InitializedPayment> {
+export async function initializePayment(plan: string, acceptedRefundPolicy = false): Promise<InitializedPayment> {
   const response = await apiRequest<ApiEnvelope<InitializedPayment>>(
     "/api/v1/payments/initialize/",
-    { method: "POST", body: JSON.stringify({ plan }) },
+    { method: "POST", body: JSON.stringify({ plan, accepted_refund_policy: acceptedRefundPolicy }) },
     true,
   );
   return response.data;

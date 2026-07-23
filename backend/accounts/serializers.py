@@ -23,6 +23,10 @@ class RegisterSerializer(serializers.ModelSerializer):
         write_only=True,
         trim_whitespace=False,
     )
+    accepted_terms = serializers.BooleanField(write_only=True)
+    acknowledged_privacy = serializers.BooleanField(write_only=True)
+    confirmed_age_and_risk = serializers.BooleanField(write_only=True)
+    marketing_consent = serializers.BooleanField(write_only=True, required=False, default=False)
 
     class Meta:
         model = User
@@ -33,6 +37,10 @@ class RegisterSerializer(serializers.ModelSerializer):
             "password_confirm",
             "first_name",
             "last_name",
+            "accepted_terms",
+            "acknowledged_privacy",
+            "confirmed_age_and_risk",
+            "marketing_consent",
         )
         extra_kwargs = {
             "email": {"required": True},
@@ -50,6 +58,27 @@ class RegisterSerializer(serializers.ModelSerializer):
 
         return email
 
+    def validate_accepted_terms(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                "You must accept the Terms of Service and Terms of Use."
+            )
+        return value
+
+    def validate_acknowledged_privacy(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                "You must acknowledge the Privacy Policy."
+            )
+        return value
+
+    def validate_confirmed_age_and_risk(self, value):
+        if not value:
+            raise serializers.ValidationError(
+                "You must confirm that you are at least 18 and accept the Risk Disclosure and Responsible Use Policy."
+            )
+        return value
+
     def validate(self, attrs):
         if attrs["password"] != attrs["password_confirm"]:
             raise serializers.ValidationError(
@@ -60,6 +89,10 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         validated_data.pop("password_confirm")
+        validated_data.pop("accepted_terms")
+        validated_data.pop("acknowledged_privacy")
+        validated_data.pop("confirmed_age_and_risk")
+        validated_data.pop("marketing_consent", False)
         password = validated_data.pop("password")
 
         user = User.objects.create_user(

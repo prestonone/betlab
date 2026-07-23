@@ -65,6 +65,7 @@ INSTALLED_APPS = [
     "predictions",
     "subscriptions",
     "payments",
+    "legal",
     "corsheaders",
 ]
 
@@ -227,3 +228,17 @@ PAYSTACK_API_URL = os.getenv("PAYSTACK_API_URL", "https://api.paystack.co")
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@betlabhq.com")
+
+# ─── Legal / business identity ──────────────────────────────────────────────
+# Central source of truth for legal-page contact details. Anything not
+# supplied via environment variables falls back to the support email rather
+# than a fabricated placeholder - see docs/legal-owner-checklist.md.
+LEGAL_BUSINESS_NAME = os.getenv("LEGAL_BUSINESS_NAME", "Bet Lab")
+LEGAL_WEBSITE_URL = os.getenv("LEGAL_WEBSITE_URL", "https://www.betlabhq.com")
+LEGAL_SUPPORT_EMAIL = os.getenv("LEGAL_SUPPORT_EMAIL", "support@betlabhq.com")
+LEGAL_EMAIL = os.getenv("LEGAL_EMAIL", "legal@betlabhq.com")
+LEGAL_PRIVACY_EMAIL = os.getenv("LEGAL_PRIVACY_EMAIL", "privacy@betlabhq.com")
+LEGAL_BUSINESS_ADDRESS = os.getenv("LEGAL_BUSINESS_ADDRESS", "")
+LEGAL_BUSINESS_PHONE = os.getenv("LEGAL_BUSINESS_PHONE", "")
+LEGAL_GOVERNING_LAW = os.getenv("LEGAL_GOVERNING_LAW", "Federal Republic of Nigeria")
+LEGAL_MINIMUM_AGE = int(os.getenv("LEGAL_MINIMUM_AGE", "18"))

@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
-import { Check, ChevronDown, Minus } from "lucide-react";
+import { Check, ChevronDown, Minus, X } from "lucide-react";
+import ConsentCheckbox from "../components/legal/ConsentCheckbox";
+import PolicyLink from "../components/legal/PolicyLink";
 import { Page, cn, GoldBtn, SectionEyebrow } from "../app/shared";
 import { initializePayment } from "../services/payments";
 import { getPlans, setBillingCountry } from "../services/subscriptions";
@@ -49,6 +51,8 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
   const [checkoutError, setCheckoutError] = useState("");
   const [apiPlans, setApiPlans] = useState<Plan[]>([]);
   const [plansError, setPlansError] = useState("");
+  const [pendingPlan, setPendingPlan] = useState<{ code: string; name: string } | null>(null);
+  const [refundAccepted, setRefundAccepted] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -58,7 +62,7 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
     return () => { active = false; };
   }, []);
 
-  const checkout = async (code: string, name: string) => {
+  const checkout = async (code: string, name: string, acceptedRefundPolicy = false) => {
     if (!authed) {
       sessionStorage.setItem("betlab_checkout_plan", code);
       sessionStorage.setItem("betlab_checkout_plan_name", name);
@@ -70,12 +74,26 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
     setCheckoutError("");
     try {
       await setBillingCountry("NG");
-      const payment = await initializePayment(code);
+      const payment = await initializePayment(code, acceptedRefundPolicy);
       window.location.assign(payment.authorization_url);
     } catch (error) {
-      setCheckoutError(error instanceof Error ? error.message : "Unable to start checkout.");
+      const message = error instanceof Error ? error.message : "Unable to start checkout.";
+      if (message.includes("Refund and Subscription Policy") && !acceptedRefundPolicy) {
+        setCheckoutPlan("");
+        setPendingPlan({ code, name });
+        return;
+      }
+      setCheckoutError(message);
       setCheckoutPlan("");
     }
+  };
+
+  const confirmRefundAndCheckout = () => {
+    if (!pendingPlan || !refundAccepted) return;
+    const { code, name } = pendingPlan;
+    setPendingPlan(null);
+    setRefundAccepted(false);
+    void checkout(code, name, true);
   };
 
   const plans = apiPlans
@@ -165,6 +183,24 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
           <p role="alert" className="-mt-14 mb-16 text-center text-[12px] text-rose-300">
             {checkoutError}
           </p>
+        )}
+
+        {pendingPlan && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4" onClick={() => setPendingPlan(null)}>
+            <div className="bg-[#111C2E] border border-[#D4AF37]/20 rounded-xl p-6 max-w-sm w-full" onClick={e => e.stopPropagation()}>
+              <div className="flex items-start justify-between mb-4">
+                <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white">One more thing</h3>
+                <button onClick={() => setPendingPlan(null)} className="text-white/30 hover:text-white/60 cursor-pointer"><X size={16} /></button>
+              </div>
+              <p className="text-[12px] text-white/45 mb-4">Before we take you to checkout for {pendingPlan.name}, please confirm:</p>
+              <ConsentCheckbox id="pricing-refund-consent" checked={refundAccepted} onChange={setRefundAccepted}>
+                I have reviewed the <PolicyLink slug="refund-policy">Refund and Subscription Policy</PolicyLink> and understand the applicable billing, cancellation and refund terms.
+              </ConsentCheckbox>
+              <GoldBtn onClick={confirmRefundAndCheckout} full size="md" className={cn("mt-5", !refundAccepted && "opacity-40 pointer-events-none")}>
+                Continue to Checkout
+              </GoldBtn>
+            </div>
+          </div>
         )}
 
         {/* FAQ */}

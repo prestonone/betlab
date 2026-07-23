@@ -1,6 +1,7 @@
 import logging
 
 from django.contrib.auth.tokens import default_token_generator
+from django.db import transaction
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
 from rest_framework import status
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from common.email import EmailSendError
+from legal.services import PolicyNotConfigured, record_registration_consent
 
 from .emails import send_password_reset_email, send_verification_email
 from .models import User
@@ -40,7 +42,24 @@ class RegisterView(APIView):
         serializer = RegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
 
-        user = serializer.save()
+        try:
+            with transaction.atomic():
+                user = serializer.save()
+                record_registration_consent(
+                    user=user,
+                    accepted_terms=serializer.validated_data["accepted_terms"],
+                    acknowledged_privacy=serializer.validated_data["acknowledged_privacy"],
+                    confirmed_age_and_risk=serializer.validated_data["confirmed_age_and_risk"],
+                    marketing_consent=serializer.validated_data.get("marketing_consent", False),
+                    request=request,
+                )
+        except PolicyNotConfigured:
+            logger.error("Registration blocked: required policy documents are not configured.")
+            return Response(
+                {"detail": "Registration is temporarily unavailable. Please try again shortly."},
+                status=status.HTTP_503_SERVICE_UNAVAILABLE,
+            )
+
         tokens = LoginSerializer.get_tokens(user)
 
         try:

@@ -8,7 +8,8 @@ export type Page =
   | "home" | "pricing" | "login" | "register"
   | "dashboard" | "predictions" | "results"
   | "about" | "contact"
-  | "reset-password" | "verify-email";
+  | "reset-password" | "verify-email"
+  | "legal";
 
 export type DashSection = "overview" | "results" | "performance";
 export type PredCategory = "Banker" | "Sure 2" | "Sure 3" | "Sure 5" | "Rollover";

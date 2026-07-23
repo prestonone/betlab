@@ -9,6 +9,7 @@ from django.test import TestCase, override_settings
 from django.urls import reverse
 from rest_framework.test import APIClient
 
+from legal.models import PolicyDocument, UserPolicyAcceptance
 from subscriptions.models import BillingProfile, Country, Plan, PlanPrice, Subscription
 
 from .models import Payment
@@ -87,7 +88,7 @@ class PaymentApiTests(TestCase):
         }
         response = self.client.post(
             reverse("payments:initialize"),
-            {"plan": self.plan.code, "amount": 1, "currency": "USD"},
+            {"plan": self.plan.code, "amount": 1, "currency": "USD", "accepted_refund_policy": True},
             format="json",
         )
         self.assertEqual(response.status_code, 201)
@@ -96,6 +97,34 @@ class PaymentApiTests(TestCase):
         self.assertEqual(payload["currency"], "NGN")
         self.assertEqual(payload["email"], self.user.email)
         self.assertEqual(Payment.objects.get().amount, Decimal("3500.00"))
+
+    def test_initialize_rejected_without_refund_policy_acknowledgement(self):
+        response = self.client.post(
+            reverse("payments:initialize"),
+            {"plan": self.plan.code},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(Payment.objects.exists())
+
+    @patch("payments.views.initialize_transaction")
+    def test_initialize_reuses_existing_refund_policy_acceptance(self, initialize):
+        initialize.return_value = {
+            "authorization_url": "https://checkout.paystack.test/example",
+            "access_code": "access-code",
+        }
+        current_refund_policy = PolicyDocument.current(PolicyDocument.PolicyType.REFUND_POLICY)
+        UserPolicyAcceptance.objects.create(
+            user=self.user,
+            policy=current_refund_policy,
+            acceptance_source=UserPolicyAcceptance.Source.WEB_SIGNUP,
+        )
+        response = self.client.post(
+            reverse("payments:initialize"),
+            {"plan": self.plan.code},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
 
     @patch("payments.views.verify_transaction")
     def test_successful_verification_activates_subscription(self, verify):
