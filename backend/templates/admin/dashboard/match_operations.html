@@ -1,12 +1,13 @@
 {% load i18n %}
 {% if visible %}
 <section class="betlab-dashboard betlab-dashboard--match-ops">
-  <h2 class="betlab-dashboard__title">Match &amp; Prediction Operations</h2>
-  <p class="betlab-dashboard__subtitle">Daily workspace for managing games, predictions, results and settlement.</p>
-
-  <div class="betlab-quick-actions">
+  <div class="betlab-dashboard__header">
+    <div>
+      <h2 class="betlab-dashboard__title">Match &amp; Prediction Operations</h2>
+      <p class="betlab-dashboard__subtitle">Daily workspace for managing games, predictions, results and settlement.</p>
+    </div>
     {% for action in quick_actions %}
-    <a class="betlab-quick-actions__item" href="{{ action.url }}">{{ action.label }}</a>
+    <a class="betlab-primary-action" href="{{ action.url }}">{{ action.label }}</a>
     {% endfor %}
   </div>
 
@@ -32,7 +33,7 @@
           <th>Access</th>
           <th>Status</th>
           <th>Result</th>
-          <th>Last Updated</th>
+          <th>Updated</th>
           <th></th>
         </tr>
       </thead>
@@ -56,10 +57,5 @@
       </tbody>
     </table>
   </div>
-  <p class="betlab-dashboard__links">
-    <a href="{% url 'admin:predictions_predictionselection_changelist' %}">View All Today's Games</a> ·
-    <a href="{% url 'admin:predictions_prediction_changelist' %}?awaiting_result=yes">View Games Awaiting Results</a> ·
-    <a href="{% url 'admin:predictions_prediction_changelist' %}?awaiting_settlement=yes">View Predictions Awaiting Settlement</a>
-  </p>
 </section>
 {% endif %}

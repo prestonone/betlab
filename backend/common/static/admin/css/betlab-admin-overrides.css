@@ -58,12 +58,16 @@ a:focus, a:hover {
 
 /* ── Operations dashboard ─────────────────────────────────────────── */
 
+#content-main {
+  max-width: 1500px;
+}
+
 .betlab-dashboard {
   background: var(--secondary);
   border: 1px solid rgba(212,175,55,0.18);
   border-radius: 8px;
-  padding: 20px 24px;
-  margin-bottom: 24px;
+  padding: 18px 24px;
+  margin-bottom: 20px;
 }
 
 .betlab-dashboard--business {
@@ -91,31 +95,33 @@ a:focus, a:hover {
   margin: 20px 0 10px;
 }
 
-.betlab-quick-actions {
+.betlab-dashboard__header {
   display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 18px;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
-.betlab-quick-actions__item {
+.betlab-primary-action {
   background: var(--button-bg);
   color: var(--button-fg) !important;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 12.5px;
-  padding: 8px 14px;
+  padding: 9px 18px;
   border-radius: 5px;
   text-decoration: none;
   white-space: nowrap;
+  flex-shrink: 0;
 }
-.betlab-quick-actions__item:hover {
+.betlab-primary-action:hover {
   background: var(--button-hover-bg);
   color: var(--button-fg) !important;
 }
 
 .betlab-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
   gap: 10px;
 }
 
@@ -201,10 +207,18 @@ a:focus, a:hover {
 .betlab-badge--result-lost { color: #f87171; }
 .betlab-badge--result-void { color: #a78bfa; }
 
-.betlab-dashboard__links {
-  font-size: 12px;
-  margin-top: 12px;
-  color: rgba(255,255,255,0.5);
+.betlab-admin-nav td, .betlab-admin-nav th {
+  word-break: break-word;
+}
+.betlab-admin-nav .module table th {
+  width: 100%;
+}
+.betlab-admin-nav .module table td {
+  white-space: nowrap;
+}
+.betlab-admin-nav .module table td a {
+  display: block;
+  padding-right: .6em;
 }
 
 .betlab-alerts {
@@ -243,5 +257,6 @@ a:focus, a:hover {
 @media (max-width: 767px) {
   .betlab-dashboard { padding: 14px 16px; }
   .betlab-cards { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
-  .betlab-quick-actions__item { flex: 1 1 auto; text-align: center; }
+  .betlab-dashboard__header { flex-direction: column; align-items: stretch; }
+  .betlab-primary-action { text-align: center; }
 }

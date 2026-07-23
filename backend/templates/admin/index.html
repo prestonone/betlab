@@ -1,11 +1,7 @@
 {% extends "admin/base_site.html" %}
-{% load i18n static dashboard_tags %}
+{% load i18n dashboard_tags %}
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}">{% endblock %}
-
-{% block coltype %}colMS{% endblock %}
-
-{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+{% block coltype %}colM{% endblock %}
 
 {% block nav-breadcrumbs %}{% endblock %}
 

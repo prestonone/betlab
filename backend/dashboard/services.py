@@ -84,18 +84,14 @@ def _awaiting_settlement_queryset():
 
 
 def get_quick_actions():
+    # Every other destination from the original spec list (today's games,
+    # drafts, published, awaiting results/settlement, postponed/cancelled,
+    # categories, selections, full history) is already reachable as one
+    # of the cards below or as a plain link in the admin nav underneath —
+    # "Add" is the one action that has no natural count/card of its own,
+    # so it's the only thing that needs a dedicated button.
     return [
         {"label": "Add New Prediction", "url": _admin_url("admin:predictions_prediction_add")},
-        {"label": "View Today's Games", "url": _todays_games_url()},
-        {"label": "View Draft Predictions", "url": _admin_url("admin:predictions_prediction_changelist", status__exact=Prediction.Status.DRAFT)},
-        {"label": "View Published Predictions", "url": _admin_url("admin:predictions_prediction_changelist", status__exact=Prediction.Status.PUBLISHED)},
-        {"label": "View Games Awaiting Results", "url": _admin_url("admin:predictions_prediction_changelist", awaiting_result="yes")},
-        {"label": "Update Match Results", "url": _admin_url("admin:predictions_prediction_changelist", awaiting_result="yes")},
-        {"label": "Settle Completed Predictions", "url": _admin_url("admin:predictions_prediction_changelist", awaiting_settlement="yes")},
-        {"label": "View Postponed or Cancelled Games", "url": _admin_url("admin:predictions_prediction_changelist", status__exact=Prediction.Status.CANCELLED)},
-        {"label": "Manage Prediction Categories", "url": _admin_url("admin:predictions_predictioncategory_changelist")},
-        {"label": "Manage Prediction Selections", "url": _admin_url("admin:predictions_predictionselection_changelist")},
-        {"label": "View Prediction History", "url": _admin_url("admin:predictions_prediction_changelist")},
     ]
 
 
@@ -451,7 +447,7 @@ def get_alerts():
     return alerts
 
 
-def get_recent_admin_activity(limit=15):
+def get_recent_admin_activity(limit=8):
     from django.contrib.admin.models import LogEntry
 
     return (
