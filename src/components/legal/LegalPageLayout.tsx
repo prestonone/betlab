@@ -31,7 +31,7 @@ export default function LegalPageLayout({ doc, onBack }: { doc: LegalDocument; o
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 print:py-0 legal-print-surface">
         <button
           onClick={onBack}
-          className="print:hidden flex items-center gap-1.5 text-[11px] text-white/35 hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors mb-6 cursor-pointer"
+          className="print:hidden flex items-center gap-1.5 text-[14px] text-white hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors mb-6 cursor-pointer"
         >
           <ArrowLeft size={13} aria-hidden="true" /> Back to Legal Centre
         </button>
@@ -40,13 +40,13 @@ export default function LegalPageLayout({ doc, onBack }: { doc: LegalDocument; o
         <h1 className="font-['Rajdhani',sans-serif] font-bold text-[36px] sm:text-[44px] text-white leading-tight mb-3">
           {doc.title}
         </h1>
-        <p className="text-white/60 text-[14px] max-w-2xl mb-4">{doc.summary}</p>
+        <p className="text-white text-[14px] max-w-2xl mb-4">{doc.summary}</p>
         <div className="flex items-center gap-3 mb-10">
           <PolicyMetadata version={doc.version} effectiveDate={doc.effectiveDate} />
           <button
             onClick={downloadPdf}
             aria-label="Download this policy as a PDF"
-            className="print:hidden flex items-center gap-1.5 font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35 hover:text-white/70 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors cursor-pointer"
+            className="print:hidden flex items-center gap-1.5 font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors cursor-pointer"
           >
             <Download size={12} aria-hidden="true" /> Download PDF
           </button>

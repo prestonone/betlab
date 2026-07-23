@@ -39,7 +39,7 @@ export default function PolicyChangeLogPage({ onBack, onOpenPolicy }: {
       <div className="max-w-3xl mx-auto px-4 sm:px-6 py-14 pb-24">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-[11px] text-white/35 hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors mb-6 cursor-pointer"
+          className="flex items-center gap-1.5 text-[14px] text-white hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors mb-6 cursor-pointer"
         >
           <ArrowLeft size={13} aria-hidden="true" /> Back to Legal Centre
         </button>
@@ -48,7 +48,7 @@ export default function PolicyChangeLogPage({ onBack, onOpenPolicy }: {
         <h1 className="font-['Rajdhani',sans-serif] font-bold text-[36px] sm:text-[44px] text-white leading-tight mb-3">
           Policy Change Log
         </h1>
-        <p className="text-white/45 text-[14px] max-w-2xl mb-10">
+        <p className="text-white text-[14px] max-w-2xl mb-10">
           Every version of every Bet Lab policy, newest first, with a summary of what changed. This log is generated
           directly from our records - nothing here is edited after the fact.
         </p>
@@ -58,11 +58,11 @@ export default function PolicyChangeLogPage({ onBack, onOpenPolicy }: {
         )}
 
         {!entries && !error && (
-          <p className="text-[13px] text-white/35">Loading change log...</p>
+          <p className="text-[16px] text-white">Loading change log...</p>
         )}
 
         {entries && entries.length === 0 && (
-          <p className="text-[13px] text-white/35">No policy versions have been published yet.</p>
+          <p className="text-[16px] text-white">No policy versions have been published yet.</p>
         )}
 
         {entries && entries.length > 0 && (
@@ -92,14 +92,14 @@ export default function PolicyChangeLogPage({ onBack, onOpenPolicy }: {
                         Current
                       </span>
                     ) : (
-                      <span className="font-[JetBrains_Mono,monospace] text-[8px] uppercase tracking-widest text-white/30 border border-white/10 px-2 py-0.5 rounded-full">
+                      <span className="font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-widest text-white border border-white/10 px-2 py-0.5 rounded-full">
                         Superseded
                       </span>
                     )}
                   </div>
                 </div>
-                <p className="text-[13px] text-white/55 leading-relaxed mb-2">{entry.change_summary}</p>
-                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">
+                <p className="text-[16px] text-white leading-relaxed mb-2">{entry.change_summary}</p>
+                <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest">
                   v{entry.version} &middot; {new Date(entry.effective_date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                 </p>
               </button>
@@ -108,7 +108,7 @@ export default function PolicyChangeLogPage({ onBack, onOpenPolicy }: {
           </div>
         )}
 
-        <div className="flex items-center gap-2 mt-10 text-white/25">
+        <div className="flex items-center gap-2 mt-10 text-white">
           <History size={12} aria-hidden="true" />
           <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest">
             Sourced live from our policy records

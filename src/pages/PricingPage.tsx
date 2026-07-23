@@ -122,7 +122,7 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
           <h1 className="font-['Rajdhani',sans-serif] font-bold text-[56px] sm:text-[68px] text-white mb-4">
             TRANSPARENT PRICING
           </h1>
-          <p className="text-white/40 mb-8 text-[14px]">From daily access to a full year of membership. Payments will be processed securely in Nigerian naira.</p>
+          <p className="text-white mb-8 text-[14px]">From daily access to a full year of membership. Payments will be processed securely in Nigerian naira.</p>
 
         </div>
 
@@ -130,7 +130,7 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
           <p role="alert" className="text-center text-[12px] text-rose-300 mb-8">{plansError}</p>
         )}
         {!plansError && plans.length === 0 && (
-          <p className="text-center text-[12px] text-white/35 mb-8">Loading pricing...</p>
+          <p className="text-center text-[15px] text-white mb-8">Loading pricing...</p>
         )}
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-20">
@@ -152,9 +152,9 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
                   <h3 className="font-['Rajdhani',sans-serif] font-bold text-[24px] text-white mb-1">{plan.name}</h3>
                   <div className="flex items-baseline gap-1 mb-1">
                     <span className="font-['Rajdhani',sans-serif] font-bold text-[48px] leading-none text-[#D4AF37]">{plan.price}</span>
-                    <span className="text-white/35 text-[12px]">{plan.period}</span>
+                    <span className="text-white text-[15px]">{plan.period}</span>
                   </div>
-                  <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 uppercase tracking-wider mb-7">{plan.picks}</p>
+                  <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-wider mb-7">{plan.picks}</p>
                   {plan.highlight
                     ? <GoldBtn onClick={() => void checkout(plan.code, plan.name)} full size="md">{checkoutPlan === plan.code ? "Opening checkout..." : "Get Lab Access"}</GoldBtn>
                     : <GoldBtn onClick={() => void checkout(plan.code, plan.name)} full size="md" outline>{checkoutPlan === plan.code ? "Opening checkout..." : "Get Lab Access"}</GoldBtn>
@@ -163,13 +163,13 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
                     {plan.inc.map(f => (
                       <div key={f} className="flex items-start gap-2.5">
                         <Check size={11} className="text-emerald-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-[12px] text-white/60">{f}</span>
+                        <span className="text-[15px] text-white">{f}</span>
                       </div>
                     ))}
                     {plan.exc.map(f => (
                       <div key={f} className="flex items-start gap-2.5 opacity-30">
-                        <Minus size={11} className="text-white/30 mt-0.5 flex-shrink-0" />
-                        <span className="text-[12px] text-white/40">{f}</span>
+                        <Minus size={11} className="text-white mt-0.5 flex-shrink-0" />
+                        <span className="text-[15px] text-white">{f}</span>
                       </div>
                     ))}
                   </div>
@@ -190,9 +190,9 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
             <div className="bg-[#111C2E] border border-[#D4AF37]/20 rounded-xl p-6 max-w-sm w-full" onClick={e => e.stopPropagation()}>
               <div className="flex items-start justify-between mb-4">
                 <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white">One more thing</h3>
-                <button onClick={() => setPendingPlan(null)} className="text-white/30 hover:text-white/60 cursor-pointer"><X size={16} /></button>
+                <button onClick={() => setPendingPlan(null)} className="text-white hover:text-[#D4AF37] cursor-pointer"><X size={16} /></button>
               </div>
-              <p className="text-[13px] text-white/60 mb-4">Before we take you to checkout for {pendingPlan.name}, please confirm:</p>
+              <p className="text-[16px] text-white mb-4">Before we take you to checkout for {pendingPlan.name}, please confirm:</p>
               <ConsentCheckbox id="pricing-refund-consent" checked={refundAccepted} onChange={setRefundAccepted}>
                 I have reviewed the <PolicyLink slug="refund-policy">Refund and Subscription Policy</PolicyLink> and understand the applicable billing, cancellation and refund terms.
               </ConsentCheckbox>
@@ -220,12 +220,12 @@ function FaqRow({ q, a }: { q: string; a: string }) {
   return (
     <div className="bg-card border border-[#D4AF37]/8 rounded-lg overflow-hidden">
       <button onClick={() => setOpen(!open)} className="w-full flex items-center justify-between px-5 py-4 text-left cursor-pointer hover:bg-white/[0.015] transition-colors">
-        <span className="font-medium text-white text-[13px]">{q}</span>
+        <span className="font-medium text-white text-[16px]">{q}</span>
         <ChevronDown size={14} className={cn("text-[#D4AF37] flex-shrink-0 transition-transform duration-200", open && "rotate-180")} />
       </button>
       {open && (
         <div className="px-5 pb-4 border-t border-white/[0.04]">
-          <p className="text-[13px] text-white/60 leading-relaxed pt-3">{a}</p>
+          <p className="text-[16px] text-white leading-relaxed pt-3">{a}</p>
         </div>
       )}
     </div>

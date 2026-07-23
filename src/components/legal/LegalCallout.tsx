@@ -15,7 +15,7 @@ export default function LegalCallout({ variant, text }: { variant: LegalCalloutB
   return (
     <div className={cn("flex items-start gap-3 rounded-lg border px-4 py-3.5 my-4", s.border, s.bg)}>
       <Icon size={16} aria-hidden="true" className={cn("mt-0.5 flex-shrink-0", s.text)} />
-      <p className="text-[13px] leading-relaxed text-white/75">{text}</p>
+      <p className="text-[16px] leading-relaxed text-white">{text}</p>
     </div>
   );
 }

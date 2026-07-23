@@ -70,7 +70,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
                 <span className="text-[#D4AF37]">REFINED.</span>
               </h1>
 
-              <p className="text-white/62 text-[16px] leading-relaxed mb-8 max-w-[500px] animate-fade-up delay-200">
+              <p className="text-white text-[16px] leading-relaxed mb-8 max-w-[500px] animate-fade-up delay-200">
                 Curated football predictions for members who want clear, disciplined daily selections. Every prediction is backed by deep statistical modelling and expert verification—not gut feeling or punditry.
               </p>
 
@@ -94,7 +94,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
                   ].map((s, i) => (
                     <div key={i} className={cn("px-5 py-4 bg-[#111C2E]/50", i < 3 && "border-r border-[#D4AF37]/10")}>
                       <p className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-[#D4AF37] leading-none">{s.v}</p>
-                      <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 uppercase tracking-widest mt-1.5">{s.label}</p>
+                      <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest mt-1.5">{s.label}</p>
                       <p className="font-[JetBrains_Mono,monospace] text-[9px] text-emerald-400 mt-0.5">{s.sub}</p>
                     </div>
                   ))}
@@ -121,7 +121,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
                 <div className="absolute bottom-14 right-0 z-20 bg-[#111C2E] border border-[#D4AF37]/20 rounded-lg px-4 py-2.5 shadow-2xl flex items-center gap-3">
                   <CheckCircle2 size={15} className="text-emerald-400" />
                   <div>
-                    <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/40 uppercase tracking-widest">Yesterday&apos;s record</p>
+                    <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest">Yesterday&apos;s record</p>
                     <p className="font-['Rajdhani',sans-serif] font-bold text-white text-[16px] leading-none mt-0.5">5 / 6 <span className="text-emerald-400">Correct</span></p>
                   </div>
                 </div>
@@ -141,7 +141,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
           <h2 className="font-['Rajdhani',sans-serif] font-bold text-[48px] sm:text-[60px] text-white mb-3">
             DATA-DRIVEN. ANALYST-VERIFIED.
           </h2>
-          <p className="text-white/55 max-w-lg mx-auto text-[14px] leading-relaxed">
+          <p className="text-white max-w-lg mx-auto text-[14px] leading-relaxed">
             We treat football prediction as a serious analytical discipline — building models that surface genuine edge, not noise.
           </p>
         </div>
@@ -152,7 +152,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
                 {f.icon}
               </div>
               <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1.5">{f.title}</h3>
-              <p className="text-[13px] text-white/55 leading-relaxed">{f.desc}</p>
+              <p className="text-[16px] text-white leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -176,7 +176,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
             ))}
           </div>
           <div className="mt-8 text-center">
-            <p className="text-[12px] text-white/30 mb-4 font-[JetBrains_Mono,monospace]">+ 3 more predictions available to subscribers today</p>
+            <p className="text-[15px] text-white mb-4 font-[JetBrains_Mono,monospace]">+ 3 more predictions available to subscribers today</p>
             <GoldBtn onClick={goToAccess} size="md">
               Unlock All Predictions <Lock size={13} />
             </GoldBtn>
@@ -191,7 +191,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
           <h2 className="font-['Rajdhani',sans-serif] font-bold text-[48px] sm:text-[56px] text-white mb-3">
             CHOOSE YOUR EDGE
           </h2>
-          <p className="text-white/55 max-w-md mx-auto text-[13px]">Choose the access period that works for you. Payments will be secured with Paystack.</p>
+          <p className="text-white max-w-md mx-auto text-[16px]">Choose the access period that works for you. Payments will be secured with Paystack.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-4">
           {plans.map((plan, i) => (
@@ -211,12 +211,12 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
                 <h3 className="font-['Rajdhani',sans-serif] font-bold text-[24px] text-white mb-1">{plan.name}</h3>
                 <div className="flex items-baseline gap-1 mb-1">
                   <span className="font-['Rajdhani',sans-serif] font-bold text-[42px] text-[#D4AF37] leading-none">{plan.price}</span>
-                  <span className="text-white/35 text-[12px]">{plan.sub}</span>
+                  <span className="text-white text-[15px]">{plan.sub}</span>
                 </div>
-                <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white/30 mb-7 uppercase tracking-wider">{plan.picks}</p>
+                <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white mb-7 uppercase tracking-wider">{plan.picks}</p>
                 <ul className="space-y-2.5 mb-7">
                   {plan.features.map(f => (
-                    <li key={f} className="flex items-center gap-2.5 text-[13px] text-white/60">
+                    <li key={f} className="flex items-center gap-2.5 text-[16px] text-white">
                       <Check size={12} className="text-[#D4AF37] flex-shrink-0" />{f}
                     </li>
                   ))}
@@ -246,14 +246,14 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
                     <Star key={j} size={13} className="text-[#D4AF37] fill-[#D4AF37]" />
                   ))}
                 </div>
-                <p className="text-[13px] text-white/55 leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
+                <p className="text-[16px] text-white leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
                 <div className="flex items-center gap-3 pt-4 border-t border-white/[0.04]">
                   <div className="w-8 h-8 rounded-full bg-[#D4AF37]/12 border border-[#D4AF37]/22 flex items-center justify-center">
                     <span className="font-bold text-[#D4AF37] text-[10px]">{t.avatar}</span>
                   </div>
                   <div>
-                    <p className="text-[13px] font-medium text-white">{t.name}</p>
-                    <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 mt-0.5">{t.role}</p>
+                    <p className="text-[16px] font-medium text-white">{t.name}</p>
+                    <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white mt-0.5">{t.role}</p>
                   </div>
                 </div>
               </div>
@@ -271,7 +271,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
           <h2 className="font-['Rajdhani',sans-serif] font-bold text-[44px] sm:text-[56px] text-white mb-3 leading-tight">
             DAILY PICKS.<br />SIMPLE LAB ACCESS.
           </h2>
-          <p className="text-white/55 mb-8 max-w-md mx-auto text-[14px]">Create an account, choose an access plan and receive carefully selected daily football picks in one simple dashboard.</p>
+          <p className="text-white mb-8 max-w-md mx-auto text-[14px]">Create an account, choose an access plan and receive carefully selected daily football picks in one simple dashboard.</p>
           <GoldBtn onClick={goToAccess} size="lg">
             {authed ? "Choose Your Plan" : "Create Your Account"} <ArrowRight size={16} />
           </GoldBtn>

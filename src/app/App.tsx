@@ -100,7 +100,7 @@ export default function App() {
       <div className="min-h-screen bg-background text-foreground flex items-center justify-center">
         <div className="text-center">
           <AnimatedLogoMark size={40} radius={8} className="mx-auto mb-3" />
-          <p className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35">
+          <p className="font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white">
             Restoring secure session
           </p>
         </div>

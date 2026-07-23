@@ -54,7 +54,7 @@ export default function VerifyEmailPage({ nav }: { nav: (p: Page) => void }) {
           {status === "verifying" && (
             <>
               <div className="w-8 h-8 border-2 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin mx-auto mb-4" />
-              <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white/35 uppercase tracking-widest">Verifying your email</p>
+              <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white uppercase tracking-widest">Verifying your email</p>
             </>
           )}
 
@@ -64,7 +64,7 @@ export default function VerifyEmailPage({ nav }: { nav: (p: Page) => void }) {
                 <CheckCircle2 size={20} className="text-emerald-400" />
               </div>
               <p className="font-['Rajdhani',sans-serif] font-bold text-white text-lg mb-1">Email verified</p>
-              <p className="text-[12px] text-white/40 mb-5">Your account is fully set up.</p>
+              <p className="text-[15px] text-white mb-5">Your account is fully set up.</p>
               <GoldBtn full size="md" onClick={() => nav(isAuthenticated ? "dashboard" : "login")}>
                 {isAuthenticated ? "Go to dashboard" : "Go to sign in"} <ArrowRight size={14} />
               </GoldBtn>

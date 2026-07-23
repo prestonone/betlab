@@ -80,7 +80,7 @@ export default function MatchCentrePage() {
               <span className="text-[#D4AF37]">MATCH CENTRE</span>
             </h1>
 
-            <p className="text-white/60 text-[14px] sm:text-[15px] leading-relaxed max-w-2xl">
+            <p className="text-white text-[14px] sm:text-[15px] leading-relaxed max-w-2xl">
               Follow the matches connected to Bet Lab predictions and keep up
               with today&apos;s football action from one convenient place.
             </p>
@@ -103,7 +103,7 @@ export default function MatchCentrePage() {
               </div>
 
               {!loading && !error && (
-                <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25">
+                <span className="font-[JetBrains_Mono,monospace] text-[12px] text-white">
                   {matchSelections.length} matches
                 </span>
               )}
@@ -112,7 +112,7 @@ export default function MatchCentrePage() {
             {loading && (
               <div className="rounded-xl border border-[#D4AF37]/10 bg-card p-10 text-center">
                 <div className="w-7 h-7 border-2 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin mx-auto mb-4" />
-                <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white/30 uppercase tracking-widest">
+                <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white uppercase tracking-widest">
                   Loading picks
                 </p>
               </div>
@@ -126,7 +126,7 @@ export default function MatchCentrePage() {
                     <p className="text-[13px] text-rose-300 mb-1">
                       Match Centre unavailable
                     </p>
-                    <p className="text-[13px] text-white/45 leading-relaxed">
+                    <p className="text-[16px] text-white leading-relaxed">
                       {error} You can still use the live-score links beside this panel.
                     </p>
                   </div>
@@ -137,10 +137,10 @@ export default function MatchCentrePage() {
             {!loading && !error && matchSelections.length === 0 && (
               <div className="rounded-xl border border-[#D4AF37]/10 bg-card p-8 text-center">
                 <Trophy size={24} className="text-[#D4AF37]/50 mx-auto mb-3" />
-                <p className="text-[13px] text-white/55 mb-1">
+                <p className="text-[16px] text-white mb-1">
                   No current picks yet
                 </p>
-                <p className="text-[13px] text-white/40">
+                <p className="text-[16px] text-white">
                   Published Bet Lab matches will appear here automatically.
                 </p>
               </div>
@@ -165,7 +165,7 @@ export default function MatchCentrePage() {
 
                           <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white leading-tight">
                             {item.selection.home_team}
-                            <span className="text-white/25 mx-2">vs</span>
+                            <span className="text-white mx-2">vs</span>
                             {item.selection.away_team}
                           </h3>
                         </div>
@@ -177,19 +177,19 @@ export default function MatchCentrePage() {
 
                       <div className="grid grid-cols-2 gap-3 mb-4">
                         <div className="rounded-lg bg-white/[0.025] px-3 py-2.5">
-                          <p className="font-[JetBrains_Mono,monospace] text-[8px] text-white/20 uppercase tracking-wider mb-1">
+                          <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white uppercase tracking-wider mb-1">
                             Selection
                           </p>
-                          <p className="text-[12px] text-white/65">
+                          <p className="text-[15px] text-white">
                             {item.selection.market}
                           </p>
                         </div>
 
                         <div className="rounded-lg bg-white/[0.025] px-3 py-2.5">
-                          <p className="font-[JetBrains_Mono,monospace] text-[8px] text-white/20 uppercase tracking-wider mb-1">
+                          <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white uppercase tracking-wider mb-1">
                             Kickoff
                           </p>
-                          <p className="text-[12px] text-white/65">
+                          <p className="text-[15px] text-white">
                             {hasValidKickoff
                               ? kickoff.toLocaleString([], {
                                   day: "2-digit",
@@ -203,11 +203,11 @@ export default function MatchCentrePage() {
                       </div>
 
                       <div className="flex items-center justify-between border-t border-white/[0.04] pt-3">
-                        <span className="text-[10px] text-white/25 truncate pr-4">
+                        <span className="text-[13px] text-white truncate pr-4">
                           {item.predictionTitle}
                         </span>
 
-                        <span className="flex items-center gap-1.5 font-[JetBrains_Mono,monospace] text-[8px] text-white/30 uppercase tracking-wider">
+                        <span className="flex items-center gap-1.5 font-[JetBrains_Mono,monospace] text-[10px] text-white uppercase tracking-wider">
                           <Clock size={11} />
                           Awaiting kickoff
                         </span>
@@ -257,7 +257,7 @@ export default function MatchCentrePage() {
                     Follow today&apos;s matches live
                   </h3>
 
-                  <p className="text-[13px] text-white/45 leading-relaxed max-w-md mx-auto">
+                  <p className="text-[16px] text-white leading-relaxed max-w-md mx-auto">
                     Choose a trusted score provider below. It opens in a new tab,
                     while Bet Lab remains available for reviewing your picks.
                   </p>
@@ -280,7 +280,7 @@ export default function MatchCentrePage() {
                           <p className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">
                             Sofascore
                           </p>
-                          <p className="text-[13px] text-white/45 leading-relaxed">
+                          <p className="text-[16px] text-white leading-relaxed">
                             Live scores, fixtures, tables and detailed match statistics.
                           </p>
                         </div>
@@ -302,14 +302,14 @@ export default function MatchCentrePage() {
                     <div className="flex items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
                         <div className="w-10 h-10 shrink-0 rounded-lg border border-white/[0.08] bg-white/[0.035] flex items-center justify-center">
-                          <Activity size={18} className="text-white/55" />
+                          <Activity size={18} className="text-white" />
                         </div>
 
                         <div>
                           <p className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">
                             LiveScore
                           </p>
-                          <p className="text-[13px] text-white/45 leading-relaxed">
+                          <p className="text-[16px] text-white leading-relaxed">
                             Fast live results, upcoming fixtures and competition schedules.
                           </p>
                         </div>
@@ -317,7 +317,7 @@ export default function MatchCentrePage() {
 
                       <ArrowRight
                         size={17}
-                        className="mt-1 shrink-0 text-white/20 group-hover:text-white/60 group-hover:translate-x-1 transition"
+                        className="mt-1 shrink-0 text-white group-hover:text-[#D4AF37] group-hover:translate-x-1 transition"
                       />
                     </div>
                   </a>
@@ -327,7 +327,7 @@ export default function MatchCentrePage() {
                   <div className="rounded-lg border border-white/[0.05] bg-white/[0.018] px-4 py-3">
                     <div className="flex items-start gap-3">
                       <Info size={14} className="text-[#D4AF37]/55 mt-0.5 shrink-0" />
-                      <p className="text-[10px] text-white/25 leading-relaxed">
+                      <p className="text-[13px] text-white leading-relaxed">
                         Return to this Match Centre at any time to compare the live
                         action with Bet Lab&apos;s published selections.
                       </p>
@@ -348,7 +348,7 @@ export default function MatchCentrePage() {
                   key={competition}
                   className="rounded-lg border border-white/[0.05] bg-card px-3 py-3 text-center"
                 >
-                  <p className="font-[JetBrains_Mono,monospace] text-[8px] text-white/30 uppercase tracking-wider">
+                  <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white uppercase tracking-wider">
                     {competition}
                   </p>
                 </div>
@@ -360,7 +360,7 @@ export default function MatchCentrePage() {
         <div className="mt-8 rounded-xl border border-[#D4AF37]/10 bg-[#D4AF37]/[0.025] px-5 py-4">
           <div className="flex items-start gap-3">
             <Info size={16} className="text-[#D4AF37]/70 mt-0.5 shrink-0" />
-            <p className="text-[13px] text-white/45 leading-relaxed">
+            <p className="text-[16px] text-white leading-relaxed">
               Live scores are supplied by independent football-score services.
               Bet Lab predictions remain informational and do not guarantee any
               betting outcome.

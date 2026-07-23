@@ -177,7 +177,7 @@ export function Chip({ label, variant }: {
     rose: "bg-rose-500/12 text-rose-400 border-rose-500/25",
     blue: "bg-blue-500/12 text-blue-300 border-blue-500/20",
     violet: "bg-violet-500/12 text-violet-300 border-violet-500/20",
-    ghost: "bg-white/5 text-white/45 border-white/10",
+    ghost: "bg-white/5 text-white border-white/10",
   };
   return (
     <span className={cn("inline-flex items-center border px-2 py-0.5 rounded text-[10px] font-[JetBrains_Mono,monospace] tracking-[0.08em] uppercase font-medium", s[variant])}>
@@ -246,7 +246,7 @@ export function LiveTicker() {
     <div className="border-y border-[#D4AF37]/10 bg-[#0D1828]/60 overflow-hidden py-2.5">
       <div className="flex animate-ticker whitespace-nowrap">
         {doubled.map((item, i) => (
-          <span key={i} className="font-[JetBrains_Mono,monospace] text-[11px] text-white/35 px-10 flex-shrink-0">
+          <span key={i} className="font-[JetBrains_Mono,monospace] text-[14px] text-white px-10 flex-shrink-0">
             {item}
           </span>
         ))}
@@ -268,7 +268,7 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
   };
   const leagueHue: Record<string, string> = {
     EPL: "text-purple-400", UCL: "text-sky-400", LAL: "text-red-400",
-    SA: "text-blue-300", BUN: "text-red-300", L1: "text-white/50",
+    SA: "text-blue-300", BUN: "text-red-300", L1: "text-white",
   };
 
   return (
@@ -283,12 +283,12 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
         {/* Header row */}
         <div className="flex items-center justify-between gap-2 mb-4">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className={cn("font-[JetBrains_Mono,monospace] text-[10px] font-medium uppercase tracking-wider", leagueHue[pred.leagueCode] ?? "text-white/45")}>
+            <span className={cn("font-[JetBrains_Mono,monospace] text-[12px] font-medium uppercase tracking-wider", leagueHue[pred.leagueCode] ?? "text-white")}>
               {pred.league}
             </span>
             <CategoryPip label={pred.category} color={MOCK_CATEGORY_COLOR[pred.category]} />
           </div>
-          <div className="flex items-center gap-1.5 text-white/30 flex-shrink-0">
+          <div className="flex items-center gap-1.5 text-white flex-shrink-0">
             <Clock size={11} />
             <span className="font-[JetBrains_Mono,monospace] text-[10px]">{formatKickoff(pred.kickoff)}</span>
           </div>
@@ -298,25 +298,25 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
         <div className="flex items-center gap-3 mb-4">
           <div className="flex-1 text-right">
             <p className="font-['Rajdhani',sans-serif] font-bold text-[22px] text-white leading-none">{pred.home}</p>
-            <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase mt-0.5 tracking-wider">Home</p>
+            <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase mt-0.5 tracking-wider">Home</p>
           </div>
           <div className="w-9 h-9 rounded-full bg-[#162036] border border-[#D4AF37]/15 flex items-center justify-center flex-shrink-0">
             <span className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] font-bold">VS</span>
           </div>
           <div className="flex-1">
             <p className="font-['Rajdhani',sans-serif] font-bold text-[22px] text-white leading-none">{pred.away}</p>
-            <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase mt-0.5 tracking-wider">Away</p>
+            <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase mt-0.5 tracking-wider">Away</p>
           </div>
         </div>
 
         {/* Prediction pill */}
         <div className="bg-[#0B1220]/70 border border-white/5 rounded px-4 py-3 mb-4 flex items-center justify-between gap-3">
           <div>
-            <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 uppercase tracking-widest mb-1">Prediction</p>
+            <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest mb-1">Prediction</p>
             <p className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white leading-none">{pred.prediction}</p>
           </div>
           <div className="text-right">
-            <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 uppercase tracking-widest mb-1">Odds</p>
+            <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest mb-1">Odds</p>
             <p className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-[#D4AF37] leading-none">{pred.odds.toFixed(2)}</p>
           </div>
         </div>
@@ -324,7 +324,7 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
         {/* Confidence */}
         <div className="mb-4">
           <div className="flex items-center justify-between mb-1.5">
-            <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/30">Confidence</span>
+            <span className="font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white">Confidence</span>
             <span className={cn(
               "font-[JetBrains_Mono,monospace] text-xs font-bold",
               pred.confidence >= 75 ? "text-emerald-400" : pred.confidence >= 60 ? "text-[#D4AF37]" : "text-rose-400"
@@ -339,7 +339,7 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
             <div className="w-5 h-5 rounded-full bg-[#D4AF37]/15 flex items-center justify-center">
               <span className="font-bold text-[#D4AF37] text-[8px]">{pred.analyst.split(" ").map(w => w[0]).filter((_, i, a) => i === 0 || i === a.length - 1).join("")}</span>
             </div>
-            <span className="text-[11px] text-white/35">{pred.analyst}</span>
+            <span className="text-[14px] text-white">{pred.analyst}</span>
           </div>
           <button
             onClick={() => setOpen(!open)}
@@ -351,7 +351,7 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
 
         {open && (
           <div className="mt-3 pt-3 border-t border-white/[0.05] animate-fade-in">
-            <p className="text-[13px] text-white/62 leading-relaxed">{pred.analysis}</p>
+            <p className="text-[16px] text-white leading-relaxed">{pred.analysis}</p>
           </div>
         )}
       </div>
@@ -363,7 +363,7 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
             <Lock size={18} className="text-[#D4AF37]" />
           </div>
           <p className="font-['Rajdhani',sans-serif] font-bold text-white text-lg">Lab Access Required</p>
-          <p className="text-[11px] text-white/35 mt-1 font-[JetBrains_Mono,monospace]">Choose a plan to unlock</p>
+          <p className="text-[14px] text-white mt-1 font-[JetBrains_Mono,monospace]">Choose a plan to unlock</p>
         </div>
       )}
     </article>
@@ -419,7 +419,7 @@ export function ApiPredictionCard({
           </div>
 
           <div className="text-right flex-shrink-0">
-            <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 uppercase tracking-widest">
+            <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest">
               Total odds
             </p>
             <p className="font-['Rajdhani',sans-serif] font-bold text-[27px] text-[#D4AF37] leading-none mt-1">
@@ -435,11 +435,11 @@ export function ApiPredictionCard({
               className="bg-[#0B1220]/70 border border-white/5 rounded-lg p-3.5"
             >
               <div className="flex items-center justify-between gap-3 mb-2">
-                <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/35 uppercase tracking-wider">
+                <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-wider">
                   {index + 1}. {selection.league}
                 </span>
 
-                <span className="flex items-center gap-1 font-[JetBrains_Mono,monospace] text-[9px] text-white/30">
+                <span className="flex items-center gap-1 font-[JetBrains_Mono,monospace] text-[12px] text-white">
                   <Clock size={10} />
                   {formatKickoff(selection.match_time)}
                 </span>
@@ -447,16 +447,16 @@ export function ApiPredictionCard({
 
               <p className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white">
                 {selection.home_team}
-                <span className="text-white/25 mx-2">vs</span>
+                <span className="text-white mx-2">vs</span>
                 {selection.away_team}
               </p>
 
               <div className="flex items-end justify-between gap-3 mt-2">
                 <div>
-                  <p className="font-[JetBrains_Mono,monospace] text-[8px] text-white/25 uppercase tracking-widest">
+                  <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white uppercase tracking-widest">
                     Selection
                   </p>
-                  <p className="text-[13px] text-white/70 mt-0.5">
+                  <p className="text-[16px] text-white mt-0.5">
                     {selection.market}
                   </p>
                 </div>
@@ -470,7 +470,7 @@ export function ApiPredictionCard({
         </div>
 
         <div className="flex items-center justify-between pt-4 mt-4 border-t border-white/[0.05]">
-          <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 uppercase tracking-widest">
+          <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest">
             {pred.selections.length} selection{pred.selections.length === 1 ? "" : "s"}
           </span>
 
@@ -491,7 +491,7 @@ export function ApiPredictionCard({
 
         {open && (
           <div className="mt-3 pt-3 border-t border-white/[0.05]">
-            <p className="text-[13px] text-white/62 leading-relaxed">
+            <p className="text-[16px] text-white leading-relaxed">
               {pred.analysis || "No analysis has been published yet."}
             </p>
           </div>
@@ -506,7 +506,7 @@ export function ApiPredictionCard({
           <p className="font-['Rajdhani',sans-serif] font-bold text-white text-lg">
             Lab Access Required
           </p>
-          <p className="text-[11px] text-white/35 mt-1 font-[JetBrains_Mono,monospace]">
+          <p className="text-[14px] text-white mt-1 font-[JetBrains_Mono,monospace]">
             Choose a plan to unlock
           </p>
         </div>

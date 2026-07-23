@@ -253,24 +253,24 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
       )}>
         {/* Nav */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
-          <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20 uppercase tracking-[0.2em] px-3 mb-3">Navigation</p>
+          <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-[0.2em] px-3 mb-3">Navigation</p>
           {navItems.map(item => (
             <button key={item.s} onClick={() => { setSection(item.s); setSidebarOpen(false); }}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded text-[13px] font-medium transition-all duration-150 cursor-pointer",
                 section === item.s
                   ? "bg-[#D4AF37]/12 text-[#D4AF37] border border-[#D4AF37]/20"
-                  : "text-white/40 hover:text-white/80 hover:bg-white/[0.03]"
+                  : "text-white hover:text-[#D4AF37] hover:bg-white/[0.03]"
               )}>
-              <span className={section === item.s ? "text-[#D4AF37]" : "text-white/25"}>{item.icon}</span>
+              <span className={section === item.s ? "text-[#D4AF37]" : "text-white"}>{item.icon}</span>
               {item.label}
             </button>
           ))}
 
           <div className="pt-4">
-            <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20 uppercase tracking-[0.2em] px-3 mb-3">Account</p>
-            <button onClick={() => nav("pricing")} className="w-full flex items-center gap-3 px-3 py-2.5 rounded text-[13px] text-white/40 hover:text-white/80 hover:bg-white/[0.03] transition-all cursor-pointer">
-              <span className="text-white/25"><Settings size={15} /></span>Settings
+            <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-[0.2em] px-3 mb-3">Account</p>
+            <button onClick={() => nav("pricing")} className="w-full flex items-center gap-3 px-3 py-2.5 rounded text-[16px] text-white hover:text-[#D4AF37] hover:bg-white/[0.03] transition-all cursor-pointer">
+              <span className="text-white"><Settings size={15} /></span>Settings
             </button>
           </div>
         </nav>
@@ -280,7 +280,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
           <div className="bg-gradient-to-b from-[#1A2640] to-[#111C2E] border border-[#D4AF37]/18 rounded-lg p-4">
             <div className="flex items-center justify-between mb-3">
               <div>
-                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 uppercase tracking-widest mb-0.5">Membership</p>
+                <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest mb-0.5">Membership</p>
                 <p className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-[#D4AF37]">
                   {isLoading ? "Loading..." : subscription?.plan_name ?? "No active plan"}
                 </p>
@@ -293,7 +293,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                 <div className="h-full bg-[#D4AF37]/50 rounded-full" style={{ width: `${expiryPct}%` }} />
               </div>
             </div>
-            <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25">
+            <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white">
               {hasSubscription ? `Expires ${expiryLabel} · ${daysLeft}d left` : "Choose a plan to unlock Lab access"}
             </p>
             <button onClick={() => nav("pricing")} className="mt-3 w-full text-center font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/50 hover:text-[#D4AF37] transition-colors cursor-pointer uppercase tracking-widest">
@@ -348,11 +348,11 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
           {/* Page header */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
             <div>
-              <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-[0.2em] mb-1">Dashboard · {section}</p>
+              <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-[0.2em] mb-1">Dashboard · {section}</p>
               <h1 className="font-['Rajdhani',sans-serif] font-bold text-[38px] text-white leading-none">
                 {greeting}, <span className="text-[#D4AF37]">{(displayNameFor(user).split(" ")[0]) || "there"}.</span>
               </h1>
-              <p className="text-[12px] text-white/35 mt-1">
+              <p className="text-[15px] text-white mt-1">
                 {new Date().toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} · {stats.todaysPicks.length} predictions live today
               </p>
             </div>
@@ -374,11 +374,11 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
             ].map((k, i) => (
               <div key={i} className="bg-card border border-[#D4AF37]/8 rounded-lg p-4 hover:border-[#D4AF37]/18 transition-colors group">
                 <div className="flex items-start justify-between mb-3">
-                  <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 uppercase tracking-widest leading-tight">{k.label}</span>
+                  <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest leading-tight">{k.label}</span>
                   <span className={cn(k.c, "opacity-40 group-hover:opacity-70 transition-opacity")}>{k.icon}</span>
                 </div>
                 <p className={cn("font-['Rajdhani',sans-serif] font-bold text-[28px] leading-none", k.c)}>{k.value}</p>
-                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 mt-1.5">{k.sub}</p>
+                <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white mt-1.5">{k.sub}</p>
               </div>
             ))}
           </div>
@@ -391,7 +391,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                 <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
                   <div className="flex items-center justify-between mb-5">
                     <div>
-                      <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest mb-1">Performance</p>
+                      <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest mb-1">Performance</p>
                       <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white">Win Rate — July 2026</h3>
                     </div>
                     <Chip label={`${stats.trend.length} days tracked`} variant="emerald" />
@@ -417,7 +417,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                   <h3 className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white mb-4">Recent Results</h3>
                   <div className="space-y-3">
                     {stats.settled.length === 0 && (
-                      <p className="text-[11px] text-white/25">No settled predictions yet.</p>
+                      <p className="text-[14px] text-white">No settled predictions yet.</p>
                     )}
                     {stats.settled.slice(-7).reverse().map(p => {
                       const profit = unitProfit(p);
@@ -429,17 +429,17 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                               ? <CheckCircle2 size={12} className="text-emerald-400 flex-shrink-0" />
                               : p.result_status === "lost"
                               ? <XCircle size={12} className="text-rose-400 flex-shrink-0" />
-                              : <Minus size={12} className="text-white/20 flex-shrink-0" />
+                              : <Minus size={12} className="text-white flex-shrink-0" />
                             }
                             <div className="min-w-0">
-                              <p className="text-[11px] text-white/55 truncate">{p.title}</p>
-                              <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20">
+                              <p className="text-[14px] text-white truncate">{p.title}</p>
+                              <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white">
                                 {kickoff ? kickoff.toLocaleDateString("en-GB", { day: "2-digit", month: "short" }) : "—"}
                               </p>
                             </div>
                           </div>
                           <span className={cn("font-[JetBrains_Mono,monospace] text-[11px] font-bold flex-shrink-0",
-                            profit > 0 ? "text-emerald-400" : profit < 0 ? "text-rose-400" : "text-white/20")}>
+                            profit > 0 ? "text-emerald-400" : profit < 0 ? "text-rose-400" : "text-white")}>
                             {profit > 0 ? `+${profit}` : profit === 0 ? "—" : profit}
                           </span>
                         </div>
@@ -460,7 +460,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                 </div>
                 {predictionsError && <p className="text-[12px] text-rose-400">{predictionsError}</p>}
                 {!predictionsError && stats.todaysPicks.length === 0 && (
-                  <p className="text-[12px] text-white/30">No live predictions right now — check back soon.</p>
+                  <p className="text-[15px] text-white">No live predictions right now — check back soon.</p>
                 )}
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {stats.todaysPicks.slice(0, 3).map(p => <ApiPredictionCard key={p.id} pred={p} />)}
@@ -476,16 +476,16 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                 <h2 className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-white">Results Log</h2>
                 <div className="flex items-center gap-2">
                   <span className="font-[JetBrains_Mono,monospace] text-[11px] text-emerald-400">{stats.settled.filter(p => p.result_status === "won").length}W</span>
-                  <span className="text-white/15">/</span>
+                  <span className="text-white">/</span>
                   <span className="font-[JetBrains_Mono,monospace] text-[11px] text-rose-400">{stats.settled.filter(p => p.result_status === "lost").length}L</span>
-                  <span className="text-white/15">/</span>
-                  <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white/25">{stats.settled.filter(p => p.result_status === "void").length}V</span>
-                  <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20 ml-1">(all-time)</span>
+                  <span className="text-white">/</span>
+                  <span className="font-[JetBrains_Mono,monospace] text-[14px] text-white">{stats.settled.filter(p => p.result_status === "void").length}V</span>
+                  <span className="font-[JetBrains_Mono,monospace] text-[12px] text-white ml-1">(all-time)</span>
                 </div>
               </div>
               <div className="bg-card border border-[#D4AF37]/8 rounded-lg overflow-hidden">
                 {stats.settled.length === 0 && (
-                  <p className="text-[12px] text-white/30 px-5 py-6">No settled predictions yet.</p>
+                  <p className="text-[15px] text-white px-5 py-6">No settled predictions yet.</p>
                 )}
                 {stats.settled.slice().reverse().map((p, i) => {
                   const profit = unitProfit(p);
@@ -496,22 +496,22 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                       "flex items-center gap-4 px-5 py-3.5 hover:bg-white/[0.015] transition-colors",
                       i < stats.settled.length - 1 && "border-b border-white/[0.04]"
                     )}>
-                      <span className="font-[JetBrains_Mono,monospace] text-[10px] text-white/25 w-12 flex-shrink-0">
+                      <span className="font-[JetBrains_Mono,monospace] text-[13px] text-white w-12 flex-shrink-0">
                         {kickoff ? kickoff.toLocaleDateString("en-GB", { day: "2-digit", month: "short" }) : "—"}
                       </span>
                       <div className="flex-1 min-w-0">
-                        <p className="text-[13px] text-white/70 truncate">{p.title}</p>
-                        <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 mt-0.5">{p.category.name} · {leagues}</p>
+                        <p className="text-[16px] text-white truncate">{p.title}</p>
+                        <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white mt-0.5">{p.category.name} · {leagues}</p>
                       </div>
-                      <span className="font-[JetBrains_Mono,monospace] text-[11px] text-white/40 flex-shrink-0">{combinedOdds(p).toFixed(2)}</span>
+                      <span className="font-[JetBrains_Mono,monospace] text-[14px] text-white flex-shrink-0">{combinedOdds(p).toFixed(2)}</span>
                       <div className="flex items-center gap-1.5 w-14 flex-shrink-0">
                         <div className={cn("w-1.5 h-1.5 rounded-full", p.result_status === "won" ? "bg-emerald-500" : p.result_status === "lost" ? "bg-rose-500" : "bg-white/15")} />
-                        <span className={cn("font-[JetBrains_Mono,monospace] text-[10px] uppercase", p.result_status === "won" ? "text-emerald-400" : p.result_status === "lost" ? "text-rose-400" : "text-white/20")}>
+                        <span className={cn("font-[JetBrains_Mono,monospace] text-[13px] uppercase", p.result_status === "won" ? "text-emerald-400" : p.result_status === "lost" ? "text-rose-400" : "text-white")}>
                           {p.result_status}
                         </span>
                       </div>
                       <span className={cn("font-[JetBrains_Mono,monospace] text-[11px] font-bold w-14 text-right flex-shrink-0",
-                        profit > 0 ? "text-emerald-400" : profit < 0 ? "text-rose-400" : "text-white/20")}>
+                        profit > 0 ? "text-emerald-400" : profit < 0 ? "text-rose-400" : "text-white")}>
                         {profit > 0 ? `+${profit}u` : profit === 0 ? "VOID" : `${profit}u`}
                       </span>
                     </div>
@@ -531,9 +531,9 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                   { label: "Total ROI", value: `${stats.roi >= 0 ? "+" : ""}${stats.roi}%`, sub: "Flat-stake, 1 unit/pred" },
                 ].map((s, i) => (
                   <div key={i} className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
-                    <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest mb-2">{s.label}</p>
+                    <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest mb-2">{s.label}</p>
                     <p className="font-['Rajdhani',sans-serif] font-bold text-[32px] text-[#D4AF37] leading-none">{s.value}</p>
-                    <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 mt-2">{s.sub}</p>
+                    <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white mt-2">{s.sub}</p>
                   </div>
                 ))}
               </div>
@@ -545,7 +545,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                   <Chip label="Flat stake" variant="ghost" />
                 </div>
                 {stats.trend.length === 0 ? (
-                  <p className="text-[12px] text-white/30 py-10 text-center">Not enough settled predictions yet to chart a trend.</p>
+                  <p className="text-[15px] text-white py-10 text-center">Not enough settled predictions yet to chart a trend.</p>
                 ) : (
                   <ResponsiveContainer width="100%" height={200}>
                     <AreaChart data={stats.trend} margin={{ top: 2, right: 2, bottom: 0, left: -22 }}>
@@ -569,20 +569,20 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                 <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-5">Win Rate by League</h3>
                 <div className="space-y-3">
                   {stats.leaguePerf.length === 0 && (
-                    <p className="text-[12px] text-white/30">No settled predictions yet.</p>
+                    <p className="text-[15px] text-white">No settled predictions yet.</p>
                   )}
                   {stats.leaguePerf.map(l => (
                     <div key={l.league} className="flex items-center gap-4">
-                      <span className="font-[JetBrains_Mono,monospace] text-[10px] text-white/40 uppercase w-14 flex-shrink-0 truncate">{l.league}</span>
+                      <span className="font-[JetBrains_Mono,monospace] text-[13px] text-white uppercase w-14 flex-shrink-0 truncate">{l.league}</span>
                       <div className="flex-1 h-1.5 bg-white/8 rounded-full overflow-hidden">
                         <div className="h-full rounded-full transition-all duration-700"
                           style={{ width: `${l.winRate}%`, background: l.winRate >= 80 ? "#10B981" : l.winRate >= 75 ? GOLD : "rgba(255,255,255,0.3)" }} />
                       </div>
                       <span className={cn("font-[JetBrains_Mono,monospace] text-[11px] font-bold w-10 text-right flex-shrink-0",
-                        l.winRate >= 80 ? "text-emerald-400" : l.winRate >= 75 ? "text-[#D4AF37]" : "text-white/40")}>
+                        l.winRate >= 80 ? "text-emerald-400" : l.winRate >= 75 ? "text-[#D4AF37]" : "text-white")}>
                         {l.winRate}%
                       </span>
-                      <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/20 w-14 text-right flex-shrink-0">{l.predictions} picks</span>
+                      <span className="font-[JetBrains_Mono,monospace] text-[12px] text-white w-14 text-right flex-shrink-0">{l.predictions} picks</span>
                     </div>
                   ))}
                 </div>
@@ -597,23 +597,23 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
               )}
 
               {!consent && !consentError && (
-                <p className="text-[12px] text-white/30">Loading your legal &amp; privacy record...</p>
+                <p className="text-[15px] text-white">Loading your legal &amp; privacy record...</p>
               )}
 
               {consent && (
                 <>
                   <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
                     <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">Policies You've Accepted</h3>
-                    <p className="text-[12px] text-white/35 mb-5">The most recent version of each policy you've agreed to, and when.</p>
+                    <p className="text-[15px] text-white mb-5">The most recent version of each policy you've agreed to, and when.</p>
                     {consent.acceptances.length === 0 ? (
-                      <p className="text-[12px] text-white/30">No policy acceptances on record yet.</p>
+                      <p className="text-[15px] text-white">No policy acceptances on record yet.</p>
                     ) : (
                       <div className="space-y-2">
                         {consent.acceptances.map(a => (
                           <div key={a.policy_type} className="flex items-center justify-between gap-3 py-2 border-b border-white/[0.05] last:border-0">
                             <div className="min-w-0">
-                              <p className="text-[13px] text-white/75 truncate">{a.policy_type_display}</p>
-                              <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">
+                              <p className="text-[16px] text-white truncate">{a.policy_type_display}</p>
+                              <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest">
                                 v{a.version} &middot; {new Date(a.accepted_at).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                               </p>
                             </div>
@@ -631,7 +631,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
 
                   <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
                     <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">Marketing Communications</h3>
-                    <p className="text-[12px] text-white/35 mb-4">
+                    <p className="text-[15px] text-white mb-4">
                       {consent.marketing_consent.status === "opted_in"
                         ? "You're currently opted in to marketing emails."
                         : "You're currently opted out of marketing emails."}
@@ -649,11 +649,11 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
 
                   <div className="bg-card border border-[#D4AF37]/8 rounded-lg p-5">
                     <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">Consent History</h3>
-                    <p className="text-[12px] text-white/35 mb-4">A downloadable export of your full consent history is coming soon.</p>
+                    <p className="text-[15px] text-white mb-4">A downloadable export of your full consent history is coming soon.</p>
                     <button
                       disabled
                       aria-disabled="true"
-                      className="flex items-center gap-1.5 font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/25 border border-white/10 rounded-full px-4 py-2 cursor-not-allowed"
+                      className="flex items-center gap-1.5 font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white border border-white/10 rounded-full px-4 py-2 cursor-not-allowed"
                     >
                       <Download size={12} aria-hidden="true" /> Download (Coming Soon)
                     </button>

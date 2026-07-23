@@ -47,7 +47,7 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
           <div>
             <SectionEyebrow>Intelligence Feed</SectionEyebrow>
             <h1 className="font-['Rajdhani',sans-serif] font-bold text-[52px] text-white leading-none">TODAY&apos;S PREDICTIONS</h1>
-            <p className="text-white/35 text-[12px] mt-2 font-[JetBrains_Mono,monospace]">Saturday, 19 July 2026 · {predictions.length} prediction packages published</p>
+            <p className="text-white text-[15px] mt-2 font-[JetBrains_Mono,monospace]">Saturday, 19 July 2026 · {predictions.length} prediction packages published</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 border border-emerald-500/20 bg-emerald-500/8 rounded-full px-3 py-1.5">
@@ -55,7 +55,7 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
               <span className="font-[JetBrains_Mono,monospace] text-[9px] text-emerald-400 uppercase tracking-widest">Live</span>
             </div>
             <div className="bg-card border border-[#D4AF37]/8 rounded-lg px-3.5 py-2">
-              <span className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30">Avg confidence: </span>
+              <span className="font-[JetBrains_Mono,monospace] text-[12px] text-white">Avg confidence: </span>
               <span className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] font-bold">73.8%</span>
             </div>
           </div>
@@ -64,14 +64,14 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
         <div className="flex flex-wrap gap-2 mb-8">
           <button onClick={() => setFilter("all")} className={cn(
             "px-4 py-1.5 rounded border font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest transition-all cursor-pointer",
-            filter === "all" ? "bg-[#D4AF37] text-[#070E1A] border-[#D4AF37]" : "bg-card border-[#D4AF37]/8 text-white/40 hover:border-[#D4AF37]/22 hover:text-white"
+            filter === "all" ? "bg-[#D4AF37] text-[#070E1A] border-[#D4AF37]" : "bg-card border-[#D4AF37]/8 text-white hover:border-[#D4AF37]/22 hover:text-white"
           )}>
             All
           </button>
           {categories.map(cat => (
             <button key={cat.slug} onClick={() => setFilter(cat.slug)} className={cn(
               "px-4 py-1.5 rounded border font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest transition-all cursor-pointer",
-              filter === cat.slug ? "bg-[#D4AF37] text-[#070E1A] border-[#D4AF37]" : "bg-card border-[#D4AF37]/8 text-white/40 hover:border-[#D4AF37]/22 hover:text-white"
+              filter === cat.slug ? "bg-[#D4AF37] text-[#070E1A] border-[#D4AF37]" : "bg-card border-[#D4AF37]/8 text-white hover:border-[#D4AF37]/22 hover:text-white"
             )}>
               {cat.name}
             </button>
@@ -81,7 +81,7 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
         {loading && (
           <div className="py-20 text-center">
             <div className="w-8 h-8 border-2 border-[#D4AF37]/20 border-t-[#D4AF37] rounded-full animate-spin mx-auto" />
-            <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white/35 uppercase tracking-widest mt-4">
+            <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white uppercase tracking-widest mt-4">
               Loading prediction packages
             </p>
           </div>
@@ -92,7 +92,7 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
             <p className="font-['Rajdhani',sans-serif] font-bold text-[22px] text-white">
               Predictions unavailable
             </p>
-            <p className="text-[12px] text-white/40 mt-2">
+            <p className="text-[15px] text-white mt-2">
               {error} Please confirm that the Django server is running.
             </p>
           </div>
@@ -103,7 +103,7 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
             <p className="font-['Rajdhani',sans-serif] font-bold text-[24px] text-white">
               No prediction packages found
             </p>
-            <p className="text-[12px] text-white/35 mt-2">
+            <p className="text-[15px] text-white mt-2">
               There are currently no published packages in this category.
             </p>
           </div>
@@ -127,7 +127,7 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
               <Lock size={20} className="text-[#D4AF37]" />
             </div>
             <h3 className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-white mb-2">5 MORE PICKS TODAY</h3>
-            <p className="text-[13px] text-white/35 mb-6">Subscribe to access the full daily intelligence feed</p>
+            <p className="text-[16px] text-white mb-6">Subscribe to access the full daily intelligence feed</p>
             <GoldBtn onClick={() => nav("pricing")} size="md">Get Lab Access <ArrowRight size={14} /></GoldBtn>
           </div>
         )}

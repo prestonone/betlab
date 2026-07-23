@@ -24,9 +24,9 @@ export default function ConsentCheckbox({
         aria-required={required}
         className="mt-0.5 w-3.5 h-3.5 flex-shrink-0 accent-[#D4AF37] cursor-pointer"
       />
-      <span className="text-[13px] leading-relaxed text-white/60">
+      <span className="text-[16px] leading-relaxed text-white">
         {children}
-        {!required && <span className="text-white/25"> (optional)</span>}
+        {!required && <span className="text-white"> (optional)</span>}
       </span>
     </label>
   );

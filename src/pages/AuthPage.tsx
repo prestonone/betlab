@@ -189,7 +189,7 @@ export default function AuthPage({ mode, nav }: {
           <h1 className="font-['Rajdhani',sans-serif] font-bold text-[36px] text-white mb-1">
             {tab === "login" ? "WELCOME BACK" : "JOIN BET LAB"}
           </h1>
-          <p className="text-[12px] text-white/35">
+          <p className="text-[15px] text-white">
             {tab === "login" ? "Access your intelligence feed" : "Simple signup · Secure payment"}
           </p>
         </div>
@@ -198,7 +198,7 @@ export default function AuthPage({ mode, nav }: {
         {!showForgot && (
           <div className="flex bg-card border border-[#D4AF37]/12 rounded-lg p-1 mb-6">
             {(["login", "register"] as const).map(t => (
-              <button key={t} onClick={() => { setTab(t); setStep(1); setError(""); }} className={cn("flex-1 py-2 rounded text-[13px] font-medium transition-all capitalize cursor-pointer", tab === t ? "bg-[#D4AF37] text-[#070E1A]" : "text-white/40 hover:text-white")}>
+              <button key={t} onClick={() => { setTab(t); setStep(1); setError(""); }} className={cn("flex-1 py-2 rounded text-[16px] font-medium transition-all capitalize cursor-pointer", tab === t ? "bg-[#D4AF37] text-[#070E1A]" : "text-white hover:text-white")}>
                 {t === "login" ? "Sign In" : "Register"}
               </button>
             ))}
@@ -213,7 +213,7 @@ export default function AuthPage({ mode, nav }: {
                   <CheckCircle2 size={20} className="text-emerald-400" />
                 </div>
                 <p className="font-['Rajdhani',sans-serif] font-bold text-white text-lg mb-1">Check your email</p>
-                <p className="text-[12px] text-white/40 mb-5">If an account exists for that address, a reset link is on its way.</p>
+                <p className="text-[15px] text-white mb-5">If an account exists for that address, a reset link is on its way.</p>
                 <button
                   type="button"
                   onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(""); }}
@@ -226,12 +226,12 @@ export default function AuthPage({ mode, nav }: {
               <form onSubmit={submitForgot} className="space-y-4">
                 <div>
                   <p className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">Reset your password</p>
-                  <p className="text-[12px] text-white/35 mb-4">Enter your account email and we&apos;ll send you a reset link.</p>
-                  <label className="block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35 mb-1.5">Email</label>
+                  <p className="text-[15px] text-white mb-4">Enter your account email and we&apos;ll send you a reset link.</p>
+                  <label className="block font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white mb-1.5">Email</label>
                   <div className="relative">
-                    <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                    <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
                     <input type="email" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} required placeholder="you@example.com"
-                      className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-3.5 py-2.5 text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors" />
+                      className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-3.5 py-2.5 text-[16px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors" />
                   </div>
                 </div>
 
@@ -250,7 +250,7 @@ export default function AuthPage({ mode, nav }: {
                 <button
                   type="button"
                   onClick={() => setShowForgot(false)}
-                  className="w-full text-center text-[11px] text-white/35 hover:text-white/60 cursor-pointer"
+                  className="w-full text-center text-[14px] text-white hover:text-[#D4AF37] cursor-pointer"
                 >
                   Back to sign in
                 </button>
@@ -262,29 +262,29 @@ export default function AuthPage({ mode, nav }: {
           <form onSubmit={go} className="space-y-4">
             {tab === "register" && step === 1 && (
               <div>
-                <label className="block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35 mb-1.5">Full Name</label>
+                <label className="block font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white mb-1.5">Full Name</label>
                 <input type="text" value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} required placeholder="Your full name"
-                  className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded px-3.5 py-2.5 text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors" />
+                  className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded px-3.5 py-2.5 text-[16px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors" />
               </div>
             )}
             {(tab === "login" || step === 1) && (
               <div>
-                <label className="block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35 mb-1.5">Email</label>
+                <label className="block font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white mb-1.5">Email</label>
                 <div className="relative">
-                  <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                  <Mail size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
                   <input type="email" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} required placeholder="you@example.com"
-                    className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-3.5 py-2.5 text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors" />
+                    className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-3.5 py-2.5 text-[16px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors" />
                 </div>
               </div>
             )}
             {(tab === "login" || step === 1) && (
               <div>
-                <label className="block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35 mb-1.5">Password</label>
+                <label className="block font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white mb-1.5">Password</label>
                 <div className="relative">
-                  <Lock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                  <Lock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
                   <input type={showPass ? "text" : "password"} value={form.pass} onChange={e => setForm({ ...form, pass: e.target.value })} required placeholder="••••••••"
-                    className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-9 py-2.5 text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors" />
-                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50 cursor-pointer">
+                    className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-9 py-2.5 text-[16px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors" />
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-[#D4AF37] cursor-pointer">
                     {showPass ? <EyeOff size={13} /> : <Eye size={13} />}
                   </button>
                 </div>
@@ -298,7 +298,7 @@ export default function AuthPage({ mode, nav }: {
                   <p className="text-[12px] text-rose-400">{plansError}</p>
                 )}
                 {!plansError && plans.length === 0 && (
-                  <p className="text-[12px] text-white/35">Loading plans...</p>
+                  <p className="text-[15px] text-white">Loading plans...</p>
                 )}
                 {plans.map(p => (
                   <label key={p.code} className={cn("flex items-center gap-3.5 p-3.5 rounded-lg border cursor-pointer transition-all", form.plan === p.code ? "border-[#D4AF37]/40 bg-[#D4AF37]/5" : "border-[#D4AF37]/8 hover:border-[#D4AF37]/20")}>
@@ -306,7 +306,7 @@ export default function AuthPage({ mode, nav }: {
                     <div className="flex-1 flex items-center justify-between">
                       <div>
                         <span className="font-['Rajdhani',sans-serif] font-bold text-white text-[16px]">{p.name}</span>
-                        <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/30 mt-0.5 uppercase">{p.duration_days}-day access</p>
+                        <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white mt-0.5 uppercase">{p.duration_days}-day access</p>
                       </div>
                       <span className="font-['Rajdhani',sans-serif] font-bold text-[#D4AF37] text-[16px]">
                         {p.currency_symbol}{Math.round(parseFloat(p.price)).toLocaleString()}
@@ -314,7 +314,7 @@ export default function AuthPage({ mode, nav }: {
                     </div>
                   </label>
                 ))}
-                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 text-center pt-1 uppercase tracking-widest">Access begins after payment verification</p>
+                <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white text-center pt-1 uppercase tracking-widest">Access begins after payment verification</p>
 
                 <ResponsibleUseWarning />
 
@@ -336,7 +336,7 @@ export default function AuthPage({ mode, nav }: {
                     onChange={v => setConsent({ ...consent, acceptedRefundPolicy: v })}
                   >
                     I have reviewed the <PolicyLink slug="refund-policy">Refund and Subscription Policy</PolicyLink> and understand the applicable billing, cancellation and refund terms.
-                    <span className="text-white/25"> (required only if paying now)</span>
+                    <span className="text-white"> (required only if paying now)</span>
                   </ConsentCheckbox>
 
                   <ConsentCheckbox
@@ -355,7 +355,7 @@ export default function AuthPage({ mode, nav }: {
               <div className="flex items-center justify-between">
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input type="checkbox" className="w-3 h-3 accent-[#D4AF37]" />
-                  <span className="text-[11px] text-white/35">Remember me</span>
+                  <span className="text-[14px] text-white">Remember me</span>
                 </label>
                 <button type="button" onClick={() => setShowForgot(true)} className="text-[11px] text-[#D4AF37]/60 hover:text-[#D4AF37] cursor-pointer">Forgot password?</button>
               </div>
@@ -392,13 +392,13 @@ export default function AuthPage({ mode, nav }: {
                 type="button"
                 onClick={() => void continueFree()}
                 disabled={isSubmitting}
-                className="w-full text-center text-[11px] text-white/35 hover:text-white/60 transition-colors cursor-pointer disabled:opacity-50"
+                className="w-full text-center text-[14px] text-white hover:text-[#D4AF37] transition-colors cursor-pointer disabled:opacity-50"
               >
                 Continue for free instead
               </button>
             )}
           </form>
-          <p className="mt-5 text-center font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">Secure authentication powered by Bet Lab</p>
+          <p className="mt-5 text-center font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest">Secure authentication powered by Bet Lab</p>
         </div>
         )}
       </div>

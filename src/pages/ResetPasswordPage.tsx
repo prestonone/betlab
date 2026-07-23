@@ -48,7 +48,7 @@ export default function ResetPasswordPage({ nav }: { nav: (p: Page) => void }) {
         <div className="text-center mb-8">
           <AnimatedLogoMark size={48} radius={10} className="mx-auto mb-4" />
           <h1 className="font-['Rajdhani',sans-serif] font-bold text-[36px] text-white mb-1">RESET PASSWORD</h1>
-          <p className="text-[12px] text-white/35">Choose a new password for your account</p>
+          <p className="text-[15px] text-white">Choose a new password for your account</p>
         </div>
 
         <div className="bg-card border border-[#D4AF37]/12 rounded-xl p-7">
@@ -65,7 +65,7 @@ export default function ResetPasswordPage({ nav }: { nav: (p: Page) => void }) {
                 <CheckCircle2 size={20} className="text-emerald-400" />
               </div>
               <p className="font-['Rajdhani',sans-serif] font-bold text-white text-lg mb-1">Password updated</p>
-              <p className="text-[12px] text-white/40 mb-5">You can now sign in with your new password.</p>
+              <p className="text-[15px] text-white mb-5">You can now sign in with your new password.</p>
               <GoldBtn full size="md" onClick={() => nav("login")}>
                 Go to sign in <ArrowRight size={14} />
               </GoldBtn>
@@ -73,9 +73,9 @@ export default function ResetPasswordPage({ nav }: { nav: (p: Page) => void }) {
           ) : (
             <form onSubmit={submit} className="space-y-4">
               <div>
-                <label className="block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35 mb-1.5">New Password</label>
+                <label className="block font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white mb-1.5">New Password</label>
                 <div className="relative">
-                  <Lock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                  <Lock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
                   <input
                     type={showPass ? "text" : "password"}
                     value={password}
@@ -83,18 +83,18 @@ export default function ResetPasswordPage({ nav }: { nav: (p: Page) => void }) {
                     required
                     minLength={8}
                     placeholder="••••••••"
-                    className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-9 py-2.5 text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors"
+                    className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-9 py-2.5 text-[16px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors"
                   />
-                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white/20 hover:text-white/50 cursor-pointer">
+                  <button type="button" onClick={() => setShowPass(!showPass)} className="absolute right-3 top-1/2 -translate-y-1/2 text-white hover:text-[#D4AF37] cursor-pointer">
                     {showPass ? <EyeOff size={13} /> : <Eye size={13} />}
                   </button>
                 </div>
               </div>
 
               <div>
-                <label className="block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35 mb-1.5">Confirm Password</label>
+                <label className="block font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white mb-1.5">Confirm Password</label>
                 <div className="relative">
-                  <Lock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white/20" />
+                  <Lock size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-white" />
                   <input
                     type={showPass ? "text" : "password"}
                     value={passwordConfirm}
@@ -102,7 +102,7 @@ export default function ResetPasswordPage({ nav }: { nav: (p: Page) => void }) {
                     required
                     minLength={8}
                     placeholder="••••••••"
-                    className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-3.5 py-2.5 text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors"
+                    className="w-full bg-[#162036] border border-[#D4AF37]/12 rounded pl-9 pr-3.5 py-2.5 text-[16px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors"
                   />
                 </div>
               </div>

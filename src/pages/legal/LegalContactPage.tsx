@@ -15,8 +15,8 @@ const CATEGORIES: { value: LegalContactPayload["category"]; label: string }[] = 
 ];
 
 const inputClass =
-  "w-full bg-[#162036] border border-[#D4AF37]/12 rounded px-3.5 py-2.5 text-[13px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors";
-const labelClass = "block font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-white/35 mb-1.5";
+  "w-full bg-[#162036] border border-[#D4AF37]/12 rounded px-3.5 py-2.5 text-[16px] text-white placeholder-white/20 focus:outline-none focus:border-[#D4AF37]/45 transition-colors";
+const labelClass = "block font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white mb-1.5";
 
 export default function LegalContactPage({ onBack }: { onBack: () => void }) {
   const [form, setForm] = useState({ category: "general" as LegalContactPayload["category"], name: "", email: "", message: "" });
@@ -53,7 +53,7 @@ export default function LegalContactPage({ onBack }: { onBack: () => void }) {
       <div className="max-w-xl mx-auto px-4 sm:px-6 py-14 pb-24">
         <button
           onClick={onBack}
-          className="flex items-center gap-1.5 text-[11px] text-white/35 hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors mb-6 cursor-pointer"
+          className="flex items-center gap-1.5 text-[14px] text-white hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors mb-6 cursor-pointer"
         >
           <ArrowLeft size={13} aria-hidden="true" /> Back to Legal Centre
         </button>
@@ -62,7 +62,7 @@ export default function LegalContactPage({ onBack }: { onBack: () => void }) {
         <h1 className="font-['Rajdhani',sans-serif] font-bold text-[36px] sm:text-[44px] text-white leading-tight mb-3">
           Legal Contact
         </h1>
-        <p className="text-white/45 text-[14px] max-w-2xl mb-10">
+        <p className="text-white text-[14px] max-w-2xl mb-10">
           Use this form for privacy requests, copyright notices, refund questions, responsible gambling concerns, or
           any other legal inquiry. We aim to respond within a reasonable time.
         </p>
@@ -70,7 +70,7 @@ export default function LegalContactPage({ onBack }: { onBack: () => void }) {
         {confirmation ? (
           <div className="bg-card border border-emerald-500/25 rounded-xl p-6 flex items-start gap-3">
             <CheckCircle2 size={18} aria-hidden="true" className="text-emerald-400 shrink-0 mt-0.5" />
-            <p className="text-[13px] text-white/70">{confirmation}</p>
+            <p className="text-[16px] text-white">{confirmation}</p>
           </div>
         ) : (
           <form onSubmit={submit} className="bg-card border border-[#D4AF37]/12 rounded-xl p-7 space-y-4">

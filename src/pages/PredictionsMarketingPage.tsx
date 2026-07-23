@@ -11,7 +11,7 @@ export default function PredictionsMarketingPage({ nav }: { nav: (p: Page) => vo
           <div>
             <SectionEyebrow>Intelligence Feed</SectionEyebrow>
             <h1 className="font-['Rajdhani',sans-serif] font-bold text-[52px] text-white leading-none">TODAY&apos;S PREDICTIONS</h1>
-            <p className="text-white/35 text-[12px] mt-2 font-[JetBrains_Mono,monospace]">A preview of today&apos;s picks · Sign in to unlock the full live feed</p>
+            <p className="text-white text-[15px] mt-2 font-[JetBrains_Mono,monospace]">A preview of today&apos;s picks · Sign in to unlock the full live feed</p>
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-1.5 border border-emerald-500/20 bg-emerald-500/8 rounded-full px-3 py-1.5">
@@ -25,7 +25,7 @@ export default function PredictionsMarketingPage({ nav }: { nav: (p: Page) => vo
           {cats.map(cat => (
             <span key={cat} className={cn(
               "px-4 py-1.5 rounded border font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest",
-              cat === "all" ? "bg-[#D4AF37] text-[#070E1A] border-[#D4AF37]" : "bg-card border-[#D4AF37]/8 text-white/40"
+              cat === "all" ? "bg-[#D4AF37] text-[#070E1A] border-[#D4AF37]" : "bg-card border-[#D4AF37]/8 text-white"
             )}>
               {cat === "all" ? "All" : cat}
             </span>
@@ -43,7 +43,7 @@ export default function PredictionsMarketingPage({ nav }: { nav: (p: Page) => vo
             <Lock size={20} className="text-[#D4AF37]" />
           </div>
           <h3 className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-white mb-2">SEE EVERY PICK, LIVE</h3>
-          <p className="text-[13px] text-white/35 mb-6">Create a free account to access the full daily intelligence feed, category filters and live results.</p>
+          <p className="text-[16px] text-white mb-6">Create a free account to access the full daily intelligence feed, category filters and live results.</p>
           <div className="flex items-center justify-center gap-3">
             <GoldBtn onClick={() => nav("register")} size="md">Get Lab Access <ArrowRight size={14} /></GoldBtn>
             <GoldBtn onClick={() => nav("login")} size="md" outline>Sign In</GoldBtn>

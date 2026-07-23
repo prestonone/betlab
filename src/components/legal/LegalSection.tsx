@@ -12,7 +12,7 @@ export default function LegalSection({ section }: { section: LegalSectionData })
           return (
             <div key={i} className="space-y-3 mb-3">
               {block.items.map((p, j) => (
-                <p key={j} className="text-[13px] leading-relaxed text-white/72">{p}</p>
+                <p key={j} className="text-[16px] leading-relaxed text-white">{p}</p>
               ))}
             </div>
           );
@@ -22,7 +22,7 @@ export default function LegalSection({ section }: { section: LegalSectionData })
           return (
             <Tag key={i} className={block.ordered ? "list-decimal pl-5 space-y-1.5 mb-3" : "list-disc pl-5 space-y-1.5 mb-3"}>
               {block.items.map((item, j) => (
-                <li key={j} className="text-[13px] leading-relaxed text-white/72">{item}</li>
+                <li key={j} className="text-[16px] leading-relaxed text-white">{item}</li>
               ))}
             </Tag>
           );

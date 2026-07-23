@@ -102,7 +102,7 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
           {links.map(l => (
             <button key={l.p} onClick={() => nav(l.p)} className={cn(
               "text-[13px] transition-colors cursor-pointer relative py-1",
-              page === l.p ? "text-[#D4AF37]" : "text-white/50 hover:text-white/85"
+              page === l.p ? "text-[#D4AF37]" : "text-white hover:text-[#D4AF37]"
             )}>
               {l.label}
               {page === l.p && <span className="absolute bottom-0 inset-x-0 h-px bg-[#D4AF37]/60" />}
@@ -116,7 +116,7 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
             <>
               {/* Notifications */}
               <div className="relative">
-                <button onClick={() => setNotifOpen(!notifOpen)} className="relative w-8 h-8 flex items-center justify-center rounded border border-[#D4AF37]/15 text-white/40 hover:text-[#D4AF37] hover:border-[#D4AF37]/35 transition-all cursor-pointer">
+                <button onClick={() => setNotifOpen(!notifOpen)} className="relative w-8 h-8 flex items-center justify-center rounded border border-[#D4AF37]/15 text-white hover:text-[#D4AF37] hover:border-[#D4AF37]/35 transition-all cursor-pointer">
                   <Bell size={14} />
                   {unread > 0 && <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />}
                 </button>
@@ -124,17 +124,17 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
                   <div className="absolute right-0 top-full mt-2 w-80 bg-[#111C2E] border border-[#D4AF37]/15 rounded-lg shadow-2xl overflow-hidden z-50">
                     <div className="px-4 py-2.5 border-b border-white/[0.05] flex items-center justify-between">
                       <span className="font-[JetBrains_Mono,monospace] text-[10px] text-[#D4AF37] uppercase tracking-widest">Notifications</span>
-                      {unread > 0 && <span className="font-[JetBrains_Mono,monospace] text-[10px] text-white/30">{unread} unread</span>}
+                      {unread > 0 && <span className="font-[JetBrains_Mono,monospace] text-[13px] text-white">{unread} unread</span>}
                     </div>
                     {notifications.length === 0 && (
-                      <p className="px-4 py-6 text-[12px] text-white/30 text-center">Nothing new right now.</p>
+                      <p className="px-4 py-6 text-[15px] text-white text-center">Nothing new right now.</p>
                     )}
                     {notifications.map((n, i) => (
                       <div key={i} className={cn("px-4 py-3 border-b border-white/[0.04] hover:bg-white/[0.02] transition-colors cursor-pointer flex gap-3", n.unread && "bg-[#D4AF37]/[0.03]")}>
                         <span className="text-sm mt-0.5 flex-shrink-0">{n.icon}</span>
                         <div>
-                          <p className="text-[12px] text-white/75 leading-snug">{n.text}</p>
-                          {n.time && <p className="font-[JetBrains_Mono,monospace] text-[10px] text-white/25 mt-1">{n.time}</p>}
+                          <p className="text-[15px] text-white leading-snug">{n.text}</p>
+                          {n.time && <p className="font-[JetBrains_Mono,monospace] text-[13px] text-white mt-1">{n.time}</p>}
                         </div>
                         {n.unread && <div className="w-1.5 h-1.5 rounded-full bg-[#D4AF37] flex-shrink-0 mt-1.5 ml-auto" />}
                       </div>
@@ -149,22 +149,22 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
                   <span className="text-[#D4AF37] text-[10px] font-bold">{initials}</span>
                 </div>
                 <div className="hidden sm:block">
-                  <p className="text-[12px] font-medium text-white leading-none">{displayName.split(" ")[0]}</p>
+                  <p className="text-[15px] font-medium text-white leading-none">{displayName.split(" ")[0]}</p>
                   <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] mt-0.5">{planLabel}</p>
                 </div>
-                <button onClick={() => { setAuthed(false); nav("home"); }} className="ml-1 text-white/25 hover:text-white/60 transition-colors cursor-pointer">
+                <button onClick={() => { setAuthed(false); nav("home"); }} className="ml-1 text-white hover:text-[#D4AF37] transition-colors cursor-pointer">
                   <LogOut size={13} />
                 </button>
               </div>
             </>
           ) : (
             <>
-              <button onClick={() => nav("login")} className="text-[13px] text-white/50 hover:text-white transition-colors cursor-pointer">Sign In</button>
+              <button onClick={() => nav("login")} className="text-[16px] text-white hover:text-white transition-colors cursor-pointer">Sign In</button>
               <GoldBtn onClick={() => nav("register")} size="sm">Get Access</GoldBtn>
             </>
           )}
 
-          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-white/50 hover:text-white transition-colors cursor-pointer ml-1">
+          <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden text-white hover:text-white transition-colors cursor-pointer ml-1">
             {mobileOpen ? <X size={18} /> : <Menu size={18} />}
           </button>
         </div>
@@ -176,7 +176,7 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
           <nav className="px-4 py-3 flex flex-col gap-0.5">
             {links.map(l => (
               <button key={l.p} onClick={() => { nav(l.p); setMobileOpen(false); }}
-                className={cn("text-left px-3 py-2.5 rounded text-[13px] transition-colors", page === l.p ? "text-[#D4AF37] bg-[#D4AF37]/8" : "text-white/60 hover:text-white hover:bg-white/[0.03]")}>
+                className={cn("text-left px-3 py-2.5 rounded text-[16px] transition-colors", page === l.p ? "text-[#D4AF37] bg-[#D4AF37]/8" : "text-white hover:text-white hover:bg-white/[0.03]")}>
                 {l.label}
               </button>
             ))}

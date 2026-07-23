@@ -56,21 +56,21 @@ export default function LegalCentrePage({ onOpen, onOpenRoute }: { onOpen: (slug
         <div className="text-center mb-10">
           <SectionEyebrow>Legal &amp; Policies</SectionEyebrow>
           <h1 className="font-['Rajdhani',sans-serif] font-bold text-[44px] sm:text-[56px] text-white mb-4">LEGAL CENTRE</h1>
-          <p className="text-white/40 max-w-xl mx-auto text-[14px]">
+          <p className="text-white max-w-xl mx-auto text-[14px]">
             Every policy governing your use of Bet Lab, in one place. Bet Lab is a football analysis subscription
             service, not a bookmaker - see our Disclaimer and Risk Disclosure for details.
           </p>
         </div>
 
         <div className="max-w-md mx-auto mb-10 relative">
-          <Search size={14} aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white/25" />
+          <Search size={14} aria-hidden="true" className="absolute left-3.5 top-1/2 -translate-y-1/2 text-white" />
           <input
             type="search"
             value={query}
             onChange={e => setQuery(e.target.value)}
             placeholder="Search policies by title, keyword or heading..."
             aria-label="Search legal policies"
-            className="w-full bg-card border border-[#D4AF37]/12 rounded-lg pl-10 pr-4 py-2.5 text-[13px] text-white placeholder-white/25 focus:outline-none focus-visible:border-[#D4AF37]/60 transition-colors"
+            className="w-full bg-card border border-[#D4AF37]/12 rounded-lg pl-10 pr-4 py-2.5 text-[16px] text-white placeholder-white/25 focus:outline-none focus-visible:border-[#D4AF37]/60 transition-colors"
           />
         </div>
 
@@ -79,7 +79,7 @@ export default function LegalCentrePage({ onOpen, onOpenRoute }: { onOpen: (slug
         </div>
 
         {visibleDocuments.length === 0 && (
-          <p className="text-center text-[13px] text-white/35 mb-14">No policies match &quot;{query}&quot;.</p>
+          <p className="text-center text-[16px] text-white mb-14">No policies match &quot;{query}&quot;.</p>
         )}
 
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-14">
@@ -95,8 +95,8 @@ export default function LegalCentrePage({ onOpen, onOpenRoute }: { onOpen: (slug
                   <Icon size={16} aria-hidden="true" />
                 </div>
                 <h3 className="font-['Rajdhani',sans-serif] font-bold text-[17px] text-white mb-1.5">{doc.shortTitle}</h3>
-                <p className="text-[13px] text-white/50 leading-relaxed mb-3">{doc.summary}</p>
-                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">
+                <p className="text-[16px] text-white leading-relaxed mb-3">{doc.summary}</p>
+                <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest">
                   v{doc.version} &middot; {new Date(doc.effectiveDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                 </p>
               </button>
@@ -107,21 +107,21 @@ export default function LegalCentrePage({ onOpen, onOpenRoute }: { onOpen: (slug
         <div className="flex flex-wrap items-center justify-center gap-3 mb-14">
           <button
             onClick={() => onOpenRoute("/legal/changes")}
-            className="flex items-center gap-2 font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-widest text-white/40 hover:text-[#D4AF37] transition-colors cursor-pointer border border-white/10 hover:border-[#D4AF37]/30 rounded-full px-4 py-2"
+            className="flex items-center gap-2 font-[JetBrains_Mono,monospace] text-[12px] uppercase tracking-widest text-white hover:text-[#D4AF37] transition-colors cursor-pointer border border-white/10 hover:border-[#D4AF37]/30 rounded-full px-4 py-2"
           >
             <History size={12} aria-hidden="true" /> Policy Change Log
           </button>
           <button
             onClick={() => onOpenRoute("/legal/contact")}
-            className="flex items-center gap-2 font-[JetBrains_Mono,monospace] text-[10px] uppercase tracking-widest text-white/40 hover:text-[#D4AF37] transition-colors cursor-pointer border border-white/10 hover:border-[#D4AF37]/30 rounded-full px-4 py-2"
+            className="flex items-center gap-2 font-[JetBrains_Mono,monospace] text-[12px] uppercase tracking-widest text-white hover:text-[#D4AF37] transition-colors cursor-pointer border border-white/10 hover:border-[#D4AF37]/30 rounded-full px-4 py-2"
           >
             <Mail size={12} aria-hidden="true" /> Legal Contact Form
           </button>
         </div>
 
         <div className="max-w-lg mx-auto text-center bg-card border border-[#D4AF37]/10 rounded-lg p-6">
-          <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest mb-2">Questions</p>
-          <p className="text-[13px] text-white/60 leading-relaxed">
+          <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase tracking-widest mb-2">Questions</p>
+          <p className="text-[16px] text-white leading-relaxed">
             Support: {LEGAL_SUPPORT_EMAIL}<br />
             Legal: {LEGAL_EMAIL}<br />
             Privacy: {LEGAL_PRIVACY_EMAIL}
