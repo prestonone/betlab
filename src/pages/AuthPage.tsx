@@ -217,7 +217,7 @@ export default function AuthPage({ mode, nav }: {
                 <button
                   type="button"
                   onClick={() => { setShowForgot(false); setForgotSent(false); setForgotEmail(""); }}
-                  className="text-[11px] text-[#D4AF37]/60 hover:text-[#D4AF37] cursor-pointer"
+                  className="text-[13px] text-[#D4AF37]/60 hover:text-[#D4AF37] cursor-pointer"
                 >
                   Back to sign in
                 </button>
@@ -357,7 +357,7 @@ export default function AuthPage({ mode, nav }: {
                   <input type="checkbox" className="w-3 h-3 accent-[#D4AF37]" />
                   <span className="text-[14px] text-white">Remember me</span>
                 </label>
-                <button type="button" onClick={() => setShowForgot(true)} className="text-[11px] text-[#D4AF37]/60 hover:text-[#D4AF37] cursor-pointer">Forgot password?</button>
+                <button type="button" onClick={() => setShowForgot(true)} className="text-[13px] text-[#D4AF37]/60 hover:text-[#D4AF37] cursor-pointer">Forgot password?</button>
               </div>
             )}
 

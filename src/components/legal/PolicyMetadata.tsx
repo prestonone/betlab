@@ -7,7 +7,7 @@ export default function PolicyMetadata({ version, effectiveDate }: { version: st
 
   return (
     <div className="flex flex-wrap items-center gap-2 print:hidden">
-      <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-[#D4AF37] border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-2.5 py-1 rounded-full">
+      <span className="font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-[#D4AF37] border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-2.5 py-1 rounded-full">
         Version {version}
       </span>
       <span className="font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-white border border-white/10 px-2.5 py-1 rounded-full">

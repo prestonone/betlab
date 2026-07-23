@@ -208,7 +208,7 @@ export function SectionEyebrow({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex items-center gap-3 mb-3">
       <div className="h-px w-7 bg-[#D4AF37]" />
-      <span className="font-[JetBrains_Mono,monospace] text-[10px] text-[#D4AF37] uppercase tracking-[0.2em]">{children}</span>
+      <span className="font-[JetBrains_Mono,monospace] text-[12px] text-[#D4AF37] uppercase tracking-[0.2em]">{children}</span>
     </div>
   );
 }
@@ -301,7 +301,7 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
             <p className="font-[JetBrains_Mono,monospace] text-[11px] text-white uppercase mt-0.5 tracking-wider">Home</p>
           </div>
           <div className="w-9 h-9 rounded-full bg-[#162036] border border-[#D4AF37]/15 flex items-center justify-center flex-shrink-0">
-            <span className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] font-bold">VS</span>
+            <span className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37] font-bold">VS</span>
           </div>
           <div className="flex-1">
             <p className="font-['Rajdhani',sans-serif] font-bold text-[22px] text-white leading-none">{pred.away}</p>
@@ -337,13 +337,13 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
         <div className="flex items-center justify-between pt-3 border-t border-white/[0.05]">
           <div className="flex items-center gap-2">
             <div className="w-5 h-5 rounded-full bg-[#D4AF37]/15 flex items-center justify-center">
-              <span className="font-bold text-[#D4AF37] text-[8px]">{pred.analyst.split(" ").map(w => w[0]).filter((_, i, a) => i === 0 || i === a.length - 1).join("")}</span>
+              <span className="font-bold text-[#D4AF37] text-[10px]">{pred.analyst.split(" ").map(w => w[0]).filter((_, i, a) => i === 0 || i === a.length - 1).join("")}</span>
             </div>
             <span className="text-[14px] text-white">{pred.analyst}</span>
           </div>
           <button
             onClick={() => setOpen(!open)}
-            className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/60 hover:text-[#D4AF37] transition-colors uppercase tracking-widest flex items-center gap-1 cursor-pointer"
+            className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37]/60 hover:text-[#D4AF37] transition-colors uppercase tracking-widest flex items-center gap-1 cursor-pointer"
           >
             Analysis <ChevronDown size={9} className={cn("transition-transform duration-200", open && "rotate-180")} />
           </button>
@@ -476,7 +476,7 @@ export function ApiPredictionCard({
 
           <button
             onClick={() => setOpen(!open)}
-            className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/60 hover:text-[#D4AF37] transition-colors uppercase tracking-widest flex items-center gap-1 cursor-pointer"
+            className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37]/60 hover:text-[#D4AF37] transition-colors uppercase tracking-widest flex items-center gap-1 cursor-pointer"
           >
             Analysis
             <ChevronDown

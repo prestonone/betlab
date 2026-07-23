@@ -93,7 +93,7 @@ export default function MatchCentrePage() {
           <section>
             <div className="flex items-end justify-between mb-4">
               <div>
-                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/70 uppercase tracking-widest mb-1">
+                <p className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37]/70 uppercase tracking-widest mb-1">
                   Bet Lab intelligence
                 </p>
 
@@ -159,7 +159,7 @@ export default function MatchCentrePage() {
                     >
                       <div className="flex items-start justify-between gap-4 mb-4">
                         <div>
-                          <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/65 uppercase tracking-wider mb-1">
+                          <p className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37]/65 uppercase tracking-wider mb-1">
                             {item.selection.league}
                           </p>
 
@@ -170,7 +170,7 @@ export default function MatchCentrePage() {
                           </h3>
                         </div>
 
-                        <span className="shrink-0 rounded-full border border-[#D4AF37]/15 bg-[#D4AF37]/[0.05] px-2.5 py-1 font-[JetBrains_Mono,monospace] text-[8px] text-[#D4AF37] uppercase tracking-wider">
+                        <span className="shrink-0 rounded-full border border-[#D4AF37]/15 bg-[#D4AF37]/[0.05] px-2.5 py-1 font-[JetBrains_Mono,monospace] text-[10px] text-[#D4AF37] uppercase tracking-wider">
                           {item.category}
                         </span>
                       </div>
@@ -223,7 +223,7 @@ export default function MatchCentrePage() {
           <section>
             <div className="flex items-end justify-between mb-4">
               <div>
-                <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/70 uppercase tracking-widest mb-1">
+                <p className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37]/70 uppercase tracking-widest mb-1">
                   Live football
                 </p>
 
@@ -249,7 +249,7 @@ export default function MatchCentrePage() {
                     <Activity size={25} className="text-[#D4AF37]" />
                   </div>
 
-                  <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/65 uppercase tracking-[0.2em] mb-3">
+                  <p className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37]/65 uppercase tracking-[0.2em] mb-3">
                     Live-score providers
                   </p>
 

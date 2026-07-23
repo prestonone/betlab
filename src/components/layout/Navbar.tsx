@@ -123,7 +123,7 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
                 {notifOpen && (
                   <div className="absolute right-0 top-full mt-2 w-80 bg-[#111C2E] border border-[#D4AF37]/15 rounded-lg shadow-2xl overflow-hidden z-50">
                     <div className="px-4 py-2.5 border-b border-white/[0.05] flex items-center justify-between">
-                      <span className="font-[JetBrains_Mono,monospace] text-[10px] text-[#D4AF37] uppercase tracking-widest">Notifications</span>
+                      <span className="font-[JetBrains_Mono,monospace] text-[12px] text-[#D4AF37] uppercase tracking-widest">Notifications</span>
                       {unread > 0 && <span className="font-[JetBrains_Mono,monospace] text-[13px] text-white">{unread} unread</span>}
                     </div>
                     {notifications.length === 0 && (
@@ -146,11 +146,11 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
               {/* User pill */}
               <div className="flex items-center gap-2.5 pl-2.5 border-l border-white/8">
                 <div className="w-7 h-7 rounded-full bg-[#D4AF37]/18 border border-[#D4AF37]/30 flex items-center justify-center">
-                  <span className="text-[#D4AF37] text-[10px] font-bold">{initials}</span>
+                  <span className="text-[#D4AF37] text-[12px] font-bold">{initials}</span>
                 </div>
                 <div className="hidden sm:block">
                   <p className="text-[15px] font-medium text-white leading-none">{displayName.split(" ")[0]}</p>
-                  <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] mt-0.5">{planLabel}</p>
+                  <p className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37] mt-0.5">{planLabel}</p>
                 </div>
                 <button onClick={() => { setAuthed(false); nav("home"); }} className="ml-1 text-white hover:text-[#D4AF37] transition-colors cursor-pointer">
                   <LogOut size={13} />

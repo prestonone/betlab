@@ -56,7 +56,7 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
             </div>
             <div className="bg-card border border-[#D4AF37]/8 rounded-lg px-3.5 py-2">
               <span className="font-[JetBrains_Mono,monospace] text-[12px] text-white">Avg confidence: </span>
-              <span className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] font-bold">73.8%</span>
+              <span className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37] font-bold">73.8%</span>
             </div>
           </div>
         </div>

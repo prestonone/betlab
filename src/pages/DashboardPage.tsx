@@ -296,7 +296,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
             <p className="font-[JetBrains_Mono,monospace] text-[12px] text-white">
               {hasSubscription ? `Expires ${expiryLabel} · ${daysLeft}d left` : "Choose a plan to unlock Lab access"}
             </p>
-            <button onClick={() => nav("pricing")} className="mt-3 w-full text-center font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/50 hover:text-[#D4AF37] transition-colors cursor-pointer uppercase tracking-widest">
+            <button onClick={() => nav("pricing")} className="mt-3 w-full text-center font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37]/50 hover:text-[#D4AF37] transition-colors cursor-pointer uppercase tracking-widest">
               Upgrade Plan →
             </button>
           </div>
@@ -327,7 +327,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
             </div>
           )}
           {user && !user.is_email_verified && (
-            <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-4 py-3 text-[12px] text-[#D4AF37]" role="status">
+            <div className="mb-6 flex flex-wrap items-center gap-3 rounded-lg border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-4 py-3 text-[13px] text-[#D4AF37]" role="status">
               <MailWarning size={15} className="flex-shrink-0" />
               <span className="flex-1">
                 {resendState === "sent"
@@ -338,7 +338,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                 <button
                   onClick={resendVerification}
                   disabled={resendState === "sending"}
-                  className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-[#D4AF37] underline underline-offset-2 hover:text-[#D4AF37]/80 disabled:opacity-50 cursor-pointer"
+                  className="font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-[#D4AF37] underline underline-offset-2 hover:text-[#D4AF37]/80 disabled:opacity-50 cursor-pointer"
                 >
                   {resendState === "sending" ? "Sending..." : resendState === "error" ? "Retry" : "Resend email"}
                 </button>
@@ -446,7 +446,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                       );
                     })}
                   </div>
-                  <button onClick={() => setSection("results")} className="mt-4 w-full text-center font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/50 hover:text-[#D4AF37] transition-colors cursor-pointer pt-3 border-t border-white/[0.04] uppercase tracking-widest">
+                  <button onClick={() => setSection("results")} className="mt-4 w-full text-center font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37]/50 hover:text-[#D4AF37] transition-colors cursor-pointer pt-3 border-t border-white/[0.04] uppercase tracking-widest">
                     View all results →
                   </button>
                 </div>
@@ -456,7 +456,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
               <div>
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="font-['Rajdhani',sans-serif] font-bold text-[22px] text-white">Today&apos;s Top Picks</h3>
-                  <button onClick={() => nav("predictions")} className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37]/60 hover:text-[#D4AF37] uppercase tracking-widest cursor-pointer">View all →</button>
+                  <button onClick={() => nav("predictions")} className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37]/60 hover:text-[#D4AF37] uppercase tracking-widest cursor-pointer">View all →</button>
                 </div>
                 {predictionsError && <p className="text-[12px] text-rose-400">{predictionsError}</p>}
                 {!predictionsError && stats.todaysPicks.length === 0 && (
@@ -619,7 +619,7 @@ export default function DashboardPage({ nav }: { nav: (p: Page) => void }) {
                             </div>
                             <button
                               onClick={() => nav("legal")}
-                              className="shrink-0 font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-[#D4AF37]/60 hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors cursor-pointer"
+                              className="shrink-0 font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-[#D4AF37]/60 hover:text-[#D4AF37] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#D4AF37] transition-colors cursor-pointer"
                             >
                               View
                             </button>

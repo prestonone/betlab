@@ -27,7 +27,7 @@ export default function AboutPage({ nav }: { nav: (p: Page) => void }) {
           <div className="absolute inset-0 bg-gradient-to-br from-[#1A2845]/60 to-[#111C2E] pointer-events-none" />
           <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#D4AF37]/30 to-transparent" />
           <div className="relative text-center max-w-2xl mx-auto">
-            <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] uppercase tracking-widest mb-4">Mission Statement</p>
+            <p className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37] uppercase tracking-widest mb-4">Mission Statement</p>
             <p className="font-['Rajdhani',sans-serif] font-bold text-[22px] text-white leading-relaxed">
               &ldquo;To build the most transparent, data-driven football intelligence platform in the world — where every prediction is traceable, every result is accountable, and every subscriber makes more informed decisions.&rdquo;
             </p>
@@ -56,11 +56,11 @@ export default function AboutPage({ nav }: { nav: (p: Page) => void }) {
             {team.map((t, i) => (
               <div key={i} className="bg-card border border-[#D4AF37]/8 rounded-lg p-5 flex gap-4">
                 <div className="w-11 h-11 rounded-lg bg-[#D4AF37]/12 border border-[#D4AF37]/20 flex items-center justify-center flex-shrink-0">
-                  <span className="font-bold text-[#D4AF37] text-[12px]">{t.initials}</span>
+                  <span className="font-bold text-[#D4AF37] text-[13px]">{t.initials}</span>
                 </div>
                 <div>
                   <h3 className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white leading-none">{t.name}</h3>
-                  <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] uppercase tracking-widest mb-2 mt-0.5">{t.role}</p>
+                  <p className="font-[JetBrains_Mono,monospace] text-[11px] text-[#D4AF37] uppercase tracking-widest mb-2 mt-0.5">{t.role}</p>
                   <p className="text-[16px] text-white leading-relaxed">{t.bio}</p>
                 </div>
               </div>

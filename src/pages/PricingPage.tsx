@@ -146,7 +146,7 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
                 <div className="p-7">
                   {plan.highlight && (
                     <div className="mb-3">
-                      <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-[#D4AF37] border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-2.5 py-1 rounded-full">Recommended</span>
+                      <span className="font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-[#D4AF37] border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-2.5 py-1 rounded-full">Recommended</span>
                     </div>
                   )}
                   <h3 className="font-['Rajdhani',sans-serif] font-bold text-[24px] text-white mb-1">{plan.name}</h3>

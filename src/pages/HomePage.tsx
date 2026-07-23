@@ -205,7 +205,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
               <div className="p-7">
                 {plan.highlight && (
                   <div className="mb-3">
-                    <span className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest text-[#D4AF37] border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-2.5 py-1 rounded-full">Most Popular</span>
+                    <span className="font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-widest text-[#D4AF37] border border-[#D4AF37]/25 bg-[#D4AF37]/8 px-2.5 py-1 rounded-full">Most Popular</span>
                   </div>
                 )}
                 <h3 className="font-['Rajdhani',sans-serif] font-bold text-[24px] text-white mb-1">{plan.name}</h3>
@@ -249,7 +249,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
                 <p className="text-[16px] text-white leading-relaxed mb-5">&ldquo;{t.quote}&rdquo;</p>
                 <div className="flex items-center gap-3 pt-4 border-t border-white/[0.04]">
                   <div className="w-8 h-8 rounded-full bg-[#D4AF37]/12 border border-[#D4AF37]/22 flex items-center justify-center">
-                    <span className="font-bold text-[#D4AF37] text-[10px]">{t.avatar}</span>
+                    <span className="font-bold text-[#D4AF37] text-[12px]">{t.avatar}</span>
                   </div>
                   <div>
                     <p className="text-[16px] font-medium text-white">{t.name}</p>
