@@ -40,7 +40,7 @@ export default function LegalPageLayout({ doc, onBack }: { doc: LegalDocument; o
         <h1 className="font-['Rajdhani',sans-serif] font-bold text-[36px] sm:text-[44px] text-white leading-tight mb-3">
           {doc.title}
         </h1>
-        <p className="text-white/45 text-[14px] max-w-2xl mb-4">{doc.summary}</p>
+        <p className="text-white/60 text-[14px] max-w-2xl mb-4">{doc.summary}</p>
         <div className="flex items-center gap-3 mb-10">
           <PolicyMetadata version={doc.version} effectiveDate={doc.effectiveDate} />
           <button

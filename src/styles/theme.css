@@ -193,11 +193,11 @@
     46%, 54% { transform: translate(38px, -8px) rotate(7deg) scale(1.02); opacity: 1; }
   }
 
-  .animate-fade-up { animation: fade-up 0.5s ease both; }
+  .animate-fade-up { animation: fade-up 0.35s ease both; }
   .animate-football-flight { animation: football-flight 3.1s cubic-bezier(0.33, 1, 0.68, 1) both; }
-  .animate-fan-back { animation: fan-back 9s ease-in-out infinite; }
-  .animate-fan-mid { animation: fan-mid 9s ease-in-out infinite; }
-  .animate-fan-front { animation: fan-front 9s ease-in-out infinite; }
+  .animate-fan-back { animation: fan-back 6s ease-in-out infinite; }
+  .animate-fan-mid { animation: fan-mid 6s ease-in-out infinite; }
+  .animate-fan-front { animation: fan-front 6s ease-in-out infinite; }
 
   @keyframes logo-bar-pulse {
     0%, 100% { transform: scaleY(0.5); }
@@ -213,10 +213,10 @@
   .logo-bar-3 { animation-delay: 0.4s; }
   .animate-fade-in { animation: fade-in 0.4s ease both; }
   .animate-ticker { animation: ticker-scroll 28s linear infinite; }
-  .delay-100 { animation-delay: 0.1s; }
-  .delay-200 { animation-delay: 0.2s; }
-  .delay-300 { animation-delay: 0.3s; }
-  .delay-400 { animation-delay: 0.4s; }
+  .delay-100 { animation-delay: 0.06s; }
+  .delay-200 { animation-delay: 0.12s; }
+  .delay-300 { animation-delay: 0.18s; }
+  .delay-400 { animation-delay: 0.24s; }
   .delay-500 { animation-delay: 0.5s; }
   .delay-600 { animation-delay: 0.6s; }
   .delay-700 { animation-delay: 0.7s; }

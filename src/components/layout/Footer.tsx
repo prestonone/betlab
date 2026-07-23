@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ChevronDown } from "lucide-react";
 import AnimatedLogoMark from "../AnimatedLogoMark";
+import { cn } from "../../app/shared";
 import type { PolicySlug } from "../../legal/types";
 
 type Page =
@@ -16,6 +19,7 @@ type Page =
 
 export default function Footer({ nav }: { nav: (p: Page) => void }) {
   const navigate = useNavigate();
+  const [legalOpen, setLegalOpen] = useState(false);
   const goToPolicy = (slug: PolicySlug) => {
     navigate(`/legal/${slug}`);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -29,7 +33,7 @@ export default function Footer({ nav }: { nav: (p: Page) => void }) {
             <AnimatedLogoMark size={24} radius={4} />
             <span className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white tracking-wide">BET<span className="text-[#D4AF37]">LAB</span></span>
           </div>
-          <p className="text-[12px] text-white/35 leading-relaxed mb-4">Premium football intelligence platform. Data-driven predictions for serious analysts.</p>
+          <p className="text-[13px] text-white/50 leading-relaxed mb-4">Premium football intelligence platform. Data-driven predictions for serious analysts.</p>
           <p className="text-[10px] font-[JetBrains_Mono,monospace] text-white/20 leading-relaxed">Bet Lab is a sports analytics subscription service. We are not a bookmaker. Please gamble responsibly. 18+ only.</p>
         </div>
         {[
@@ -46,29 +50,39 @@ export default function Footer({ nav }: { nav: (p: Page) => void }) {
           </div>
         ))}
         <div className="lg:col-span-2">
-          <h4 className="font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.2em] text-[#D4AF37] mb-4">Legal &amp; Policies</h4>
-          <ul className="grid grid-cols-2 gap-x-4 gap-y-2.5">
-            {(
-              [
-                ["Terms of Service", "terms-of-service"],
-                ["Privacy Policy", "privacy"],
-                ["Refund & Subscription", "refund-policy"],
-                ["Disclaimer & Risk Disclosure", "disclaimer"],
-                ["Responsible Gambling", "responsible-gambling"],
-                ["Cookie Policy", "cookies"],
-                ["Copyright Policy", "copyright"],
-                ["Acceptable Use", "acceptable-use"],
-                ["AML/KYC Statement", "aml-kyc"],
-                ["Prediction Methodology", "methodology"],
-              ] as [string, PolicySlug][]
-            ).map(([label, slug]) => (
-              <li key={slug}>
-                <button onClick={() => goToPolicy(slug)} className="text-[12px] text-white/35 hover:text-white/75 transition-colors cursor-pointer text-left">
-                  {label}
-                </button>
-              </li>
-            ))}
-          </ul>
+          <button
+            onClick={() => setLegalOpen(o => !o)}
+            aria-expanded={legalOpen}
+            aria-controls="footer-legal-links"
+            className="flex items-center gap-1.5 w-full font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.2em] text-[#D4AF37] mb-4 cursor-pointer"
+          >
+            Legal &amp; Policies
+            <ChevronDown size={11} className={cn("transition-transform duration-200", legalOpen && "rotate-180")} />
+          </button>
+          {legalOpen && (
+            <ul id="footer-legal-links" className="grid grid-cols-2 gap-x-4 gap-y-2.5 animate-fade-in">
+              {(
+                [
+                  ["Terms of Service", "terms-of-service"],
+                  ["Privacy Policy", "privacy"],
+                  ["Refund & Subscription", "refund-policy"],
+                  ["Disclaimer & Risk Disclosure", "disclaimer"],
+                  ["Responsible Gambling", "responsible-gambling"],
+                  ["Cookie Policy", "cookies"],
+                  ["Copyright Policy", "copyright"],
+                  ["Acceptable Use", "acceptable-use"],
+                  ["AML/KYC Statement", "aml-kyc"],
+                  ["Prediction Methodology", "methodology"],
+                ] as [string, PolicySlug][]
+              ).map(([label, slug]) => (
+                <li key={slug}>
+                  <button onClick={() => goToPolicy(slug)} className="text-[12px] text-white/35 hover:text-white/75 transition-colors cursor-pointer text-left">
+                    {label}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       </div>
       <div className="border-t border-[#D4AF37]/8 py-4">

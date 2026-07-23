@@ -192,7 +192,7 @@ export default function PricingPage({ nav, authed }: { nav: (p: Page) => void; a
                 <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white">One more thing</h3>
                 <button onClick={() => setPendingPlan(null)} className="text-white/30 hover:text-white/60 cursor-pointer"><X size={16} /></button>
               </div>
-              <p className="text-[12px] text-white/45 mb-4">Before we take you to checkout for {pendingPlan.name}, please confirm:</p>
+              <p className="text-[13px] text-white/60 mb-4">Before we take you to checkout for {pendingPlan.name}, please confirm:</p>
               <ConsentCheckbox id="pricing-refund-consent" checked={refundAccepted} onChange={setRefundAccepted}>
                 I have reviewed the <PolicyLink slug="refund-policy">Refund and Subscription Policy</PolicyLink> and understand the applicable billing, cancellation and refund terms.
               </ConsentCheckbox>
@@ -225,7 +225,7 @@ function FaqRow({ q, a }: { q: string; a: string }) {
       </button>
       {open && (
         <div className="px-5 pb-4 border-t border-white/[0.04]">
-          <p className="text-[12px] text-white/45 leading-relaxed pt-3">{a}</p>
+          <p className="text-[13px] text-white/60 leading-relaxed pt-3">{a}</p>
         </div>
       )}
     </div>

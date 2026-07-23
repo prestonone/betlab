@@ -70,7 +70,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
                 <span className="text-[#D4AF37]">REFINED.</span>
               </h1>
 
-              <p className="text-white/50 text-[16px] leading-relaxed mb-8 max-w-[500px] animate-fade-up delay-200">
+              <p className="text-white/62 text-[16px] leading-relaxed mb-8 max-w-[500px] animate-fade-up delay-200">
                 Curated football predictions for members who want clear, disciplined daily selections. Every prediction is backed by deep statistical modelling and expert verification—not gut feeling or punditry.
               </p>
 
@@ -141,18 +141,18 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
           <h2 className="font-['Rajdhani',sans-serif] font-bold text-[48px] sm:text-[60px] text-white mb-3">
             DATA-DRIVEN. ANALYST-VERIFIED.
           </h2>
-          <p className="text-white/40 max-w-lg mx-auto text-[14px] leading-relaxed">
+          <p className="text-white/55 max-w-lg mx-auto text-[14px] leading-relaxed">
             We treat football prediction as a serious analytical discipline — building models that surface genuine edge, not noise.
           </p>
         </div>
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {features.map((f, i) => (
-            <div key={i} className="bg-card border border-[#D4AF37]/8 rounded-lg p-6 group hover:border-[#D4AF37]/20 transition-all duration-300 hover:bg-[#111C2E]">
+            <div key={i} className="bg-card border border-[#D4AF37]/8 rounded-lg p-6 group hover:border-[#D4AF37]/20 transition-all duration-200 hover:bg-[#111C2E]">
               <div className="w-9 h-9 rounded bg-[#D4AF37]/10 border border-[#D4AF37]/15 flex items-center justify-center text-[#D4AF37] mb-4 group-hover:bg-[#D4AF37]/18 transition-colors">
                 {f.icon}
               </div>
               <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1.5">{f.title}</h3>
-              <p className="text-[12px] text-white/40 leading-relaxed">{f.desc}</p>
+              <p className="text-[13px] text-white/55 leading-relaxed">{f.desc}</p>
             </div>
           ))}
         </div>
@@ -191,12 +191,12 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
           <h2 className="font-['Rajdhani',sans-serif] font-bold text-[48px] sm:text-[56px] text-white mb-3">
             CHOOSE YOUR EDGE
           </h2>
-          <p className="text-white/40 max-w-md mx-auto text-[13px]">Choose the access period that works for you. Payments will be secured with Paystack.</p>
+          <p className="text-white/55 max-w-md mx-auto text-[13px]">Choose the access period that works for you. Payments will be secured with Paystack.</p>
         </div>
         <div className="grid md:grid-cols-3 gap-4">
           {plans.map((plan, i) => (
             <div key={i} className={cn(
-              "relative border rounded-lg overflow-hidden transition-all duration-300",
+              "relative border rounded-lg overflow-hidden transition-all duration-200",
               plan.highlight
                 ? "bg-gradient-to-b from-[#1A2A45] to-[#111C2E] border-[#D4AF37]/40 shadow-[0_0_50px_rgba(212,175,55,0.1)]"
                 : "bg-card border-[#D4AF37]/8 hover:border-[#D4AF37]/20"
@@ -271,7 +271,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
           <h2 className="font-['Rajdhani',sans-serif] font-bold text-[44px] sm:text-[56px] text-white mb-3 leading-tight">
             DAILY PICKS.<br />SIMPLE LAB ACCESS.
           </h2>
-          <p className="text-white/40 mb-8 max-w-md mx-auto text-[14px]">Create an account, choose an access plan and receive carefully selected daily football picks in one simple dashboard.</p>
+          <p className="text-white/55 mb-8 max-w-md mx-auto text-[14px]">Create an account, choose an access plan and receive carefully selected daily football picks in one simple dashboard.</p>
           <GoldBtn onClick={goToAccess} size="lg">
             {authed ? "Choose Your Plan" : "Create Your Account"} <ArrowRight size={16} />
           </GoldBtn>

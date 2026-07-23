@@ -80,7 +80,7 @@ export default function MatchCentrePage() {
               <span className="text-[#D4AF37]">MATCH CENTRE</span>
             </h1>
 
-            <p className="text-white/45 text-[14px] sm:text-[15px] leading-relaxed max-w-2xl">
+            <p className="text-white/60 text-[14px] sm:text-[15px] leading-relaxed max-w-2xl">
               Follow the matches connected to Bet Lab predictions and keep up
               with today&apos;s football action from one convenient place.
             </p>
@@ -126,7 +126,7 @@ export default function MatchCentrePage() {
                     <p className="text-[13px] text-rose-300 mb-1">
                       Match Centre unavailable
                     </p>
-                    <p className="text-[11px] text-white/30 leading-relaxed">
+                    <p className="text-[13px] text-white/45 leading-relaxed">
                       {error} You can still use the live-score links beside this panel.
                     </p>
                   </div>
@@ -140,7 +140,7 @@ export default function MatchCentrePage() {
                 <p className="text-[13px] text-white/55 mb-1">
                   No current picks yet
                 </p>
-                <p className="text-[11px] text-white/25">
+                <p className="text-[13px] text-white/40">
                   Published Bet Lab matches will appear here automatically.
                 </p>
               </div>
@@ -257,7 +257,7 @@ export default function MatchCentrePage() {
                     Follow today&apos;s matches live
                   </h3>
 
-                  <p className="text-[12px] text-white/30 leading-relaxed max-w-md mx-auto">
+                  <p className="text-[13px] text-white/45 leading-relaxed max-w-md mx-auto">
                     Choose a trusted score provider below. It opens in a new tab,
                     while Bet Lab remains available for reviewing your picks.
                   </p>
@@ -280,7 +280,7 @@ export default function MatchCentrePage() {
                           <p className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">
                             Sofascore
                           </p>
-                          <p className="text-[11px] text-white/30 leading-relaxed">
+                          <p className="text-[13px] text-white/45 leading-relaxed">
                             Live scores, fixtures, tables and detailed match statistics.
                           </p>
                         </div>
@@ -309,7 +309,7 @@ export default function MatchCentrePage() {
                           <p className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1">
                             LiveScore
                           </p>
-                          <p className="text-[11px] text-white/30 leading-relaxed">
+                          <p className="text-[13px] text-white/45 leading-relaxed">
                             Fast live results, upcoming fixtures and competition schedules.
                           </p>
                         </div>
@@ -360,7 +360,7 @@ export default function MatchCentrePage() {
         <div className="mt-8 rounded-xl border border-[#D4AF37]/10 bg-[#D4AF37]/[0.025] px-5 py-4">
           <div className="flex items-start gap-3">
             <Info size={16} className="text-[#D4AF37]/70 mt-0.5 shrink-0" />
-            <p className="text-[11px] text-white/30 leading-relaxed">
+            <p className="text-[13px] text-white/45 leading-relaxed">
               Live scores are supplied by independent football-score services.
               Bet Lab predictions remain informational and do not guarantee any
               betting outcome.

@@ -274,7 +274,7 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
   return (
     <article className={cn(
       "relative bg-card border border-[#D4AF37]/10 rounded-lg overflow-hidden group",
-      "transition-all duration-300 hover:border-[#D4AF37]/22 hover:shadow-[0_4px_40px_rgba(212,175,55,0.07)]",
+      "transition-all duration-200 hover:border-[#D4AF37]/22 hover:shadow-[0_4px_40px_rgba(212,175,55,0.07)]",
       locked && "pointer-events-none select-none"
     )}>
       <div className={cn("h-[2px] w-full bg-gradient-to-r", accentLine[pred.category])} />
@@ -351,7 +351,7 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
 
         {open && (
           <div className="mt-3 pt-3 border-t border-white/[0.05] animate-fade-in">
-            <p className="text-[12px] text-white/50 leading-relaxed">{pred.analysis}</p>
+            <p className="text-[13px] text-white/62 leading-relaxed">{pred.analysis}</p>
           </div>
         )}
       </div>
@@ -397,7 +397,7 @@ export function ApiPredictionCard({
     <article
       className={cn(
         "relative bg-card border border-[#D4AF37]/10 rounded-lg overflow-hidden",
-        "transition-all duration-300 hover:border-[#D4AF37]/22",
+        "transition-all duration-200 hover:border-[#D4AF37]/22",
         "hover:shadow-[0_4px_40px_rgba(212,175,55,0.07)]",
         locked && "pointer-events-none select-none",
       )}
@@ -491,7 +491,7 @@ export function ApiPredictionCard({
 
         {open && (
           <div className="mt-3 pt-3 border-t border-white/[0.05]">
-            <p className="text-[12px] text-white/50 leading-relaxed">
+            <p className="text-[13px] text-white/62 leading-relaxed">
               {pred.analysis || "No analysis has been published yet."}
             </p>
           </div>

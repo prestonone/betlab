@@ -98,7 +98,7 @@ export default function PolicyChangeLogPage({ onBack, onOpenPolicy }: {
                     )}
                   </div>
                 </div>
-                <p className="text-[12px] text-white/40 leading-relaxed mb-2">{entry.change_summary}</p>
+                <p className="text-[13px] text-white/55 leading-relaxed mb-2">{entry.change_summary}</p>
                 <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">
                   v{entry.version} &middot; {new Date(entry.effective_date).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                 </p>

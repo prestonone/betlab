@@ -47,7 +47,7 @@ export default function ContactPage() {
                   <Check size={24} className="text-emerald-400" />
                 </div>
                 <h3 className="font-['Rajdhani',sans-serif] font-bold text-[26px] text-white mb-2">Message Sent</h3>
-                <p className="text-[12px] text-white/35">We aim to respond within a reasonable time.</p>
+                <p className="text-[13px] text-white/50">We aim to respond within a reasonable time.</p>
               </div>
             ) : (
               <form onSubmit={submit} className="space-y-4">
@@ -106,7 +106,7 @@ export default function ContactPage() {
             </div>
             <div className="bg-card border border-[#D4AF37]/8 rounded-xl p-5">
               <h3 className="font-['Rajdhani',sans-serif] font-bold text-[16px] text-white mb-2">Response Time</h3>
-              <p className="text-[12px] text-white/35 leading-relaxed mb-3">We respond to all enquiries within 24 hours on business days.</p>
+              <p className="text-[13px] text-white/50 leading-relaxed mb-3">We respond to all enquiries within 24 hours on business days.</p>
               <div className="flex items-center gap-2">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="font-[JetBrains_Mono,monospace] text-[9px] text-emerald-400">Support online now</span>

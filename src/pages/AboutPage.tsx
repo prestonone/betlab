@@ -17,7 +17,7 @@ export default function AboutPage({ nav }: { nav: (p: Page) => void }) {
           <h1 className="font-['Rajdhani',sans-serif] font-bold text-[56px] sm:text-[68px] text-white leading-none mb-6">
             WE BUILT BET LAB<br /><span className="text-[#D4AF37]">FOR SMARTER PICKS.</span>
           </h1>
-          <p className="text-white/45 max-w-2xl text-[15px] leading-relaxed">
+          <p className="text-white/60 max-w-2xl text-[15px] leading-relaxed">
             Bet Lab was created to give a skilled football analyst a simple, professional platform for publishing carefully selected daily games. Members get clear categories, confidence levels, useful analysis and a transparent results history.
           </p>
         </div>
@@ -44,7 +44,7 @@ export default function AboutPage({ nav }: { nav: (p: Page) => void }) {
             <div key={i} className="bg-card border border-[#D4AF37]/8 rounded-lg p-6">
               <div className="w-9 h-9 rounded bg-[#D4AF37]/8 border border-[#D4AF37]/15 flex items-center justify-center text-[#D4AF37] mb-4">{v.icon}</div>
               <h3 className="font-['Rajdhani',sans-serif] font-bold text-[20px] text-white mb-1.5">{v.title}</h3>
-              <p className="text-[12px] text-white/40 leading-relaxed">{v.desc}</p>
+              <p className="text-[13px] text-white/55 leading-relaxed">{v.desc}</p>
             </div>
           ))}
         </div>
@@ -61,7 +61,7 @@ export default function AboutPage({ nav }: { nav: (p: Page) => void }) {
                 <div>
                   <h3 className="font-['Rajdhani',sans-serif] font-bold text-[18px] text-white leading-none">{t.name}</h3>
                   <p className="font-[JetBrains_Mono,monospace] text-[9px] text-[#D4AF37] uppercase tracking-widest mb-2 mt-0.5">{t.role}</p>
-                  <p className="text-[12px] text-white/40 leading-relaxed">{t.bio}</p>
+                  <p className="text-[13px] text-white/55 leading-relaxed">{t.bio}</p>
                 </div>
               </div>
             ))}
@@ -73,7 +73,7 @@ export default function AboutPage({ nav }: { nav: (p: Page) => void }) {
           <AlertCircle size={16} className="text-[#D4AF37]/50 flex-shrink-0 mt-0.5" />
           <div>
             <p className="font-['Rajdhani',sans-serif] font-bold text-[16px] text-white mb-1">Responsible Use</p>
-            <p className="text-[12px] text-white/35 leading-relaxed">
+            <p className="text-[13px] text-white/50 leading-relaxed">
               Bet Lab is a sports analytics platform. We provide research and predictions. We are not a bookmaker and do not encourage irresponsible gambling. Please bet responsibly.
               If you have concerns, visit <span className="text-[#D4AF37]">begambleaware.org</span>. 18+ only.
             </p>

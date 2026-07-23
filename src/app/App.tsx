@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import AnimatedFavicon from "../components/AnimatedFavicon";
 import AnimatedLogoMark from "../components/AnimatedLogoMark";
+import BackToTop from "../components/layout/BackToTop";
 import Footer from "../components/layout/Footer";
 import Navbar from "../components/layout/Navbar";
 import { useAuth } from "../contexts/AuthContext";
@@ -130,6 +131,7 @@ export default function App() {
       </div>
 
       {!isDash && <Footer nav={nav} />}
+      {!isDash && <BackToTop />}
     </div>
   );
 }

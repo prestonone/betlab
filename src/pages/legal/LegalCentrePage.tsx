@@ -95,7 +95,7 @@ export default function LegalCentrePage({ onOpen, onOpenRoute }: { onOpen: (slug
                   <Icon size={16} aria-hidden="true" />
                 </div>
                 <h3 className="font-['Rajdhani',sans-serif] font-bold text-[17px] text-white mb-1.5">{doc.shortTitle}</h3>
-                <p className="text-[11.5px] text-white/35 leading-relaxed mb-3">{doc.summary}</p>
+                <p className="text-[13px] text-white/50 leading-relaxed mb-3">{doc.summary}</p>
                 <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest">
                   v{doc.version} &middot; {new Date(doc.effectiveDate).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
                 </p>
@@ -121,7 +121,7 @@ export default function LegalCentrePage({ onOpen, onOpenRoute }: { onOpen: (slug
 
         <div className="max-w-lg mx-auto text-center bg-card border border-[#D4AF37]/10 rounded-lg p-6">
           <p className="font-[JetBrains_Mono,monospace] text-[9px] text-white/25 uppercase tracking-widest mb-2">Questions</p>
-          <p className="text-[12px] text-white/45 leading-relaxed">
+          <p className="text-[13px] text-white/60 leading-relaxed">
             Support: {LEGAL_SUPPORT_EMAIL}<br />
             Legal: {LEGAL_EMAIL}<br />
             Privacy: {LEGAL_PRIVACY_EMAIL}
