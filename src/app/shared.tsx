@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { ChevronDown, Clock, Lock } from "lucide-react";
-import type { Prediction as ApiPrediction } from "../services/predictions";
+import type { Prediction as ApiPrediction, CategoryColor } from "../services/predictions";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -225,15 +225,16 @@ export function ConfidenceBar({ value }: { value: number }) {
   );
 }
 
-export function CategoryPip({ cat }: { cat: PredCategory }) {
-  const m: Record<PredCategory, "gold" | "emerald" | "rose" | "blue" | "violet"> = {
-    "Banker": "gold",
-    "Sure 2": "emerald",
-    "Sure 3": "violet",
-    "Sure 5": "blue",
-    "Rollover": "rose",
-  };
-  return <Chip label={cat} variant={m[cat]} />;
+const MOCK_CATEGORY_COLOR: Record<PredCategory, CategoryColor> = {
+  "Banker": "gold",
+  "Sure 2": "emerald",
+  "Sure 3": "violet",
+  "Sure 5": "blue",
+  "Rollover": "rose",
+};
+
+export function CategoryPip({ label, color }: { label: string; color: CategoryColor }) {
+  return <Chip label={label} variant={color} />;
 }
 
 // ─── Live Ticker ──────────────────────────────────────────────────────────────
@@ -285,7 +286,7 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
             <span className={cn("font-[JetBrains_Mono,monospace] text-[10px] font-medium uppercase tracking-wider", leagueHue[pred.leagueCode] ?? "text-white/45")}>
               {pred.league}
             </span>
-            <CategoryPip cat={pred.category} />
+            <CategoryPip label={pred.category} color={MOCK_CATEGORY_COLOR[pred.category]} />
           </div>
           <div className="flex items-center gap-1.5 text-white/30 flex-shrink-0">
             <Clock size={11} />
@@ -379,14 +380,12 @@ export function ApiPredictionCard({
 }) {
   const [open, setOpen] = useState(false);
 
-  const category = pred.category.name as PredCategory;
-
-  const accentLine: Record<PredCategory, string> = {
-    "Banker": "from-[#D4AF37] via-[#D4AF37]/50 to-transparent",
-    "Sure 2": "from-emerald-500 via-emerald-500/50 to-transparent",
-    "Sure 3": "from-violet-500 via-violet-500/50 to-transparent",
-    "Sure 5": "from-blue-400 via-blue-400/50 to-transparent",
-    "Rollover": "from-rose-500 via-rose-500/50 to-transparent",
+  const accentLine: Record<CategoryColor, string> = {
+    gold: "from-[#D4AF37] via-[#D4AF37]/50 to-transparent",
+    emerald: "from-emerald-500 via-emerald-500/50 to-transparent",
+    violet: "from-violet-500 via-violet-500/50 to-transparent",
+    blue: "from-blue-400 via-blue-400/50 to-transparent",
+    rose: "from-rose-500 via-rose-500/50 to-transparent",
   };
 
   const totalOdds = pred.selections.reduce(
@@ -406,14 +405,14 @@ export function ApiPredictionCard({
       <div
         className={cn(
           "h-[2px] w-full bg-gradient-to-r",
-          accentLine[category] ?? accentLine.Banker,
+          accentLine[pred.category.color] ?? accentLine.gold,
         )}
       />
 
       <div className={cn("p-5", locked && "blur-sm")}>
         <div className="flex items-start justify-between gap-3 mb-5">
           <div>
-            <CategoryPip cat={category} />
+            <CategoryPip label={pred.category.name} color={pred.category.color} />
             <h3 className="font-['Rajdhani',sans-serif] font-bold text-[25px] text-white mt-2 leading-tight">
               {pred.title}
             </h3>

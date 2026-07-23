@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { ArrowRight, Lock } from "lucide-react";
-import { Page, PredCategory, cn, GoldBtn, SectionEyebrow, ApiPredictionCard } from "../app/shared";
-import { getPredictions, type Prediction as ApiPrediction } from "../services/predictions";
+import { Page, cn, GoldBtn, SectionEyebrow, ApiPredictionCard } from "../app/shared";
+import { getPredictions, getPredictionCategories, type Prediction as ApiPrediction, type PredictionCategory } from "../services/predictions";
 import { useCurrentSubscription } from "../hooks/useCurrentSubscription";
 
 export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => void; authed: boolean }) {
   const { hasSubscription } = useCurrentSubscription(authed);
-  const [filter, setFilter] = useState<"all" | PredCategory>("all");
+  const [filter, setFilter] = useState("all");
+  const [categories, setCategories] = useState<PredictionCategory[]>([]);
   const [predictions, setPredictions] = useState<ApiPrediction[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -17,8 +18,12 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
         setLoading(true);
         setError("");
 
-        const data = await getPredictions();
-        setPredictions(data);
+        const [predictionData, categoryData] = await Promise.all([
+          getPredictions(),
+          getPredictionCategories(),
+        ]);
+        setPredictions(predictionData);
+        setCategories(categoryData);
       } catch (err) {
         console.error(err);
         setError("Unable to load predictions.");
@@ -30,11 +35,10 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
     loadPredictions();
   }, []);
 
-  const cats: ("all" | PredCategory)[] = ["all", "Banker", "Sure 2", "Sure 3", "Sure 5", "Rollover"];
   const filtered =
     filter === "all"
       ? predictions
-      : predictions.filter((prediction) => prediction.category.name === filter);
+      : predictions.filter((prediction) => prediction.category.slug === filter);
 
   return (
     <div className="pt-[60px]">
@@ -58,12 +62,18 @@ export default function PredictionsPage({ nav, authed }: { nav: (p: Page) => voi
         </div>
 
         <div className="flex flex-wrap gap-2 mb-8">
-          {cats.map(cat => (
-            <button key={cat} onClick={() => setFilter(cat)} className={cn(
+          <button onClick={() => setFilter("all")} className={cn(
+            "px-4 py-1.5 rounded border font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest transition-all cursor-pointer",
+            filter === "all" ? "bg-[#D4AF37] text-[#070E1A] border-[#D4AF37]" : "bg-card border-[#D4AF37]/8 text-white/40 hover:border-[#D4AF37]/22 hover:text-white"
+          )}>
+            All
+          </button>
+          {categories.map(cat => (
+            <button key={cat.slug} onClick={() => setFilter(cat.slug)} className={cn(
               "px-4 py-1.5 rounded border font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-widest transition-all cursor-pointer",
-              filter === cat ? "bg-[#D4AF37] text-[#070E1A] border-[#D4AF37]" : "bg-card border-[#D4AF37]/8 text-white/40 hover:border-[#D4AF37]/22 hover:text-white"
+              filter === cat.slug ? "bg-[#D4AF37] text-[#070E1A] border-[#D4AF37]" : "bg-card border-[#D4AF37]/8 text-white/40 hover:border-[#D4AF37]/22 hover:text-white"
             )}>
-              {cat === "all" ? "All" : cat}
+              {cat.name}
             </button>
           ))}
         </div>

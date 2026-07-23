@@ -4,9 +4,22 @@ from django.utils import timezone
 
 
 class PredictionCategory(models.Model):
+    class Color(models.TextChoices):
+        GOLD = "gold", "Gold"
+        EMERALD = "emerald", "Emerald"
+        VIOLET = "violet", "Violet"
+        BLUE = "blue", "Blue"
+        ROSE = "rose", "Rose"
+
     name = models.CharField(max_length=100, unique=True)
     slug = models.SlugField(max_length=120, unique=True)
     description = models.TextField(blank=True)
+    color = models.CharField(
+        max_length=10,
+        choices=Color.choices,
+        default=Color.GOLD,
+        help_text="Accent colour used for this category's badge and card highlight on the frontend.",
+    )
     is_active = models.BooleanField(default=True)
     display_order = models.PositiveIntegerField(default=0)
 

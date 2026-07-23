@@ -15,6 +15,7 @@ class PredictionCategorySerializer(serializers.ModelSerializer):
             "name",
             "slug",
             "description",
+            "color",
             "display_order",
         ]
 

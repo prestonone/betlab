@@ -1,7 +1,12 @@
+export type CategoryColor = "gold" | "emerald" | "violet" | "blue" | "rose";
+
 export interface PredictionCategory {
   id: number;
   name: string;
   slug: string;
+  description: string;
+  color: CategoryColor;
+  display_order: number;
 }
 
 export interface PredictionSelection {
@@ -36,4 +41,8 @@ export async function getPredictions(): Promise<Prediction[]> {
     {},
     Boolean(getAccessToken()),
   );
+}
+
+export async function getPredictionCategories(): Promise<PredictionCategory[]> {
+  return apiRequest<PredictionCategory[]>("/api/v1/predictions/categories/");
 }

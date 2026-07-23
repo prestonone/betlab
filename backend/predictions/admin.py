@@ -18,12 +18,13 @@ class PredictionCategoryAdmin(admin.ModelAdmin):
     list_display = (
         "name",
         "slug",
+        "color",
         "is_active",
         "display_order",
         "prediction_count",
     )
-    list_editable = ("is_active", "display_order")
-    list_filter = ("is_active",)
+    list_editable = ("color", "is_active", "display_order")
+    list_filter = ("is_active", "color")
     search_fields = ("name", "description")
     prepopulated_fields = {"slug": ("name",)}
     ordering = ("display_order", "name")
