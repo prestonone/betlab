@@ -23,7 +23,7 @@ function FooterToggle({ id, label, open, onToggle }: { id: string; label: string
       onClick={onToggle}
       aria-expanded={open}
       aria-controls={id}
-      className="flex items-center gap-1.5 w-full font-[JetBrains_Mono,monospace] text-[9px] uppercase tracking-[0.2em] text-[#D4AF37] mb-4 cursor-pointer"
+      className="flex items-center gap-1.5 w-full font-[JetBrains_Mono,monospace] text-[11px] uppercase tracking-[0.2em] text-[#D4AF37] mb-4 cursor-pointer"
     >
       {label}
       <ChevronDown size={11} className={cn("transition-transform duration-200", open && "rotate-180")} />
