@@ -1,12 +1,14 @@
 import hashlib
 import hmac
 import json
+from datetime import timedelta
 from decimal import Decimal
 from unittest.mock import patch
 
 from django.contrib.auth import get_user_model
 from django.test import TestCase, override_settings
 from django.urls import reverse
+from django.utils import timezone
 from rest_framework.test import APIClient
 
 from legal.models import PolicyDocument, UserPolicyAcceptance
@@ -122,6 +124,47 @@ class PaymentApiTests(TestCase):
         response = self.client.post(
             reverse("payments:initialize"),
             {"plan": self.plan.code},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+
+    @patch("payments.views.initialize_transaction")
+    def test_initialize_allows_unverified_email_within_grace_period(self, initialize):
+        initialize.return_value = {
+            "authorization_url": "https://checkout.paystack.test/example",
+            "access_code": "access-code",
+        }
+        self.assertFalse(self.user.is_email_verified)
+        response = self.client.post(
+            reverse("payments:initialize"),
+            {"plan": self.plan.code, "accepted_refund_policy": True},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 201)
+
+    def test_initialize_rejected_for_unverified_email_past_grace_period(self):
+        self.user.date_joined = timezone.now() - timedelta(minutes=45)
+        self.user.save(update_fields=["date_joined"])
+        response = self.client.post(
+            reverse("payments:initialize"),
+            {"plan": self.plan.code, "accepted_refund_policy": True},
+            format="json",
+        )
+        self.assertEqual(response.status_code, 403)
+        self.assertFalse(Payment.objects.exists())
+
+    @patch("payments.views.initialize_transaction")
+    def test_initialize_allows_verified_email_past_grace_period(self, initialize):
+        initialize.return_value = {
+            "authorization_url": "https://checkout.paystack.test/example",
+            "access_code": "access-code",
+        }
+        self.user.date_joined = timezone.now() - timedelta(days=30)
+        self.user.is_email_verified = True
+        self.user.save(update_fields=["date_joined", "is_email_verified"])
+        response = self.client.post(
+            reverse("payments:initialize"),
+            {"plan": self.plan.code, "accepted_refund_policy": True},
             format="json",
         )
         self.assertEqual(response.status_code, 201)

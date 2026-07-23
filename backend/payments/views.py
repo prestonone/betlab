@@ -3,8 +3,10 @@ import hmac
 import json
 import logging
 import uuid
+from datetime import timedelta
 
 from django.conf import settings
+from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
 from rest_framework import status
@@ -33,10 +35,27 @@ def _payment_error(message: str, status_code=status.HTTP_400_BAD_REQUEST):
     return error_response(message=message, status_code=status_code)
 
 
+# New accounts can pay immediately as part of "Create Account & Pay" (the
+# primary conversion flow), before there has been any chance to click a
+# verification link. This grace window preserves that flow while still
+# requiring verification from accounts that are past it, e.g. a long-lapsed
+# unverified account trying to resubscribe.
+EMAIL_VERIFICATION_GRACE_PERIOD = timedelta(minutes=30)
+
+
 class InitializePaymentView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        if not request.user.is_email_verified:
+            account_age = timezone.now() - request.user.date_joined
+            if account_age > EMAIL_VERIFICATION_GRACE_PERIOD:
+                return _payment_error(
+                    "Please verify your email address before subscribing. "
+                    "Check your inbox for the verification link, or request a new one from your dashboard.",
+                    status.HTTP_403_FORBIDDEN,
+                )
+
         plan_code = str(request.data.get("plan", "")).strip().lower()
         if not plan_code:
             return _payment_error("Plan is required.")
