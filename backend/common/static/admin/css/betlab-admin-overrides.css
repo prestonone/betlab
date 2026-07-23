@@ -55,3 +55,193 @@ a:link, a:visited {
 a:focus, a:hover {
   color: var(--link-hover-color);
 }
+
+/* ── Operations dashboard ─────────────────────────────────────────── */
+
+.betlab-dashboard {
+  background: var(--secondary);
+  border: 1px solid rgba(212,175,55,0.18);
+  border-radius: 8px;
+  padding: 20px 24px;
+  margin-bottom: 24px;
+}
+
+.betlab-dashboard--business {
+  border-color: rgba(212,175,55,0.1);
+  opacity: 0.97;
+}
+
+.betlab-dashboard__title {
+  color: #fff;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 4px;
+}
+
+.betlab-dashboard__subtitle {
+  color: rgba(255,255,255,0.55);
+  font-size: 12.5px;
+  margin: 0 0 16px;
+}
+
+.betlab-dashboard__subheading {
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 20px 0 10px;
+}
+
+.betlab-quick-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+.betlab-quick-actions__item {
+  background: var(--button-bg);
+  color: var(--button-fg) !important;
+  font-weight: 600;
+  font-size: 12.5px;
+  padding: 8px 14px;
+  border-radius: 5px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.betlab-quick-actions__item:hover {
+  background: var(--button-hover-bg);
+  color: var(--button-fg) !important;
+}
+
+.betlab-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+}
+
+.betlab-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(212,175,55,0.15);
+  border-radius: 6px;
+  padding: 12px 14px;
+  text-decoration: none;
+  min-height: 62px;
+}
+.betlab-card:hover {
+  border-color: var(--accent);
+}
+.betlab-card--static {
+  cursor: default;
+}
+.betlab-card--static:hover {
+  border-color: rgba(212,175,55,0.15);
+}
+.betlab-card__count {
+  color: var(--accent);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+.betlab-card__label {
+  color: rgba(255,255,255,0.65);
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+.betlab-card__note {
+  color: rgba(255,255,255,0.4);
+  font-size: 10.5px;
+  margin-top: 4px;
+}
+
+.betlab-table-wrap {
+  overflow-x: auto;
+}
+.betlab-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12.5px;
+}
+.betlab-table th, .betlab-table td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  color: rgba(255,255,255,0.8);
+  white-space: nowrap;
+  text-align: left;
+}
+.betlab-table th {
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+}
+
+.betlab-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+}
+.betlab-badge--free { color: #34d399; }
+.betlab-badge--lab { color: var(--accent); }
+.betlab-badge--status-draft { color: #9ca3af; }
+.betlab-badge--status-scheduled { color: #60a5fa; }
+.betlab-badge--status-published { color: #34d399; }
+.betlab-badge--status-locked { color: #f59e0b; }
+.betlab-badge--status-settled { color: #a78bfa; }
+.betlab-badge--status-cancelled { color: #f87171; }
+.betlab-badge--result-pending { color: #9ca3af; }
+.betlab-badge--result-won { color: #34d399; }
+.betlab-badge--result-lost { color: #f87171; }
+.betlab-badge--result-void { color: #a78bfa; }
+
+.betlab-dashboard__links {
+  font-size: 12px;
+  margin-top: 12px;
+  color: rgba(255,255,255,0.5);
+}
+
+.betlab-alerts {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.betlab-alert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  border-radius: 5px;
+  margin-bottom: 6px;
+  font-size: 12.5px;
+  border-left: 3px solid transparent;
+  background: rgba(255,255,255,0.03);
+}
+.betlab-alert--information { border-left-color: #60a5fa; }
+.betlab-alert--warning { border-left-color: #f59e0b; }
+.betlab-alert--critical { border-left-color: #f87171; }
+.betlab-alert__severity {
+  font-weight: 800;
+  font-size: 10px;
+  letter-spacing: 0.05em;
+  color: rgba(255,255,255,0.5);
+}
+.betlab-alert__description { color: #fff; }
+.betlab-alert__action { color: rgba(255,255,255,0.5); }
+
+.betlab-admin-nav {
+  margin-top: 8px;
+}
+
+@media (max-width: 767px) {
+  .betlab-dashboard { padding: 14px 16px; }
+  .betlab-cards { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .betlab-quick-actions__item { flex: 1 1 auto; text-align: center; }
+}

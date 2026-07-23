@@ -17,7 +17,7 @@ from common.api import error_response, success_response
 from legal.models import PolicyDocument, UserPolicyAcceptance
 from legal.services import PolicyNotConfigured, has_current_acceptance, record_acceptance
 
-from .models import Payment
+from .models import Payment, PaymentVerificationAttempt, WebhookEvent
 from .paystack import PaystackError, initialize_transaction, verify_transaction
 from .serializers import PaymentSerializer
 from .services import (
@@ -163,10 +163,28 @@ class VerifyPaymentView(APIView):
                 provider_data=provider_data,
             )
         except PaystackError as exc:
+            PaymentVerificationAttempt.objects.create(
+                payment=payment,
+                transaction_reference=reference,
+                status=PaymentVerificationAttempt.Status.FAILED,
+                failure_reason=str(exc)[:255],
+            )
             logger.warning("Paystack verification failed for payment %s", payment.pk)
             return _payment_error(str(exc), status.HTTP_503_SERVICE_UNAVAILABLE)
         except PaymentValidationError as exc:
+            PaymentVerificationAttempt.objects.create(
+                payment=payment,
+                transaction_reference=reference,
+                status=PaymentVerificationAttempt.Status.FAILED,
+                failure_reason=str(exc)[:255],
+            )
             return _payment_error(str(exc))
+
+        PaymentVerificationAttempt.objects.create(
+            payment=payment,
+            transaction_reference=reference,
+            status=PaymentVerificationAttempt.Status.SUCCESS,
+        )
 
         if payment.status != Payment.Status.SUCCESS:
             if payment.status == Payment.Status.PENDING:
@@ -211,23 +229,47 @@ class PaystackWebhookView(APIView):
             hashlib.sha512,
         ).hexdigest()
         if not signature or not hmac.compare_digest(signature, expected):
+            WebhookEvent.objects.create(
+                processing_status=WebhookEvent.ProcessingStatus.INVALID_SIGNATURE,
+                failure_reason="Signature did not match.",
+            )
             return _payment_error("Invalid webhook signature.", status.HTTP_401_UNAUTHORIZED)
 
         try:
             event = json.loads(request.body.decode("utf-8"))
         except (UnicodeDecodeError, json.JSONDecodeError):
+            WebhookEvent.objects.create(
+                processing_status=WebhookEvent.ProcessingStatus.FAILED,
+                failure_reason="Malformed webhook payload.",
+            )
             return _payment_error("Malformed webhook payload.")
 
-        if event.get("event") != "charge.success":
+        event_type = str(event.get("event", ""))
+        if event_type != "charge.success":
+            WebhookEvent.objects.create(
+                event_type=event_type,
+                processing_status=WebhookEvent.ProcessingStatus.IGNORED,
+            )
             return success_response(message="Event ignored.")
         provider_data = event.get("data")
         if not isinstance(provider_data, dict):
+            WebhookEvent.objects.create(
+                event_type=event_type,
+                processing_status=WebhookEvent.ProcessingStatus.FAILED,
+                failure_reason="Malformed event data.",
+            )
             return _payment_error("Malformed webhook payload.")
 
         reference = str(provider_data.get("reference", ""))
         payment = Payment.objects.filter(reference=reference).first()
         if payment is None:
             logger.warning("Paystack webhook referenced an unknown payment")
+            WebhookEvent.objects.create(
+                event_type=event_type,
+                external_reference=reference,
+                processing_status=WebhookEvent.ProcessingStatus.IGNORED,
+                failure_reason="No matching payment record.",
+            )
             return success_response(message="Unknown payment ignored.")
 
         try:
@@ -235,10 +277,22 @@ class PaystackWebhookView(APIView):
                 payment=payment,
                 provider_data=provider_data,
             )
-        except PaymentValidationError:
+        except PaymentValidationError as exc:
             logger.warning("Paystack webhook validation failed for payment %s", payment.pk)
+            WebhookEvent.objects.create(
+                event_type=event_type,
+                external_reference=reference,
+                processing_status=WebhookEvent.ProcessingStatus.FAILED,
+                failure_reason=str(exc)[:255],
+            )
             return _payment_error("Payment validation failed.")
 
+        WebhookEvent.objects.create(
+            event_type=event_type,
+            external_reference=reference,
+            processing_status=WebhookEvent.ProcessingStatus.PROCESSED,
+            processed_at=timezone.now(),
+        )
         return success_response(
             message=(
                 "Payment processed successfully."

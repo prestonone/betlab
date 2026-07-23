@@ -66,6 +66,7 @@ INSTALLED_APPS = [
     "subscriptions",
     "payments",
     "legal",
+    "dashboard",
     "corsheaders",
 ]
 
@@ -264,3 +265,29 @@ LEGAL_BUSINESS_ADDRESS = os.getenv("LEGAL_BUSINESS_ADDRESS", "")
 LEGAL_BUSINESS_PHONE = os.getenv("LEGAL_BUSINESS_PHONE", "")
 LEGAL_GOVERNING_LAW = os.getenv("LEGAL_GOVERNING_LAW", "Federal Republic of Nigeria")
 LEGAL_MINIMUM_AGE = int(os.getenv("LEGAL_MINIMUM_AGE", "18"))
+
+# ─── Caching ─────────────────────────────────────────────────────────────────
+# In-process cache used only for briefly caching non-critical admin-dashboard
+# metrics (see dashboard/services.py). Not shared across processes/workers -
+# on Render's multi-worker gunicorn setup each worker caches independently,
+# which is fine for a ~60s dashboard metric that's allowed to be a little
+# stale, but means cache.clear() from one worker won't affect others.
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+    }
+}
+
+# ─── Deployment metadata ─────────────────────────────────────────────────────
+# Optional, purely informational - shown on the admin dashboard when set.
+# On Render, add these as environment variables on the service:
+#   APP_RELEASE_SHA   = the deployed commit SHA (Render exposes this as
+#                        RENDER_GIT_COMMIT automatically; set
+#                        APP_RELEASE_SHA=$RENDER_GIT_COMMIT in the service's
+#                        environment, or reference it directly).
+#   APP_DEPLOYED_AT   = set via a Render "Pre-Deploy Command" or manually;
+#                        Render does not expose a deploy timestamp env var.
+#   APP_RELEASE_NAME  = optional human-readable label, e.g. a version tag.
+# None of these are read here directly - dashboard/services.py reads them
+# from the environment at request time via os.getenv() so a redeploy
+# without restarting picks up new values immediately.

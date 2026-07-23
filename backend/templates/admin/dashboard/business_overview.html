@@ -1,0 +1,92 @@
+{% load i18n %}
+{% if visible %}
+<section class="betlab-dashboard betlab-dashboard--business">
+  <h2 class="betlab-dashboard__title">Business &amp; System Overview</h2>
+  <p class="betlab-dashboard__subtitle">Revenue, subscribers, payment health and system status. Not shown to content staff.</p>
+
+  <div class="betlab-cards">
+    <div class="betlab-card betlab-card--static">
+      <span class="betlab-card__count">{{ metrics.total_users }}</span>
+      <span class="betlab-card__label">Total Users</span>
+    </div>
+    <div class="betlab-card betlab-card--static">
+      <span class="betlab-card__count">{{ metrics.active_subscribers }}</span>
+      <span class="betlab-card__label">Active Subscribers</span>
+    </div>
+    <a class="betlab-card" href="{{ metrics.pending_payments_url }}">
+      <span class="betlab-card__count">{{ metrics.pending_payments }}</span>
+      <span class="betlab-card__label">Pending Payments</span>
+    </a>
+    <div class="betlab-card betlab-card--static">
+      <span class="betlab-card__count">
+        {% for row in metrics.revenue_by_currency %}{{ row.currency }} {{ row.total }}{% if not forloop.last %}, {% endif %}{% empty %}—{% endfor %}
+      </span>
+      <span class="betlab-card__label">Monthly Revenue</span>
+    </div>
+    <div class="betlab-card betlab-card--static">
+      <span class="betlab-card__count">{{ metrics.popular_plan|default:"No data yet" }}</span>
+      <span class="betlab-card__label">Popular Subscription Plan</span>
+    </div>
+    <div class="betlab-card betlab-card--static">
+      <span class="betlab-card__count">{{ metrics.predictions_published_today }}</span>
+      <span class="betlab-card__label">Predictions Published Today</span>
+    </div>
+    <div class="betlab-card betlab-card--static">
+      <span class="betlab-card__count">{% if metrics.failed_emails.tracked %}{{ metrics.failed_emails.count }}{% else %}N/A{% endif %}</span>
+      <span class="betlab-card__label">Failed Emails</span>
+      {% if not metrics.failed_emails.tracked %}<span class="betlab-card__note">{{ metrics.failed_emails.message }}</span>{% endif %}
+    </div>
+    <a class="betlab-card" href="{{ metrics.failed_webhooks_url }}">
+      <span class="betlab-card__count">{{ metrics.failed_webhooks }}</span>
+      <span class="betlab-card__label">Failed Webhooks</span>
+    </a>
+    <a class="betlab-card" href="{{ metrics.failed_verifications_url }}">
+      <span class="betlab-card__count">{{ metrics.failed_verifications }}</span>
+      <span class="betlab-card__label">Failed Paystack Verifications</span>
+    </a>
+    <div class="betlab-card betlab-card--static">
+      <span class="betlab-card__count">{% if db_health.connected %}Connected{% else %}Unavailable{% endif %}</span>
+      <span class="betlab-card__label">Database Status</span>
+      {% if db_health.response_time_ms %}<span class="betlab-card__note">{{ db_health.response_time_ms }} ms</span>{% endif %}
+    </div>
+    <div class="betlab-card betlab-card--static">
+      <span class="betlab-card__count">{% if deployment.configured %}{{ deployment.short_sha }}{% else %}Not configured{% endif %}</span>
+      <span class="betlab-card__label">Last Deployment</span>
+      {% if deployment.configured and deployment.deployed_at %}<span class="betlab-card__note">{{ deployment.deployed_at }}</span>{% endif %}
+    </div>
+  </div>
+
+  {% if alerts %}
+  <h3 class="betlab-dashboard__subheading">Alerts Requiring Attention</h3>
+  <ul class="betlab-alerts">
+    {% for alert in alerts %}
+    <li class="betlab-alert betlab-alert--{{ alert.severity }}">
+      <span class="betlab-alert__severity">{{ alert.severity|upper }}</span>
+      <span class="betlab-alert__description">{{ alert.description }}{% if alert.count %} ({{ alert.count }}){% endif %}</span>
+      <span class="betlab-alert__action">{{ alert.action }}</span>
+      {% if alert.url %}<a href="{{ alert.url }}">View</a>{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+
+  {% if recent_activity %}
+  <h3 class="betlab-dashboard__subheading">Recent Admin Activity</h3>
+  <div class="betlab-table-wrap">
+    <table class="betlab-table">
+      <thead><tr><th>Staff</th><th>Action</th><th>Object</th><th>Time</th></tr></thead>
+      <tbody>
+        {% for entry in recent_activity %}
+        <tr>
+          <td>{{ entry.user }}</td>
+          <td>{{ entry.get_change_message }}</td>
+          <td>{{ entry.object_repr }}</td>
+          <td>{{ entry.action_time|date:"d M H:i" }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</section>
+{% endif %}

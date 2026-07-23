@@ -2,7 +2,7 @@ from decimal import Decimal
 
 from django.contrib import admin
 from django.db import transaction
-from django.db.models import Count
+from django.db.models import Count, F, Q
 from django.utils import timezone
 from django.utils.html import format_html
 
@@ -11,6 +11,75 @@ from .models import (
     PredictionCategory,
     PredictionSelection,
 )
+
+
+class AwaitingResultFilter(admin.SimpleListFilter):
+    """Locked predictions whose kick-off has passed but no selection has a
+    result entered yet — step 3 of the daily workflow. Note: once every
+    selection on a locked prediction has a result, Prediction.settle() fires
+    automatically as part of PredictionSelection.settle()'s recalculation —
+    there is no separate manual "settle" action in this codebase, so a
+    locked-with-a-complete-result state cannot exist at rest."""
+
+    title = "awaiting result"
+    parameter_name = "awaiting_result"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Awaiting result"),)
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.filter(
+                status=Prediction.Status.LOCKED,
+                result_status=Prediction.ResultStatus.PENDING,
+            )
+        return queryset
+
+
+class AwaitingSettlementFilter(admin.SimpleListFilter):
+    """Locked, multi-selection predictions where some (not all) selections
+    have a result entered — settlement auto-completes as soon as the last
+    one is entered, so this surfaces packages mid-way through result entry
+    rather than a distinct manual "settle" step."""
+
+    title = "awaiting settlement"
+    parameter_name = "awaiting_settlement"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Awaiting settlement"),)
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return (
+                queryset.filter(status=Prediction.Status.LOCKED)
+                .annotate(
+                    total_selections=Count("selections"),
+                    pending_selections=Count(
+                        "selections",
+                        filter=Q(selections__result_status=PredictionSelection.ResultStatus.PENDING),
+                    ),
+                )
+                .filter(pending_selections__gt=0, pending_selections__lt=F("total_selections"))
+            )
+        return queryset
+
+
+class MissingRequiredInfoFilter(admin.SimpleListFilter):
+    """Published or scheduled predictions with no selections attached, or
+    no analysis text — genuinely incomplete before members see them."""
+
+    title = "missing required information"
+    parameter_name = "missing_info"
+
+    def lookups(self, request, model_admin):
+        return (("yes", "Missing required information"),)
+
+    def queryset(self, request, queryset):
+        if self.value() == "yes":
+            return queryset.filter(
+                status__in=[Prediction.Status.SCHEDULED, Prediction.Status.PUBLISHED],
+            ).filter(Q(selections__isnull=True) | Q(analysis="")).distinct()
+        return queryset
 
 
 @admin.register(PredictionCategory)
@@ -172,6 +241,9 @@ class PredictionAdmin(admin.ModelAdmin):
         "access_level",
         "result_status",
         "is_published",
+        AwaitingResultFilter,
+        AwaitingSettlementFilter,
+        MissingRequiredInfoFilter,
         "scheduled_for",
         "published_at",
         "locked_at",

@@ -76,3 +76,66 @@ class Payment(models.Model):
 
     def __str__(self) -> str:
         return f"{self.reference} — {self.currency} {self.amount}"
+
+
+class WebhookEvent(models.Model):
+    """Audit log of every Paystack webhook received. Stores only enough to
+    diagnose delivery problems — never the raw payload or signature."""
+
+    class ProcessingStatus(models.TextChoices):
+        PROCESSED = "processed", "Processed"
+        IGNORED = "ignored", "Ignored"
+        FAILED = "failed", "Failed"
+        INVALID_SIGNATURE = "invalid_signature", "Invalid Signature"
+
+    provider = models.CharField(max_length=30, default="paystack")
+    event_type = models.CharField(max_length=100, blank=True)
+    external_reference = models.CharField(max_length=100, blank=True, db_index=True)
+    processing_status = models.CharField(
+        max_length=20,
+        choices=ProcessingStatus.choices,
+        db_index=True,
+    )
+    failure_reason = models.CharField(max_length=255, blank=True)
+    received_at = models.DateTimeField(auto_now_add=True)
+    processed_at = models.DateTimeField(null=True, blank=True)
+    retry_count = models.PositiveIntegerField(default=0)
+    resolved = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ["-received_at"]
+
+    def __str__(self) -> str:
+        return f"{self.provider} {self.event_type or 'event'} — {self.processing_status}"
+
+
+class PaymentVerificationAttempt(models.Model):
+    """Audit log of Paystack transaction-verification attempts (the
+    VerifyPaymentView flow). Stores only enough to diagnose failures —
+    never full provider responses or secrets."""
+
+    class Status(models.TextChoices):
+        SUCCESS = "success", "Success"
+        FAILED = "failed", "Failed"
+
+    payment = models.ForeignKey(
+        Payment,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="verification_attempts",
+    )
+    transaction_reference = models.CharField(max_length=100, db_index=True)
+    provider = models.CharField(max_length=30, default="paystack")
+    status = models.CharField(max_length=20, choices=Status.choices, db_index=True)
+    response_code = models.CharField(max_length=30, blank=True)
+    failure_reason = models.CharField(max_length=255, blank=True)
+    attempted_at = models.DateTimeField(auto_now_add=True)
+    resolved = models.BooleanField(default=False)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-attempted_at"]
+
+    def __str__(self) -> str:
+        return f"{self.transaction_reference} — {self.status}"

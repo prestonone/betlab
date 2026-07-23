@@ -1,0 +1,59 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static dashboard_tags %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/dashboard.css" %}">{% endblock %}
+
+{% block coltype %}colMS{% endblock %}
+
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
+
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block nav-sidebar %}{% endblock %}
+
+{% block content %}
+<div id="content-main">
+  {% match_operations_dashboard %}
+  {% business_overview_dashboard %}
+
+  <div class="app-list betlab-admin-nav">
+    <h2 class="betlab-dashboard__subheading">All Admin Sections</h2>
+    {% for group in app_list|group_apps %}
+    <div class="module">
+      <table>
+        <caption>
+          <a href="#" class="section" title="{% blocktranslate with name=group.name %}Models in the '{{ name }}' application{% endblocktranslate %}">{{ group.name }}</a>
+        </caption>
+        {% for model in group.models %}
+        <tr class="model-{{ model.object_name|lower }}{% if model.admin_url in request.path %} current-model{% endif %}">
+          {% if model.admin_url %}
+            <th scope="row"><a href="{{ model.admin_url }}"{% if model.admin_url in request.path %} aria-current="page"{% endif %}>{{ model.name }}</a></th>
+          {% else %}
+            <th scope="row">{{ model.name }}</th>
+          {% endif %}
+
+          {% if model.add_url %}
+            <td><a href="{{ model.add_url }}" class="addlink">{% translate 'Add' %}</a></td>
+          {% else %}
+            <td></td>
+          {% endif %}
+
+          {% if model.admin_url and show_changelinks %}
+            {% if model.view_only %}
+              <td><a href="{{ model.admin_url }}" class="viewlink">{% translate 'View' %}</a></td>
+            {% else %}
+              <td><a href="{{ model.admin_url }}" class="changelink">{% translate 'Change' %}</a></td>
+            {% endif %}
+          {% else %}
+            <td></td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
