@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.utils.html import escape
 
 GOLD = "#D4AF37"
 INK = "#070E1A"
@@ -127,5 +128,34 @@ def password_reset_email(link: str) -> tuple[str, str]:
         "We received a request to reset your Bet Lab password.\n\n"
         f"Choose a new password: {link}\n\n"
         "If you didn't request this, you can safely ignore this email."
+    )
+    return html, text
+
+
+def prediction_published_email(prediction) -> tuple[str, str]:
+    dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
+    title = escape(prediction.title)
+    category = escape(prediction.category.name)
+    body = f"""
+    <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:bold;
+      letter-spacing:2px;text-transform:uppercase;color:{GOLD};">Today's Intelligence</p>
+    <h1 style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:24px;color:#ffffff;">
+      Your new prediction is live</h1>
+    <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:{MUTED};">
+      Bet Lab has published <strong style="color:#ffffff;">{title}</strong>
+      in {category}. Sign in to view the full intelligence.</p>
+    {_button("View Today's Intelligence", dashboard_url)}
+    <p style="margin:8px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.6;color:{FAINT};">
+      This service provides analysis, not guaranteed outcomes. Please use it responsibly.</p>
+    """
+    html = _base_email(
+        preheader="Today's Bet Lab prediction intelligence is now available.",
+        body_html=body,
+    )
+    text = (
+        "Today's Bet Lab intelligence is now live.\n\n"
+        f"{prediction.title} ({prediction.category.name}) has been published.\n"
+        f"Sign in to view it: {dashboard_url}\n\n"
+        "This service provides analysis, not guaranteed outcomes. Please use it responsibly."
     )
     return html, text

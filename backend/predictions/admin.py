@@ -9,8 +9,10 @@ from django.utils.html import format_html
 from .models import (
     Prediction,
     PredictionCategory,
+    PredictionPublicationNotification,
     PredictionSelection,
 )
+from .services import notify_members_prediction_published
 
 
 class AwaitingResultFilter(admin.SimpleListFilter):
@@ -219,6 +221,42 @@ class PredictionSelectionInline(admin.TabularInline):
         return super().has_delete_permission(request, obj)
 
 
+@admin.register(PredictionPublicationNotification)
+class PredictionPublicationNotificationAdmin(admin.ModelAdmin):
+    list_display = (
+        "prediction",
+        "email",
+        "status",
+        "attempt_count",
+        "sent_at",
+        "updated_at",
+    )
+    list_filter = ("status", "sent_at", "created_at")
+    search_fields = ("email", "prediction__title")
+    readonly_fields = (
+        "prediction",
+        "user",
+        "email",
+        "status",
+        "attempt_count",
+        "provider_id",
+        "last_error",
+        "sent_at",
+        "created_at",
+        "updated_at",
+    )
+    list_select_related = ("prediction", "user")
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
 @admin.register(Prediction)
 class PredictionAdmin(admin.ModelAdmin):
     list_display = (
@@ -344,6 +382,7 @@ class PredictionAdmin(admin.ModelAdmin):
 
     actions = (
         "publish_predictions",
+        "notify_subscribed_members",
         "lock_predictions",
         "cancel_predictions",
     )
@@ -587,6 +626,35 @@ class PredictionAdmin(admin.ModelAdmin):
             queryset,
             "publish",
             "published",
+        )
+
+    @admin.action(
+        description="Email subscribed members: today's intelligence is live"
+    )
+    def notify_subscribed_members(self, request, queryset):
+        if queryset.count() != 1:
+            self.message_user(
+                request,
+                "Select exactly one published prediction before sending the member email.",
+                level="warning",
+            )
+            return
+
+        prediction = queryset.first()
+
+        try:
+            result = notify_members_prediction_published(prediction)
+        except ValueError as exc:
+            self.message_user(request, str(exc), level="warning")
+            return
+
+        self.message_user(
+            request,
+            (
+                f"Member notification complete: {result.sent} sent, "
+                f"{result.failed} failed, {result.already_sent} already sent."
+            ),
+            level="warning" if result.failed else "success",
         )
 
     @admin.action(

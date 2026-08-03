@@ -442,3 +442,46 @@ class PredictionSelection(models.Model):
         )
 
         self.prediction.recalculate_result()
+
+
+class PredictionPublicationNotification(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        SENT = "sent", "Sent"
+        FAILED = "failed", "Failed"
+
+    prediction = models.ForeignKey(
+        Prediction,
+        on_delete=models.CASCADE,
+        related_name="publication_notifications",
+    )
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="prediction_publication_notifications",
+    )
+    email = models.EmailField()
+    status = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.PENDING,
+        db_index=True,
+    )
+    attempt_count = models.PositiveIntegerField(default=0)
+    provider_id = models.CharField(max_length=100, blank=True)
+    last_error = models.CharField(max_length=255, blank=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["prediction", "user"],
+                name="unique_prediction_publication_notification",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.prediction} — {self.email} — {self.status}"

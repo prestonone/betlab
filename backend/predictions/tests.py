@@ -1,5 +1,6 @@
 from datetime import timedelta
 from io import StringIO
+from unittest.mock import patch
 
 from django.contrib.admin.sites import AdminSite
 from django.contrib.auth import get_user_model
@@ -13,8 +14,10 @@ from .admin import PredictionAdmin, PredictionSelectionInline
 from .models import (
     Prediction,
     PredictionCategory,
+    PredictionPublicationNotification,
     PredictionSelection,
 )
+from .services import notify_members_prediction_published
 from subscriptions.models import Plan, Subscription
 
 
@@ -820,3 +823,145 @@ class SelectionSettlementEngineTests(TestCase):
             prediction.result_status,
             Prediction.ResultStatus.PENDING,
         )
+
+
+class PredictionPublicationNotificationTests(TestCase):
+    def setUp(self):
+        self.category = PredictionCategory.objects.create(
+            name="Daily Intelligence",
+            slug="daily-intelligence",
+        )
+        self.prediction = Prediction.objects.create(
+            category=self.category,
+            title="Monday Intelligence",
+            status=Prediction.Status.PUBLISHED,
+            is_published=True,
+            published_at=timezone.now(),
+        )
+        self.plan = Plan.objects.create(
+            code="notification-plan",
+            name="Notification Plan",
+            duration_days=7,
+        )
+
+    def create_member(self, username, status, **subscription_dates):
+        user = get_user_model().objects.create_user(
+            username=username,
+            email=f"{username}@example.com",
+            password="test-password-123",
+        )
+        Subscription.objects.create(
+            user=user,
+            plan=self.plan,
+            status=status,
+            **subscription_dates,
+        )
+        return user
+
+    @patch("predictions.services.send_batch_emails")
+    def test_sends_once_to_each_current_member(self, send_batch_emails):
+        now = timezone.now()
+        active = self.create_member(
+            "active-member",
+            Subscription.Status.ACTIVE,
+            starts_at=now,
+            expires_at=now + timedelta(days=3),
+        )
+        grace = self.create_member(
+            "grace-member",
+            Subscription.Status.GRACE,
+            starts_at=now - timedelta(days=10),
+            expires_at=now - timedelta(days=3),
+            grace_ends_at=now + timedelta(days=1),
+        )
+        self.create_member(
+            "expired-member",
+            Subscription.Status.ACTIVE,
+            starts_at=now - timedelta(days=10),
+            expires_at=now - timedelta(days=1),
+        )
+        Subscription.objects.create(
+            user=active,
+            plan=self.plan,
+            status=Subscription.Status.ACTIVE,
+            starts_at=now,
+            expires_at=now + timedelta(days=4),
+        )
+
+        send_batch_emails.return_value = ["email-id-1", "email-id-2"]
+
+        result = notify_members_prediction_published(self.prediction)
+
+        self.assertEqual(result.sent, 2)
+        self.assertEqual(result.failed, 0)
+        send_batch_emails.assert_called_once()
+        self.assertEqual(
+            len(send_batch_emails.call_args.kwargs["emails"]),
+            2,
+        )
+        self.assertEqual(
+            set(
+                PredictionPublicationNotification.objects.values_list(
+                    "user_id", flat=True
+                )
+            ),
+            {active.pk, grace.pk},
+        )
+
+    @patch("predictions.services.send_batch_emails")
+    def test_repeat_action_does_not_send_duplicate_email(self, send_batch_emails):
+        now = timezone.now()
+        self.create_member(
+            "repeat-member",
+            Subscription.Status.ACTIVE,
+            starts_at=now,
+            expires_at=now + timedelta(days=3),
+        )
+
+        send_batch_emails.return_value = ["email-id-1"]
+
+        first = notify_members_prediction_published(self.prediction)
+        second = notify_members_prediction_published(self.prediction)
+
+        self.assertEqual(first.sent, 1)
+        self.assertEqual(second.sent, 0)
+        self.assertEqual(second.already_sent, 1)
+        send_batch_emails.assert_called_once()
+
+    @patch("predictions.services.send_batch_emails")
+    def test_failed_delivery_is_recorded_and_can_be_retried(self, send_batch_emails):
+        from common.email import EmailSendError
+
+        now = timezone.now()
+        self.create_member(
+            "retry-member",
+            Subscription.Status.ACTIVE,
+            starts_at=now,
+            expires_at=now + timedelta(days=3),
+        )
+        send_batch_emails.side_effect = [
+            EmailSendError("provider unavailable"),
+            ["email-id-1"],
+        ]
+
+        failed = notify_members_prediction_published(self.prediction)
+        retried = notify_members_prediction_published(self.prediction)
+        notification = PredictionPublicationNotification.objects.get()
+
+        self.assertEqual(failed.failed, 1)
+        self.assertEqual(retried.sent, 1)
+        self.assertEqual(notification.status, notification.Status.SENT)
+        self.assertEqual(notification.attempt_count, 2)
+        self.assertEqual(notification.last_error, "")
+        self.assertEqual(notification.provider_id, "email-id-1")
+
+    def test_unpublished_prediction_is_rejected(self):
+        self.prediction.status = Prediction.Status.DRAFT
+        self.prediction.is_published = False
+        self.prediction.save(update_fields=["status", "is_published"])
+
+        with self.assertRaisesMessage(
+            ValueError,
+            "Member notifications can only be sent for a published prediction.",
+        ):
+            notify_members_prediction_published(self.prediction)
