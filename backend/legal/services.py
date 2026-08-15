@@ -1,8 +1,17 @@
-from django.utils import timezone
+from collections.abc import Callable
+from dataclasses import dataclass
 
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.utils import timezone
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
+
+from common.email import EmailSendError, send_batch_emails
 from common.utils import get_client_ip
 
-from .models import MarketingConsent, PolicyDocument, UserPolicyAcceptance
+from .models import MarketingConsent, MarketingEmailSend, PolicyDocument, UserPolicyAcceptance
+from .tokens import unsubscribe_token
 
 
 class PolicyNotConfigured(Exception):
@@ -79,3 +88,126 @@ def record_registration_consent(
         record_acceptance(user=user, policy_type=PolicyDocument.PolicyType.DISCLAIMER, source=UserPolicyAcceptance.Source.WEB_SIGNUP, request=request)
 
     record_marketing_consent(user=user, opted_in=marketing_consent, source="web_signup", request=request)
+
+
+def build_unsubscribe_url(user) -> str:
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = unsubscribe_token.make_token(user)
+    return f"{settings.FRONTEND_URL}/unsubscribe?uid={uid}&token={token}"
+
+
+def marketing_campaign_recipients():
+    """Active users who have explicitly opted into marketing communications."""
+    return (
+        get_user_model()
+        .objects.filter(
+            marketing_consent__status=MarketingConsent.Status.OPTED_IN,
+            is_active=True,
+        )
+        .exclude(email="")
+        .order_by("pk")
+        .distinct()
+    )
+
+
+@dataclass(frozen=True)
+class MarketingCampaignResult:
+    total_recipients: int = 0
+    sent: int = 0
+    failed: int = 0
+    already_sent: int = 0
+
+
+def send_marketing_campaign_email(
+    *,
+    campaign: str,
+    subject: str,
+    build_email: Callable[[str], tuple[str, str]],
+) -> MarketingCampaignResult:
+    """Send a one-off marketing email to every opted-in recipient, tracked
+    per (campaign, user) so a re-run after a partial failure only retries
+    what didn't already succeed. `build_email` receives that recipient's
+    personalized unsubscribe URL and must return (html, text)."""
+
+    total_recipients = 0
+    sent = 0
+    failed = 0
+    already_sent = 0
+
+    pending = []
+
+    for user in marketing_campaign_recipients().iterator():
+        total_recipients += 1
+        notification, _ = MarketingEmailSend.objects.get_or_create(
+            campaign=campaign,
+            user=user,
+            defaults={"email": user.email},
+        )
+
+        if notification.status == MarketingEmailSend.Status.SENT:
+            already_sent += 1
+            continue
+
+        notification.email = user.email
+        notification.attempt_count += 1
+        notification.last_error = ""
+        notification.save(
+            update_fields=["email", "attempt_count", "last_error", "updated_at"]
+        )
+
+        pending.append((notification, user))
+
+    for batch_number, start in enumerate(range(0, len(pending), 100), start=1):
+        batch = pending[start : start + 100]
+        emails = []
+        for notification, user in batch:
+            html, text = build_email(build_unsubscribe_url(user))
+            emails.append(
+                {
+                    "from": settings.DEFAULT_FROM_EMAIL,
+                    "to": [notification.email],
+                    "subject": subject,
+                    "html": html,
+                    "text": text,
+                }
+            )
+        idempotency_key = (
+            f"{campaign}-batch-{batch_number}-"
+            f"{batch[0][0].user_id}-{batch[-1][0].user_id}"
+        )
+
+        try:
+            provider_ids = send_batch_emails(
+                emails=emails,
+                idempotency_key=idempotency_key,
+            )
+        except EmailSendError as exc:
+            for notification, _user in batch:
+                notification.status = MarketingEmailSend.Status.FAILED
+                notification.last_error = str(exc)[:255]
+                notification.updated_at = timezone.now()
+            MarketingEmailSend.objects.bulk_update(
+                [notification for notification, _user in batch],
+                ["status", "last_error", "updated_at"],
+            )
+            failed += len(batch)
+            continue
+
+        sent_at = timezone.now()
+        for (notification, _user), provider_id in zip(batch, provider_ids):
+            notification.status = MarketingEmailSend.Status.SENT
+            notification.provider_id = provider_id
+            notification.sent_at = sent_at
+            notification.updated_at = sent_at
+        MarketingEmailSend.objects.bulk_update(
+            [notification for notification, _user in batch],
+            ["status", "provider_id", "sent_at", "updated_at"],
+        )
+        sent += len(batch)
+
+    return MarketingCampaignResult(
+        total_recipients=total_recipients,
+        sent=sent,
+        failed=failed,
+        already_sent=already_sent,
+    )

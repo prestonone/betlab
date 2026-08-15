@@ -1,6 +1,9 @@
 import logging
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.utils.encoding import force_str
+from django.utils.http import urlsafe_base64_decode
 from rest_framework import status
 from rest_framework.generics import ListAPIView
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -17,10 +20,22 @@ from .serializers import (
     MarketingConsentUpdateSerializer,
     MyPolicyAcceptanceSerializer,
     PolicyDocumentSerializer,
+    UnsubscribeConfirmSerializer,
 )
 from .services import record_marketing_consent
+from .tokens import unsubscribe_token
 
 logger = logging.getLogger(__name__)
+
+User = get_user_model()
+
+
+def _user_from_uid(uid: str):
+    try:
+        pk = force_str(urlsafe_base64_decode(uid))
+        return User.objects.get(pk=pk)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        return None
 
 
 class PolicyChangeLogView(ListAPIView):
@@ -108,3 +123,36 @@ class MarketingConsentUpdateView(APIView):
             data=MarketingConsentSerializer(consent).data,
             message="Marketing preference updated.",
         )
+
+
+class UnsubscribeConfirmView(APIView):
+    """Public, token-authenticated unsubscribe action. Deliberately POST-only
+    (no state change on GET): some email clients and corporate link
+    scanners prefetch GET links inside emails before a human clicks them,
+    which would silently unsubscribe people who never clicked anything.
+    The frontend /unsubscribe page GETs to show a confirmation screen, then
+    POSTs here to actually record the opt-out."""
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = UnsubscribeConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        user = _user_from_uid(serializer.validated_data["uid"])
+        token = serializer.validated_data["token"]
+
+        if user is None or not unsubscribe_token.check_token(user, token):
+            return error_response(
+                message="This unsubscribe link is invalid or has expired.",
+                status_code=status.HTTP_400_BAD_REQUEST,
+            )
+
+        record_marketing_consent(
+            user=user,
+            opted_in=False,
+            source="email_unsubscribe",
+            request=request,
+        )
+
+        return success_response(message="You've been unsubscribed from Bet Lab marketing emails.")

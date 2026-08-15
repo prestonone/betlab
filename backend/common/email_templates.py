@@ -26,7 +26,19 @@ def _button(label: str, url: str) -> str:
     """
 
 
-def _base_email(*, preheader: str, body_html: str) -> str:
+def _base_email(*, preheader: str, body_html: str, unsubscribe_url: str | None = None) -> str:
+    unsubscribe_row = ""
+    if unsubscribe_url:
+        unsubscribe_row = f"""
+            <tr>
+              <td style="padding:14px 32px 22px;text-align:center;">
+                <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.6;color:{FAINT};">
+                  You're receiving this because you opted in to Bet Lab marketing emails.
+                  <a href="{unsubscribe_url}" style="color:{GOLD};">Unsubscribe</a>
+                </p>
+              </td>
+            </tr>
+            """
     return f"""<!doctype html>
 <html lang="en">
   <head>
@@ -69,6 +81,7 @@ def _base_email(*, preheader: str, body_html: str) -> str:
                 </p>
               </td>
             </tr>
+            {unsubscribe_row}
           </table>
         </td>
       </tr>
@@ -157,5 +170,40 @@ def prediction_published_email(prediction) -> tuple[str, str]:
         f"{prediction.title} ({prediction.category.name}) has been published.\n"
         f"Sign in to view it: {dashboard_url}\n\n"
         "This service provides analysis, not guaranteed outcomes. Please use it responsibly."
+    )
+    return html, text
+
+
+NEW_SEASON_EMAIL_SUBJECT = "The new season starts now — and so do we"
+
+
+def new_season_email(*, unsubscribe_url: str) -> tuple[str, str]:
+    dashboard_url = f"{settings.FRONTEND_URL}/dashboard"
+    body = f"""
+    <p style="margin:0 0 6px;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:bold;
+      letter-spacing:2px;text-transform:uppercase;color:{GOLD};">New Season</p>
+    <h1 style="margin:0 0 16px;font-family:Arial,Helvetica,sans-serif;font-size:24px;color:#ffffff;">
+      A new season. A better Bet Lab.</h1>
+    <p style="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.6;color:{MUTED};">
+      Football's back &mdash; and we're treating it as a reset. This season we're tightening our process,
+      sharpening our models, and holding every prediction we publish to a higher standard.
+      You'll see the difference starting now.</p>
+    {_button("See what's new", dashboard_url)}
+    <p style="margin:8px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.6;color:{FAINT};">
+      This service provides analysis, not guaranteed outcomes. Please use it responsibly.</p>
+    """
+    html = _base_email(
+        preheader="New season. Sharper predictions. Here's what's changing at Bet Lab.",
+        body_html=body,
+        unsubscribe_url=unsubscribe_url,
+    )
+    text = (
+        "A new season. A better Bet Lab.\n\n"
+        "Football's back - and we're treating it as a reset. This season we're tightening our process, "
+        "sharpening our models, and holding every prediction we publish to a higher standard. "
+        "You'll see the difference starting now.\n\n"
+        f"See what's new: {dashboard_url}\n\n"
+        "This service provides analysis, not guaranteed outcomes. Please use it responsibly.\n\n"
+        f"Unsubscribe: {unsubscribe_url}"
     )
     return html, text

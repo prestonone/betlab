@@ -8,7 +8,7 @@ export type Page =
   | "home" | "pricing" | "login" | "register"
   | "dashboard" | "predictions" | "results"
   | "about" | "contact"
-  | "reset-password" | "verify-email"
+  | "reset-password" | "verify-email" | "unsubscribe"
   | "legal";
 
 export type DashSection = "overview" | "results" | "performance" | "legal";

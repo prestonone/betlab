@@ -48,3 +48,8 @@ class MarketingConsentSerializer(serializers.ModelSerializer):
 
 class MarketingConsentUpdateSerializer(serializers.Serializer):
     opted_in = serializers.BooleanField()
+
+
+class UnsubscribeConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()

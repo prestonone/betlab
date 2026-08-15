@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import MarketingConsent, PolicyDocument, UserPolicyAcceptance
+from .models import MarketingConsent, MarketingEmailSend, PolicyDocument, UserPolicyAcceptance
 
 
 @admin.register(PolicyDocument)
@@ -38,3 +38,32 @@ class MarketingConsentAdmin(admin.ModelAdmin):
     list_filter = ("status", "source")
     search_fields = ("user__email", "user__username")
     readonly_fields = ("consented_at", "withdrawn_at", "ip_address", "user_agent", "created_at", "updated_at")
+
+
+@admin.register(MarketingEmailSend)
+class MarketingEmailSendAdmin(admin.ModelAdmin):
+    list_display = ("campaign", "email", "status", "attempt_count", "sent_at", "updated_at")
+    list_filter = ("campaign", "status")
+    search_fields = ("user__email", "email")
+    date_hierarchy = "sent_at"
+    readonly_fields = (
+        "campaign",
+        "user",
+        "email",
+        "status",
+        "attempt_count",
+        "provider_id",
+        "last_error",
+        "sent_at",
+        "created_at",
+        "updated_at",
+    )
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser

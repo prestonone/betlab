@@ -156,3 +156,49 @@ class MarketingConsent(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user}: {self.status}"
+
+
+class MarketingEmailSend(models.Model):
+    """Per-recipient, per-campaign delivery tracking for one-off marketing
+    email sends. Keyed on (campaign, user) instead of a FK to a specific
+    source object, since a marketing blast doesn't have one. Mirrors
+    predictions.PredictionPublicationNotification's shape so batch sends
+    stay idempotent and resumable: skip anything already SENT, retry
+    PENDING/FAILED rows on a re-run."""
+
+    class Status(models.TextChoices):
+        PENDING = "pending", "Pending"
+        SENT = "sent", "Sent"
+        FAILED = "failed", "Failed"
+
+    campaign = models.CharField(max_length=64, db_index=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="marketing_email_sends",
+    )
+    email = models.EmailField()
+    status = models.CharField(
+        max_length=10,
+        choices=Status.choices,
+        default=Status.PENDING,
+        db_index=True,
+    )
+    attempt_count = models.PositiveIntegerField(default=0)
+    provider_id = models.CharField(max_length=100, blank=True)
+    last_error = models.CharField(max_length=255, blank=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["campaign", "user"],
+                name="unique_marketing_email_send",
+            ),
+        ]
+
+    def __str__(self) -> str:
+        return f"{self.campaign} — {self.email} — {self.status}"

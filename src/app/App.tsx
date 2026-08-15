@@ -17,6 +17,7 @@ import PredictionsMarketingPage from "../pages/PredictionsMarketingPage";
 import PricingPage from "../pages/PricingPage";
 import ResetPasswordPage from "../pages/ResetPasswordPage";
 import ResultsPage from "../pages/ResultsPage";
+import UnsubscribePage from "../pages/UnsubscribePage";
 import VerifyEmailPage from "../pages/VerifyEmailPage";
 import LegalRouter from "../pages/legal/LegalRouter";
 import { cn, type Page } from "./shared";
@@ -34,6 +35,7 @@ const PATH_FOR: Record<Page, string> = {
   "contact": "/contact",
   "reset-password": "/reset-password",
   "verify-email": "/verify-email",
+  "unsubscribe": "/unsubscribe",
   "legal": "/legal",
 };
 
@@ -58,6 +60,7 @@ const TITLE_FOR: Record<Page, string> = {
   "contact": "Contact | Bet Lab",
   "reset-password": "Reset Password | Bet Lab",
   "verify-email": "Verify Email | Bet Lab",
+  "unsubscribe": "Unsubscribe | Bet Lab",
   "legal": "Legal Centre | Bet Lab",
 };
 
@@ -127,6 +130,7 @@ export default function App() {
         {page === "contact" && <ContactPage />}
         {page === "reset-password" && <ResetPasswordPage nav={nav} />}
         {page === "verify-email" && <VerifyEmailPage nav={nav} />}
+        {page === "unsubscribe" && <UnsubscribePage nav={nav} />}
         {page === "legal" && <LegalRouter />}
       </div>
 

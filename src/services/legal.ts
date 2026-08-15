@@ -68,3 +68,11 @@ export async function updateMarketingConsent(optedIn: boolean): Promise<Marketin
   );
   return response.data;
 }
+
+export async function confirmUnsubscribe(payload: { uid: string; token: string }): Promise<string> {
+  const response = await apiRequest<ApiEnvelope<null>>("/api/v1/legal/unsubscribe/", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return response.message;
+}

@@ -5,6 +5,7 @@ import AnimatedLogoMark from "../AnimatedLogoMark";
 import { useAuth } from "../../contexts/AuthContext";
 import { useCurrentSubscription } from "../../hooks/useCurrentSubscription";
 import { getPredictions, type Prediction as ApiPrediction } from "../../services/predictions";
+import { getActiveAnnouncement, type Announcement } from "../../services/announcements";
 
 function timeAgo(date: Date): string {
   const mins = Math.floor((Date.now() - date.getTime()) / 60000);
@@ -38,11 +39,13 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
   const planLabel = hasSubscription && subscription ? subscription.plan_name : "No active plan";
 
   const [predictions, setPredictions] = useState<ApiPrediction[]>([]);
+  const [announcement, setAnnouncement] = useState<Announcement | null>(null);
 
   useEffect(() => {
     if (!authed) return;
     let active = true;
     getPredictions().then(data => { if (active) setPredictions(data); }).catch(() => {});
+    getActiveAnnouncement().then(data => { if (active) setAnnouncement(data); }).catch(() => {});
     return () => { active = false; };
   }, [authed]);
 
@@ -61,6 +64,10 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
       });
     }
 
+    if (announcement) {
+      items.push({ icon: "📣", text: announcement.title, at: null });
+    }
+
     const liveToday = predictions.filter(p => p.result_status === "pending").length;
     if (liveToday > 0) {
       items.push({ icon: "📊", text: `${liveToday} prediction${liveToday === 1 ? "" : "s"} live right now`, at: null });
@@ -76,9 +83,9 @@ export default function Navbar({ page, nav, authed, setAuthed }: {
       .map(item => ({
         ...item,
         time: item.at ? timeAgo(item.at) : "",
-        unread: item.at ? Date.now() - item.at.getTime() < 24 * 60 * 60 * 1000 : false,
+        unread: item.at ? Date.now() - item.at.getTime() < 24 * 60 * 60 * 1000 : !!announcement && item.text === announcement.title,
       }));
-  }, [predictions, hasSubscription, subscription]);
+  }, [predictions, hasSubscription, subscription, announcement]);
 
   const unread = notifications.filter(n => n.unread).length;
 

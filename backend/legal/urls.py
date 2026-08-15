@@ -5,6 +5,7 @@ from .views import (
     MarketingConsentUpdateView,
     MyPolicyAcceptanceView,
     PolicyChangeLogView,
+    UnsubscribeConfirmView,
 )
 
 app_name = "legal"
@@ -14,4 +15,5 @@ urlpatterns = [
     path("contact/", LegalContactView.as_view(), name="contact"),
     path("my-consent/", MyPolicyAcceptanceView.as_view(), name="my-consent"),
     path("marketing-consent/", MarketingConsentUpdateView.as_view(), name="marketing-consent"),
+    path("unsubscribe/", UnsubscribeConfirmView.as_view(), name="unsubscribe"),
 ]

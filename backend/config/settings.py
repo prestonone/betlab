@@ -67,6 +67,7 @@ INSTALLED_APPS = [
     "payments",
     "legal",
     "dashboard",
+    "announcements",
     "corsheaders",
 ]
 
