@@ -4,6 +4,7 @@ from accounts.models import User
 from common.email import EmailSendError, send_email
 from common.email_templates import NEW_SEASON_EMAIL_SUBJECT, new_season_email
 from legal.services import (
+    all_registered_recipients,
     build_unsubscribe_url,
     marketing_campaign_recipients,
     send_marketing_campaign_email,
@@ -41,17 +42,30 @@ class Command(BaseCommand):
             action="store_true",
             help="Skip the interactive headcount confirmation for --send (non-interactive use only).",
         )
+        parser.add_argument(
+            "--all-registered-users",
+            action="store_true",
+            help=(
+                "Override the opted-in-only default and target every active "
+                "registered user regardless of MarketingConsent status. "
+                "This bypasses the app's own consent gate - only use with "
+                "explicit, informed approval, since it carries real "
+                "CAN-SPAM/GDPR compliance risk."
+            ),
+        )
 
     def handle(self, *args, **options):
+        recipients = all_registered_recipients() if options["all_registered_users"] else marketing_campaign_recipients()
+
         if options["dry_run"]:
-            self._dry_run()
+            self._dry_run(recipients)
         elif options["test_send"]:
             self._test_send(options["test_send"])
         elif options["send"]:
-            self._send(skip_confirmation=options["yes"])
+            self._send(recipients, skip_confirmation=options["yes"], all_registered=options["all_registered_users"])
 
-    def _dry_run(self):
-        recipients = list(marketing_campaign_recipients())
+    def _dry_run(self, recipients):
+        recipients = list(recipients)
         self.stdout.write(f"Would send campaign '{CAMPAIGN_KEY}' to {len(recipients)} recipient(s).")
         for user in recipients[:10]:
             self.stdout.write(f"  - {user.email}")
@@ -76,14 +90,17 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"Test email sent to {user.email}."))
         self.stdout.write(f"Unsubscribe URL: {unsubscribe_url}")
 
-    def _send(self, *, skip_confirmation: bool):
-        count = marketing_campaign_recipients().count()
+    def _send(self, recipients, *, skip_confirmation: bool, all_registered: bool):
+        count = recipients.count()
 
         if count == 0:
-            self.stdout.write(self.style.WARNING("No opted-in recipients. Nothing to send."))
+            self.stdout.write(self.style.WARNING("No recipients. Nothing to send."))
             return
 
-        self.stdout.write(f"About to send campaign '{CAMPAIGN_KEY}' to {count} opted-in recipient(s).")
+        audience = "ALL REGISTERED users (consent bypassed)" if all_registered else "opted-in recipient(s)"
+        self.stdout.write(f"About to send campaign '{CAMPAIGN_KEY}' to {count} {audience}.")
+        if all_registered:
+            self.stdout.write(self.style.WARNING("--all-registered-users is set: this ignores MarketingConsent status."))
 
         if not skip_confirmation:
             typed = input(f"Type {count} to confirm this headcount and proceed: ").strip()
@@ -95,6 +112,7 @@ class Command(BaseCommand):
             campaign=CAMPAIGN_KEY,
             subject=NEW_SEASON_EMAIL_SUBJECT,
             build_email=lambda unsubscribe_url: new_season_email(unsubscribe_url=unsubscribe_url),
+            recipients=recipients,
         )
 
         summary = (

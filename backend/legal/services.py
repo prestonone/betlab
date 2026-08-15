@@ -110,6 +110,20 @@ def marketing_campaign_recipients():
     )
 
 
+def all_registered_recipients():
+    """Every active registered user, regardless of marketing consent status.
+    Only for explicit, knowingly-approved overrides of the opted-in-only
+    default in marketing_campaign_recipients() - callers are responsible for
+    the compliance implications of bypassing consent."""
+    return (
+        get_user_model()
+        .objects.filter(is_active=True)
+        .exclude(email="")
+        .order_by("pk")
+        .distinct()
+    )
+
+
 @dataclass(frozen=True)
 class MarketingCampaignResult:
     total_recipients: int = 0
@@ -123,11 +137,17 @@ def send_marketing_campaign_email(
     campaign: str,
     subject: str,
     build_email: Callable[[str], tuple[str, str]],
+    recipients=None,
 ) -> MarketingCampaignResult:
-    """Send a one-off marketing email to every opted-in recipient, tracked
-    per (campaign, user) so a re-run after a partial failure only retries
-    what didn't already succeed. `build_email` receives that recipient's
-    personalized unsubscribe URL and must return (html, text)."""
+    """Send a one-off marketing email to `recipients` (defaults to
+    marketing_campaign_recipients(), i.e. opted-in only), tracked per
+    (campaign, user) so a re-run after a partial failure - or a re-run
+    against a wider recipient set - only sends to whoever hasn't already
+    succeeded. `build_email` receives that recipient's personalized
+    unsubscribe URL and must return (html, text)."""
+
+    if recipients is None:
+        recipients = marketing_campaign_recipients()
 
     total_recipients = 0
     sent = 0
@@ -136,7 +156,7 @@ def send_marketing_campaign_email(
 
     pending = []
 
-    for user in marketing_campaign_recipients().iterator():
+    for user in recipients.iterator():
         total_recipients += 1
         notification, _ = MarketingEmailSend.objects.get_or_create(
             campaign=campaign,
