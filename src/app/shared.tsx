@@ -12,7 +12,7 @@ export type Page =
   | "legal";
 
 export type DashSection = "overview" | "results" | "performance" | "legal";
-export type PredCategory = "Banker" | "Sure 2" | "Sure 3" | "Sure 5" | "Rollover";
+export type PredCategory = "Banker" | "Sure 2" | "Sure 3" | "Rollover";
 export type PredStatus = "pending" | "won" | "lost" | "void";
 
 export interface Prediction {
@@ -65,7 +65,7 @@ export const PREDICTIONS: Prediction[] = [
     id: 3, league: "La Liga", leagueCode: "LAL",
     home: "Real Madrid", away: "Atletico Madrid", kickoff: "2026-07-19T20:45:00Z",
     prediction: "Under 2.5 Goals", odds: 1.95, confidence: 71,
-    category: "Sure 5", analyst: "Bet Lab Research Desk",
+    category: "Sure 3", analyst: "Bet Lab Research Desk",
     analysis: "Madrid derbies average 1.8 goals across the last 6 seasons. Both sides employ organised defensive blocks in high-stakes fixtures. Low xG profile expected. Historical patterns strongly support the Under market.",
     status: "pending",
   },
@@ -229,7 +229,6 @@ const MOCK_CATEGORY_COLOR: Record<PredCategory, CategoryColor> = {
   "Banker": "gold",
   "Sure 2": "emerald",
   "Sure 3": "violet",
-  "Sure 5": "blue",
   "Rollover": "rose",
 };
 
@@ -263,7 +262,6 @@ export function PredCard({ pred, locked = false }: { pred: Prediction; locked?: 
     "Banker": "from-[#D4AF37] via-[#D4AF37]/50 to-transparent",
     "Sure 2": "from-emerald-500 via-emerald-500/50 to-transparent",
     "Sure 3": "from-violet-500 via-violet-500/50 to-transparent",
-    "Sure 5": "from-blue-400 via-blue-400/50 to-transparent",
     "Rollover": "from-rose-500 via-rose-500/50 to-transparent",
   };
   const leagueHue: Record<string, string> = {

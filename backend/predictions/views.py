@@ -1,6 +1,7 @@
+from django.db.models import Q
 from rest_framework import viewsets
 
-from subscriptions.services import has_active_membership
+from subscriptions.services import get_current_subscription, has_active_membership
 
 from .models import Prediction, PredictionCategory
 from .serializers import (
@@ -72,6 +73,13 @@ class PredictionViewSet(viewsets.ReadOnlyModelViewSet):
             queryset = queryset.filter(
                 access_level=Prediction.AccessLevel.FREE
             )
+        else:
+            current_subscription = get_current_subscription(self.request.user)
+            current_plan_id = current_subscription.plan_id if current_subscription else None
+            queryset = queryset.filter(
+                Q(category__restricted_plans__isnull=True)
+                | Q(category__restricted_plans__id=current_plan_id)
+            ).distinct()
 
         return queryset.order_by(
             "-published_at",

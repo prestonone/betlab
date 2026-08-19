@@ -23,6 +23,17 @@ class PredictionCategory(models.Model):
     is_active = models.BooleanField(default=True)
     display_order = models.PositiveIntegerField(default=0)
 
+    restricted_plans = models.ManyToManyField(
+        "subscriptions.Plan",
+        blank=True,
+        related_name="unlocked_categories",
+        help_text=(
+            "If set, only members on one of these plans can see predictions "
+            "in this category. Leave empty for no restriction (every Lab "
+            "member can see it, same as before)."
+        ),
+    )
+
     class Meta:
         ordering = ["display_order", "name"]
         verbose_name_plural = "Prediction categories"

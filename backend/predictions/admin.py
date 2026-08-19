@@ -98,6 +98,7 @@ class PredictionCategoryAdmin(admin.ModelAdmin):
     list_filter = ("is_active", "color")
     search_fields = ("name", "description")
     prepopulated_fields = {"slug": ("name",)}
+    filter_horizontal = ("restricted_plans",)
     ordering = ("display_order", "name")
 
     def get_queryset(self, request):

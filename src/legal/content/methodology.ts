@@ -23,7 +23,7 @@ export const methodology: LegalDocument = {
       heading: "2. Categories",
       blocks: [
         { type: "paragraphs", items: [
-          "Predictions are organised into categories (for example Banker, Sure 2, Sure 3, Sure 5, and Rollover) reflecting the analyst's own relative assessment of a selection, not a statistically computed probability. A category label describes how the pick has been framed by the analyst, not a guarantee of any kind.",
+          "Predictions are organised into categories (for example Banker, Sure 2, Sure 3, and Rollover) reflecting the analyst's own relative assessment of a selection, not a statistically computed probability. A category label describes how the pick has been framed by the analyst, not a guarantee of any kind.",
         ] },
       ],
     },

@@ -2,7 +2,7 @@ import { ArrowRight, Lock } from "lucide-react";
 import { Page, PREDICTIONS, cn, GoldBtn, SectionEyebrow, PredCard } from "../app/shared";
 
 export default function PredictionsMarketingPage({ nav }: { nav: (p: Page) => void }) {
-  const cats = ["all", "Banker", "Sure 2", "Sure 3", "Sure 5", "Rollover"];
+  const cats = ["all", "Banker", "Sure 2", "Sure 3", "Rollover"];
 
   return (
     <div className="pt-[60px]">

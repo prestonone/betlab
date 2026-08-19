@@ -88,7 +88,7 @@ export default function HomePage({ nav, authed }: { nav: (p: Page) => void; auth
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-0 border border-[#D4AF37]/12 rounded-lg overflow-hidden">
                   {[
                     { v: wins.toLocaleString(), label: "Picks Today", sub: "Updated daily" },
-                    { v: "4", label: "Core Categories", sub: "Banker · Sure 2 · Sure 5 · Rollover" },
+                    { v: "4", label: "Core Categories", sub: "Banker · Sure 2 · Sure 3 · Rollover" },
                     { v: members.toLocaleString(), label: "Access Plans", sub: "Daily · Weekly · Monthly" },
                     { v: "100%", label: "Results Logged", sub: "Wins and losses remain visible" },
                   ].map((s, i) => (

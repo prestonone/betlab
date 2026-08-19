@@ -16,7 +16,7 @@ const PLAN_MARKETING: Record<string, { period: string; inc: string[]; exc: strin
   },
   "weekly-lab": {
     period: "/week",
-    inc: ["All prediction categories", "Daily analysis notes", "Sure 2 and Sure 5", "Rollover updates", "Complete results log"],
+    inc: ["All prediction categories", "Daily analysis notes", "Sure 2 and Sure 3", "Rollover updates", "Complete results log"],
     exc: ["Monthly performance dashboard"],
     highlight: true,
   },
