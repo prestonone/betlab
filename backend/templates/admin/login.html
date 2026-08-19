@@ -5,14 +5,15 @@
 {% block extrastyle %}{{ block.super }}<link rel="stylesheet" href="{% static "admin/css/login.css" %}">
 {{ form.media }}
 <style>
-  .password-row { position: relative; }
-  .password-row input[type="password"],
-  .password-row input[type="text"] { padding-right: 34px; }
+  .password-input-wrap { position: relative; display: block; }
+  .password-input-wrap input[type="password"],
+  .password-input-wrap input[type="text"] { padding-right: 34px; }
   .password-toggle {
     position: absolute;
     right: 6px;
     top: 50%;
     transform: translateY(-50%);
+    display: flex;
     background: none;
     border: none;
     cursor: pointer;
@@ -77,13 +78,16 @@
   </div>
   <div class="form-row password-row">
     {{ form.password.errors }}
-    {{ form.password.label_tag }} {{ form.password }}
-    <button type="button" class="password-toggle" id="password-toggle" aria-label="Show password">
-      <svg id="password-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path>
-        <circle cx="12" cy="12" r="3"></circle>
-      </svg>
-    </button>
+    {{ form.password.label_tag }}
+    <div class="password-input-wrap">
+      {{ form.password }}
+      <button type="button" class="password-toggle" id="password-toggle" aria-label="Show password">
+        <svg id="password-toggle-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8Z"></path>
+          <circle cx="12" cy="12" r="3"></circle>
+        </svg>
+      </button>
+    </div>
     <input type="hidden" name="next" value="{{ next }}">
   </div>
   <div class="form-row remember-me-row">
